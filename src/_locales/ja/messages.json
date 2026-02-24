@@ -1,567 +1,567 @@
 {
   "actionCopyBookmarkUrl": {
-    "message": "Copy bookmark URL"
+    "message": "ブックマークURLをコピー"
   },
   "actionDefault": {
-    "message": "Action"
+    "message": "操作"
   },
   "actionDeleteBookmark": {
-    "message": "Delete bookmark"
+    "message": "ブックマークを削除"
   },
   "actionEditBookmark": {
-    "message": "Edit bookmark"
+    "message": "ブックマークを編集"
   },
   "actionRefreshFavicon": {
-    "message": "Refresh favicon"
+    "message": "ファビコンを更新"
   },
   "addBookmark": {
-    "message": "Add bookmark"
+    "message": "ブックマークを追加"
   },
   "addBookmarkTitle": {
-    "message": "Add bookmark"
+    "message": "ブックマークを追加"
   },
   "addFolder": {
-    "message": "Add folder"
+    "message": "フォルダを追加"
   },
   "addFolderTitle": {
-    "message": "Add folder"
+    "message": "フォルダを追加"
   },
   "appVersionTooltip": {
-    "message": "Extension version"
+    "message": "拡張機能バージョン"
   },
   "appVersionTooltipWithValue": {
-    "message": "Extension version: $1"
+    "message": "拡張機能バージョン: $1"
   },
   "bookmarkActionsAria": {
-    "message": "Bookmark actions"
+    "message": "ブックマーク操作"
   },
   "bookmarkCreated": {
-    "message": "Bookmark created."
+    "message": "ブックマークを作成しました。"
   },
   "bookmarkDeleted": {
-    "message": "Bookmark deleted."
+    "message": "ブックマークを削除しました。"
   },
   "bookmarkPanelAria": {
-    "message": "Bookmarks"
+    "message": "ブックマーク"
   },
   "bookmarkRootNotFound": {
-    "message": "Browser bookmark root folder not found."
+    "message": "ブラウザのブックマークルートフォルダが見つかりません。"
   },
   "bookmarkTitle": {
-    "message": "Bookmark title"
+    "message": "ブックマークタイトル"
   },
   "bookmarkUpdated": {
-    "message": "Bookmark updated."
+    "message": "ブックマークを更新しました。"
   },
   "bookmarkUrlCopied": {
-    "message": "Bookmark URL copied."
+    "message": "ブックマークURLをコピーしました。"
   },
   "bookmarksPageTitle": {
     "message": "Yet Another Bookmark Manager"
   },
   "browserEntries": {
-    "message": "Browser entries: $1"
+    "message": "ブラウザ項目数: $1"
   },
   "browserEntriesDash": {
-    "message": "Browser entries: -"
+    "message": "ブラウザ項目数: -"
   },
   "browserEntriesError": {
-    "message": "Browser entries: Error"
+    "message": "ブラウザ項目数: エラー"
   },
   "browserEntriesRefreshing": {
-    "message": "Browser entries: Refreshing..."
+    "message": "ブラウザ項目数: 更新中..."
   },
   "btnConfiguration": {
-    "message": "Configuration"
+    "message": "設定"
   },
   "btnDownload": {
-    "message": "Download"
+    "message": "ダウンロード"
   },
   "btnUpload": {
-    "message": "Upload"
+    "message": "アップロード"
   },
   "cancel": {
-    "message": "Cancel"
+    "message": "キャンセル"
   },
   "cannotDropFolder": {
-    "message": "Cannot drop into this folder."
+    "message": "このフォルダにはドロップできません。"
   },
   "chooseExistingOrCreate": {
-    "message": "Choose an existing file or create a new export file."
+    "message": "既存ファイルを選択するか、新しいエクスポートファイルを作成してください。"
   },
   "clear": {
-    "message": "Clear"
+    "message": "クリア"
   },
   "clearConfig": {
-    "message": "Clear config"
+    "message": "設定をクリア"
   },
   "clearConfigurationMessage": {
-    "message": "Remove the current WebDAV configuration?"
+    "message": "現在のWebDAV設定を削除しますか?"
   },
   "clearConfigurationTitle": {
-    "message": "Clear configuration"
+    "message": "設定をクリア"
   },
   "clearFailed": {
-    "message": "Clear failed: $1"
+    "message": "クリアに失敗しました: $1"
   },
   "close": {
-    "message": "Close"
+    "message": "閉じる"
   },
   "collapseAllFolders": {
-    "message": "Collapse all folders"
+    "message": "すべてのフォルダを折りたたむ"
   },
   "configurationCleared": {
-    "message": "Configuration cleared."
+    "message": "設定をクリアしました。"
   },
   "configurationSaved": {
-    "message": "Configuration saved."
+    "message": "設定を保存しました。"
   },
   "configureWebdavFirst": {
-    "message": "Please configure WebDAV first."
+    "message": "先にWebDAVを設定してください。"
   },
   "confirmDownloadMessage": {
-    "message": "Downloading will overwrite current browser bookmarks. Continue after confirming your backup?"
+    "message": "ダウンロードすると現在のブラウザブックマークが上書きされます。バックアップを確認してから続行しますか?"
   },
   "confirmDownloadTitle": {
-    "message": "Confirm download"
+    "message": "ダウンロードの確認"
   },
   "confirmUploadMessage": {
-    "message": "Upload current browser bookmarks to WebDAV. Continue?"
+    "message": "現在のブラウザブックマークをWebDAVにアップロードします。続行しますか?"
   },
   "confirmUploadTitle": {
-    "message": "Confirm upload"
+    "message": "アップロードの確認"
   },
   "connSuccessFoundFiles": {
-    "message": "Connection successful. Found $1 files."
+    "message": "接続に成功しました。$1 個のファイルが見つかりました。"
   },
   "connSuccessNoFiles": {
-    "message": "Connection successful. No files found."
+    "message": "接続に成功しました。ファイルは見つかりませんでした。"
   },
   "connectionFailed": {
-    "message": "Connection failed: $1"
+    "message": "接続に失敗しました: $1"
   },
   "connectionFailedHttp": {
-    "message": "Connection failed (HTTP $1)."
+    "message": "接続に失敗しました (HTTP $1)。"
   },
   "contextCopy": {
-    "message": "Copy"
+    "message": "コピー"
   },
   "contextCut": {
-    "message": "Cut"
+    "message": "切り取り"
   },
   "contextDelete": {
-    "message": "Delete"
+    "message": "削除"
   },
   "contextPaste": {
-    "message": "Paste"
+    "message": "貼り付け"
   },
   "contextSelectAll": {
-    "message": "Select all"
+    "message": "すべて選択"
   },
   "continue": {
-    "message": "Continue"
+    "message": "続行"
   },
   "continueDownload": {
-    "message": "Continue download"
+    "message": "ダウンロードを続行"
   },
   "copyBookmarkUrlFailed": {
-    "message": "Failed to copy bookmark URL: $1"
+    "message": "ブックマークURLのコピーに失敗しました: $1"
   },
   "copyBookmarkUrlFailedUnknown": {
-    "message": "Unknown copy error"
+    "message": "不明なコピーエラー"
   },
   "create": {
-    "message": "Create"
+    "message": "作成"
   },
   "createBookmarkFailed": {
-    "message": "Failed to create bookmark: $1"
+    "message": "ブックマークの作成に失敗しました: $1"
   },
   "createFolderFailed": {
-    "message": "Failed to create folder: $1"
+    "message": "フォルダの作成に失敗しました: $1"
   },
   "createNewFile": {
-    "message": "Create a new file"
+    "message": "新しいファイルを作成"
   },
   "delete": {
-    "message": "Delete"
+    "message": "削除"
   },
   "deleteAll": {
-    "message": "Delete all"
+    "message": "すべて削除"
   },
   "deleteBookmarkMessage": {
-    "message": "Delete bookmark \"$1\"?"
+    "message": "ブックマーク \"$1\" を削除しますか?"
   },
   "deleteBookmarkTitle": {
-    "message": "Delete bookmark"
+    "message": "ブックマークを削除"
   },
   "deleteFailed": {
-    "message": "Delete failed: $1"
+    "message": "削除に失敗しました: $1"
   },
   "deleteFolder": {
-    "message": "Delete folder"
+    "message": "フォルダを削除"
   },
   "deleteFolderMessage": {
-    "message": "Delete folder \"$1\"?"
+    "message": "フォルダ \"$1\" を削除しますか?"
   },
   "deleteFolderTitle": {
-    "message": "Delete folder"
+    "message": "フォルダを削除"
   },
   "directoryFiles": {
-    "message": "Directory files"
+    "message": "ディレクトリ内ファイル"
   },
   "downloadFailed": {
-    "message": "Download failed: $1"
+    "message": "ダウンロードに失敗しました: $1"
   },
   "downloadFailedHttp": {
-    "message": "Download failed (HTTP $1)."
+    "message": "ダウンロードに失敗しました (HTTP $1)。"
   },
   "downloadSuccessful": {
-    "message": "Download successful: $1"
+    "message": "ダウンロード成功: $1"
   },
   "downloadedFileInvalidBookmarks": {
-    "message": "Downloaded file is not valid bookmarks HTML."
+    "message": "ダウンロードしたファイルは有効なブックマークHTMLではありません。"
   },
   "downloadedFileNoEntries": {
-    "message": "Downloaded bookmarks file has no entries. Overwrite stopped to protect existing data."
+    "message": "ダウンロードしたブックマークファイルに項目がありません。既存データ保護のため上書きを中止しました。"
   },
   "downloadingBookmarks": {
-    "message": "Downloading bookmarks..."
+    "message": "ブックマークをダウンロード中..."
   },
   "dragSourceNotFound": {
-    "message": "Drag source not found."
+    "message": "ドラッグ元が見つかりません。"
   },
   "editActionsAria": {
-    "message": "Edit actions"
+    "message": "編集操作"
   },
   "editBookmarkTitle": {
-    "message": "Edit bookmark"
+    "message": "ブックマークを編集"
   },
   "editFolder": {
-    "message": "Edit folder"
+    "message": "フォルダを編集"
   },
   "editFolderTitle": {
-    "message": "Edit folder"
+    "message": "フォルダを編集"
   },
   "editorEdit": {
-    "message": "Edit"
+    "message": "編集"
   },
   "editorName": {
-    "message": "Name"
+    "message": "名前"
   },
   "editorNameRequired": {
-    "message": "Name is required."
+    "message": "名前は必須です。"
   },
   "editorUrl": {
     "message": "URL"
   },
   "editorUrlRequired": {
-    "message": "URL is required."
+    "message": "URLは必須です。"
   },
   "emptyFaviconData": {
-    "message": "Favicon data is empty."
+    "message": "ファビコンデータが空です。"
   },
   "emptyFolder": {
-    "message": "This folder is empty."
+    "message": "このフォルダは空です。"
   },
   "expandAllFolders": {
-    "message": "Expand all folders"
+    "message": "すべてのフォルダを展開"
   },
   "extDescription": {
-    "message": "Manage and sync bookmarks with optional WebDAV support."
+    "message": "任意のWebDAVサポートでブックマークを管理・同期します。"
   },
   "faviconFetchFailed": {
-    "message": "Failed to fetch favicon."
+    "message": "ファビコンの取得に失敗しました。"
   },
   "faviconUpdateFailed": {
-    "message": "Failed to update favicon: $1"
+    "message": "ファビコンの更新に失敗しました: $1"
   },
   "faviconUpdateFailedCount": {
-    "message": "Failed to update favicon ($1)."
+    "message": "ファビコンの更新に失敗しました ($1)。"
   },
   "faviconUpdateInProgress": {
-    "message": "Favicon update already in progress."
+    "message": "ファビコン更新はすでに進行中です。"
   },
   "faviconUpdated": {
-    "message": "Favicon updated."
+    "message": "ファビコンを更新しました。"
   },
   "faviconsUpdatedSuccess": {
-    "message": "Favicons updated: $1 succeeded."
+    "message": "ファビコンを更新しました: $1 件成功。"
   },
   "faviconsUpdatedSuccessFail": {
-    "message": "Favicons updated: $1 succeeded, $2 failed."
+    "message": "ファビコンを更新しました: $1 件成功、$2 件失敗。"
   },
   "fileNameEmpty": {
-    "message": "File name cannot be empty."
+    "message": "ファイル名は空にできません。"
   },
   "fileNameNoPathSeparators": {
-    "message": "File name cannot contain path separators."
+    "message": "ファイル名にパス区切り文字は使用できません。"
   },
   "filesInDirectory": {
-    "message": "Files in directory"
+    "message": "ディレクトリ内のファイル"
   },
   "folderBookmarkCount": {
-    "message": "$1 bookmarks"
+    "message": "$1 件のブックマーク"
   },
   "folderContainsBookmarksMessage": {
-    "message": "This folder contains $1 bookmarks. Delete the folder and all contents?"
+    "message": "このフォルダには $1 件のブックマークが含まれています。フォルダと中身をすべて削除しますか?"
   },
   "folderContainsBookmarksTitle": {
-    "message": "Folder contains bookmarks"
+    "message": "フォルダにブックマークがあります"
   },
   "folderCreated": {
-    "message": "Folder created."
+    "message": "フォルダを作成しました。"
   },
   "folderDeleted": {
-    "message": "Folder deleted."
+    "message": "フォルダを削除しました。"
   },
   "folderFolderCount": {
-    "message": "$1 folders"
+    "message": "$1 個のフォルダ"
   },
   "folderName": {
-    "message": "Folder name"
+    "message": "フォルダ名"
   },
   "folderNotFound": {
-    "message": "Folder not found."
+    "message": "フォルダが見つかりません。"
   },
   "folderSortedAsc": {
-    "message": "Folder sorted ascending."
+    "message": "フォルダを昇順で並べ替えました。"
   },
   "folderSortedDesc": {
-    "message": "Folder sorted descending."
+    "message": "フォルダを降順で並べ替えました。"
   },
   "folderUpdated": {
-    "message": "Folder updated."
+    "message": "フォルダを更新しました。"
   },
   "hostPermissionDenied": {
-    "message": "Host permission denied: $1"
+    "message": "ホスト権限が拒否されました: $1"
   },
   "hostPermissionRequired": {
-    "message": "Host permission is required: $1"
+    "message": "ホスト権限が必要です: $1"
   },
   "initializationFailed": {
-    "message": "Initialization failed: $1"
+    "message": "初期化に失敗しました: $1"
   },
   "invalidUrlFormat": {
-    "message": "Invalid URL format."
+    "message": "URLの形式が無効です。"
   },
   "languageCurrentTooltip": {
-    "message": "Language: $1"
+    "message": "言語: $1"
   },
   "loadBookmarksFailed": {
-    "message": "Failed to load bookmarks: $1"
+    "message": "ブックマークの読み込みに失敗しました: $1"
   },
   "menuAddBookmark": {
-    "message": "Add bookmark"
+    "message": "ブックマークを追加"
   },
   "menuAddFolder": {
-    "message": "Add folder"
+    "message": "フォルダを追加"
   },
   "menuCollapseFolder": {
-    "message": "Collapse folder"
+    "message": "フォルダを折りたたむ"
   },
   "menuCopyBookmarkUrl": {
-    "message": "Copy bookmark URL"
+    "message": "ブックマークURLをコピー"
   },
   "menuDeleteBookmark": {
-    "message": "Delete bookmark"
+    "message": "ブックマークを削除"
   },
   "menuDeleteFolder": {
-    "message": "Delete folder"
+    "message": "フォルダを削除"
   },
   "menuEditBookmark": {
-    "message": "Edit bookmark"
+    "message": "ブックマークを編集"
   },
   "menuEditFolder": {
-    "message": "Edit folder"
+    "message": "フォルダを編集"
   },
   "menuExpandFolder": {
-    "message": "Expand folder"
+    "message": "フォルダを展開"
   },
   "menuOpenBookmark": {
-    "message": "Open bookmark"
+    "message": "ブックマークを開く"
   },
   "menuRefreshFavicon": {
-    "message": "Refresh favicon"
+    "message": "ファビコンを更新"
   },
   "menuRefreshFolderFavicons": {
-    "message": "Refresh folder favicons"
+    "message": "フォルダのファビコンを更新"
   },
   "moveFailed": {
-    "message": "Move failed: $1"
+    "message": "移動に失敗しました: $1"
   },
   "movedSuccessfully": {
-    "message": "Moved successfully."
+    "message": "移動しました。"
   },
   "newFileNameLabel": {
-    "message": "New file name (default: bookmarks.html)"
+    "message": "新しいファイル名 (既定: bookmarks.html)"
   },
   "newFolderDefault": {
-    "message": "New folder"
+    "message": "新しいフォルダ"
   },
   "noBookmarkFoldersFound": {
-    "message": "No bookmark folders found."
+    "message": "ブックマークフォルダが見つかりません。"
   },
   "noBookmarksInFolder": {
-    "message": "No bookmarks in this folder."
+    "message": "このフォルダにはブックマークがありません。"
   },
   "noCanvasContext": {
-    "message": "Canvas context is unavailable."
+    "message": "Canvasコンテキストを利用できません。"
   },
   "notConfigured": {
-    "message": "Not configured"
+    "message": "未設定"
   },
   "optionsHeading": {
-    "message": "WebDAV Configuration"
+    "message": "WebDAV設定"
   },
   "optionsPageTitle": {
-    "message": "WebDAV Configuration"
+    "message": "WebDAV設定"
   },
   "optionsSubtitle": {
-    "message": "Configure the WebDAV directory used for bookmark sync."
+    "message": "ブックマーク同期に使用するWebDAVディレクトリを設定します。"
   },
   "parseWebdavResponseFailed": {
-    "message": "Failed to parse WebDAV response."
+    "message": "WebDAVレスポンスの解析に失敗しました。"
   },
   "passwordOptional": {
-    "message": "Password (optional)"
+    "message": "パスワード (任意)"
   },
   "pastePermissionDenied": {
-    "message": "Paste permission denied."
+    "message": "貼り付け権限がありません。"
   },
   "promptConfirm": {
-    "message": "Confirm"
+    "message": "確認"
   },
   "promptNotice": {
-    "message": "Notice"
+    "message": "通知"
   },
   "readFailedHttp": {
-    "message": "Read failed (HTTP $1)."
+    "message": "読み取りに失敗しました (HTTP $1)。"
   },
   "refresh": {
-    "message": "Refresh"
+    "message": "更新"
   },
   "refreshFolderFavicons": {
-    "message": "Refresh folder favicons"
+    "message": "フォルダのファビコンを更新"
   },
   "rootFolder": {
-    "message": "Root"
+    "message": "ルート"
   },
   "save": {
-    "message": "Save"
+    "message": "保存"
   },
   "saveConfiguration": {
-    "message": "Save configuration"
+    "message": "設定を保存"
   },
   "saveFailed": {
-    "message": "Save failed: $1"
+    "message": "保存に失敗しました: $1"
   },
   "selectOrEnterFile": {
-    "message": "Select an existing file or enter a new file name."
+    "message": "既存のファイルを選択するか、新しいファイル名を入力してください。"
   },
   "sortAscending": {
-    "message": "Sort ascending"
+    "message": "昇順で並べ替え"
   },
   "sortDescending": {
-    "message": "Sort descending"
+    "message": "降順で並べ替え"
   },
   "sortFailed": {
-    "message": "Sort failed: $1"
+    "message": "並べ替えに失敗しました: $1"
   },
   "sortFolder": {
-    "message": "Sort folder"
+    "message": "フォルダを並べ替え"
   },
   "startUpload": {
-    "message": "Start upload"
+    "message": "アップロードを開始"
   },
   "summaryBookmarks": {
-    "message": "Bookmarks: $1"
+    "message": "ブックマーク: $1"
   },
   "summaryBookmarksInitial": {
-    "message": "Bookmarks: -"
+    "message": "ブックマーク: -"
   },
   "summaryFolders": {
-    "message": "Folders: $1"
+    "message": "フォルダ: $1"
   },
   "summaryFoldersInitial": {
-    "message": "Folders: -"
+    "message": "フォルダ: -"
   },
   "testBeforeSave": {
-    "message": "Please run and pass the connection test before saving."
+    "message": "保存前に接続テストを実行し、成功させてください。"
   },
   "testConnection": {
-    "message": "Test connection"
+    "message": "接続をテスト"
   },
   "testingConnection": {
-    "message": "Testing connection..."
+    "message": "接続をテスト中..."
   },
   "testingWebdavConnection": {
-    "message": "Testing WebDAV connection..."
+    "message": "WebDAV接続をテスト中..."
   },
   "treeActionsAria": {
-    "message": "Bookmark tree actions"
+    "message": "ブックマークツリー操作"
   },
   "unnamedFolder": {
-    "message": "Untitled folder"
+    "message": "無題のフォルダ"
   },
   "untitled": {
-    "message": "Untitled"
+    "message": "無題"
   },
   "updateBookmarkFailed": {
-    "message": "Failed to update bookmark: $1"
+    "message": "ブックマークの更新に失敗しました: $1"
   },
   "updateFolderFailed": {
-    "message": "Failed to update folder: $1"
+    "message": "フォルダの更新に失敗しました: $1"
   },
   "uploadFailed": {
-    "message": "Upload failed: $1"
+    "message": "アップロードに失敗しました: $1"
   },
   "uploadFailedHttp": {
-    "message": "Upload failed (HTTP $1)."
+    "message": "アップロードに失敗しました (HTTP $1)。"
   },
   "uploadSuccessful": {
-    "message": "Upload successful: $1"
+    "message": "アップロード成功: $1"
   },
   "uploadingBookmarks": {
-    "message": "Uploading bookmarks..."
+    "message": "ブックマークをアップロード中..."
   },
   "urlInvalid": {
-    "message": "Please enter a valid URL."
+    "message": "有効なURLを入力してください。"
   },
   "urlNotWebdavDirectory": {
-    "message": "The specified URL is not a WebDAV directory."
+    "message": "指定したURLはWebDAVディレクトリではありません。"
   },
   "urlOnlyHttpHttps": {
-    "message": "Only http/https URLs are supported."
+    "message": "http/https URLのみサポートされています。"
   },
   "urlPlaceholder": {
     "message": "https://example.com"
   },
   "urlRequired": {
-    "message": "URL is required."
+    "message": "URLは必須です。"
   },
   "usernameOptional": {
-    "message": "Username (optional)"
+    "message": "ユーザー名 (任意)"
   },
   "webdavEntries": {
-    "message": "WebDAV entries: $1"
+    "message": "WebDAV項目数: $1"
   },
   "webdavEntriesDash": {
-    "message": "WebDAV entries: -"
+    "message": "WebDAV項目数: -"
   },
   "webdavEntriesError": {
-    "message": "WebDAV entries: Error"
+    "message": "WebDAV項目数: エラー"
   },
   "webdavEntriesRefreshing": {
-    "message": "WebDAV entries: Refreshing..."
+    "message": "WebDAV項目数: 更新中..."
   },
   "webdavLabel": {
     "message": "WebDAV"
   },
   "webdavMustUseHttps": {
-    "message": "WebDAV URL must use HTTPS."
+    "message": "WebDAV URLはHTTPSを使用する必要があります。"
   },
   "webdavUrlLabel": {
-    "message": "WebDAV URL (directory, HTTPS only)"
+    "message": "WebDAV URL (ディレクトリ、HTTPSのみ)"
   },
   "webdavUrlPlaceholder": {
     "message": "https://example.com/webdav/"

@@ -1,567 +1,567 @@
 {
   "actionCopyBookmarkUrl": {
-    "message": "Copy bookmark URL"
+    "message": "북마크 URL 복사"
   },
   "actionDefault": {
-    "message": "Action"
+    "message": "동작"
   },
   "actionDeleteBookmark": {
-    "message": "Delete bookmark"
+    "message": "북마크 삭제"
   },
   "actionEditBookmark": {
-    "message": "Edit bookmark"
+    "message": "북마크 편집"
   },
   "actionRefreshFavicon": {
-    "message": "Refresh favicon"
+    "message": "파비콘 새로고침"
   },
   "addBookmark": {
-    "message": "Add bookmark"
+    "message": "북마크 추가"
   },
   "addBookmarkTitle": {
-    "message": "Add bookmark"
+    "message": "북마크 추가"
   },
   "addFolder": {
-    "message": "Add folder"
+    "message": "폴더 추가"
   },
   "addFolderTitle": {
-    "message": "Add folder"
+    "message": "폴더 추가"
   },
   "appVersionTooltip": {
-    "message": "Extension version"
+    "message": "확장 프로그램 버전"
   },
   "appVersionTooltipWithValue": {
-    "message": "Extension version: $1"
+    "message": "확장 프로그램 버전: $1"
   },
   "bookmarkActionsAria": {
-    "message": "Bookmark actions"
+    "message": "북마크 작업"
   },
   "bookmarkCreated": {
-    "message": "Bookmark created."
+    "message": "북마크를 만들었습니다."
   },
   "bookmarkDeleted": {
-    "message": "Bookmark deleted."
+    "message": "북마크를 삭제했습니다."
   },
   "bookmarkPanelAria": {
-    "message": "Bookmarks"
+    "message": "북마크"
   },
   "bookmarkRootNotFound": {
-    "message": "Browser bookmark root folder not found."
+    "message": "브라우저 북마크 루트 폴더를 찾을 수 없습니다."
   },
   "bookmarkTitle": {
-    "message": "Bookmark title"
+    "message": "북마크 제목"
   },
   "bookmarkUpdated": {
-    "message": "Bookmark updated."
+    "message": "북마크를 업데이트했습니다."
   },
   "bookmarkUrlCopied": {
-    "message": "Bookmark URL copied."
+    "message": "북마크 URL을 복사했습니다."
   },
   "bookmarksPageTitle": {
     "message": "Yet Another Bookmark Manager"
   },
   "browserEntries": {
-    "message": "Browser entries: $1"
+    "message": "브라우저 항목: $1"
   },
   "browserEntriesDash": {
-    "message": "Browser entries: -"
+    "message": "브라우저 항목: -"
   },
   "browserEntriesError": {
-    "message": "Browser entries: Error"
+    "message": "브라우저 항목: 오류"
   },
   "browserEntriesRefreshing": {
-    "message": "Browser entries: Refreshing..."
+    "message": "브라우저 항목: 새로고침 중..."
   },
   "btnConfiguration": {
-    "message": "Configuration"
+    "message": "설정"
   },
   "btnDownload": {
-    "message": "Download"
+    "message": "다운로드"
   },
   "btnUpload": {
-    "message": "Upload"
+    "message": "업로드"
   },
   "cancel": {
-    "message": "Cancel"
+    "message": "취소"
   },
   "cannotDropFolder": {
-    "message": "Cannot drop into this folder."
+    "message": "이 폴더로는 드롭할 수 없습니다."
   },
   "chooseExistingOrCreate": {
-    "message": "Choose an existing file or create a new export file."
+    "message": "기존 파일을 선택하거나 새 내보내기 파일을 만드세요."
   },
   "clear": {
-    "message": "Clear"
+    "message": "지우기"
   },
   "clearConfig": {
-    "message": "Clear config"
+    "message": "설정 지우기"
   },
   "clearConfigurationMessage": {
-    "message": "Remove the current WebDAV configuration?"
+    "message": "현재 WebDAV 설정을 삭제할까요?"
   },
   "clearConfigurationTitle": {
-    "message": "Clear configuration"
+    "message": "설정 지우기"
   },
   "clearFailed": {
-    "message": "Clear failed: $1"
+    "message": "지우기 실패: $1"
   },
   "close": {
-    "message": "Close"
+    "message": "닫기"
   },
   "collapseAllFolders": {
-    "message": "Collapse all folders"
+    "message": "모든 폴더 접기"
   },
   "configurationCleared": {
-    "message": "Configuration cleared."
+    "message": "설정을 지웠습니다."
   },
   "configurationSaved": {
-    "message": "Configuration saved."
+    "message": "설정을 저장했습니다."
   },
   "configureWebdavFirst": {
-    "message": "Please configure WebDAV first."
+    "message": "먼저 WebDAV를 설정하세요."
   },
   "confirmDownloadMessage": {
-    "message": "Downloading will overwrite current browser bookmarks. Continue after confirming your backup?"
+    "message": "다운로드하면 현재 브라우저 북마크를 덮어씁니다. 백업을 확인한 뒤 계속할까요?"
   },
   "confirmDownloadTitle": {
-    "message": "Confirm download"
+    "message": "다운로드 확인"
   },
   "confirmUploadMessage": {
-    "message": "Upload current browser bookmarks to WebDAV. Continue?"
+    "message": "현재 브라우저 북마크를 WebDAV에 업로드합니다. 계속할까요?"
   },
   "confirmUploadTitle": {
-    "message": "Confirm upload"
+    "message": "업로드 확인"
   },
   "connSuccessFoundFiles": {
-    "message": "Connection successful. Found $1 files."
+    "message": "연결에 성공했습니다. 파일 $1개를 찾았습니다."
   },
   "connSuccessNoFiles": {
-    "message": "Connection successful. No files found."
+    "message": "연결에 성공했습니다. 파일을 찾지 못했습니다."
   },
   "connectionFailed": {
-    "message": "Connection failed: $1"
+    "message": "연결 실패: $1"
   },
   "connectionFailedHttp": {
-    "message": "Connection failed (HTTP $1)."
+    "message": "연결 실패 (HTTP $1)."
   },
   "contextCopy": {
-    "message": "Copy"
+    "message": "복사"
   },
   "contextCut": {
-    "message": "Cut"
+    "message": "잘라내기"
   },
   "contextDelete": {
-    "message": "Delete"
+    "message": "삭제"
   },
   "contextPaste": {
-    "message": "Paste"
+    "message": "붙여넣기"
   },
   "contextSelectAll": {
-    "message": "Select all"
+    "message": "모두 선택"
   },
   "continue": {
-    "message": "Continue"
+    "message": "계속"
   },
   "continueDownload": {
-    "message": "Continue download"
+    "message": "다운로드 계속"
   },
   "copyBookmarkUrlFailed": {
-    "message": "Failed to copy bookmark URL: $1"
+    "message": "북마크 URL 복사 실패: $1"
   },
   "copyBookmarkUrlFailedUnknown": {
-    "message": "Unknown copy error"
+    "message": "알 수 없는 복사 오류"
   },
   "create": {
-    "message": "Create"
+    "message": "만들기"
   },
   "createBookmarkFailed": {
-    "message": "Failed to create bookmark: $1"
+    "message": "북마크 생성 실패: $1"
   },
   "createFolderFailed": {
-    "message": "Failed to create folder: $1"
+    "message": "폴더 생성 실패: $1"
   },
   "createNewFile": {
-    "message": "Create a new file"
+    "message": "새 파일 만들기"
   },
   "delete": {
-    "message": "Delete"
+    "message": "삭제"
   },
   "deleteAll": {
-    "message": "Delete all"
+    "message": "전체 삭제"
   },
   "deleteBookmarkMessage": {
-    "message": "Delete bookmark \"$1\"?"
+    "message": "북마크 \"$1\"을(를) 삭제할까요?"
   },
   "deleteBookmarkTitle": {
-    "message": "Delete bookmark"
+    "message": "북마크 삭제"
   },
   "deleteFailed": {
-    "message": "Delete failed: $1"
+    "message": "삭제 실패: $1"
   },
   "deleteFolder": {
-    "message": "Delete folder"
+    "message": "폴더 삭제"
   },
   "deleteFolderMessage": {
-    "message": "Delete folder \"$1\"?"
+    "message": "폴더 \"$1\"을(를) 삭제할까요?"
   },
   "deleteFolderTitle": {
-    "message": "Delete folder"
+    "message": "폴더 삭제"
   },
   "directoryFiles": {
-    "message": "Directory files"
+    "message": "디렉터리 파일"
   },
   "downloadFailed": {
-    "message": "Download failed: $1"
+    "message": "다운로드 실패: $1"
   },
   "downloadFailedHttp": {
-    "message": "Download failed (HTTP $1)."
+    "message": "다운로드 실패 (HTTP $1)."
   },
   "downloadSuccessful": {
-    "message": "Download successful: $1"
+    "message": "다운로드 성공: $1"
   },
   "downloadedFileInvalidBookmarks": {
-    "message": "Downloaded file is not valid bookmarks HTML."
+    "message": "다운로드한 파일이 유효한 북마크 HTML이 아닙니다."
   },
   "downloadedFileNoEntries": {
-    "message": "Downloaded bookmarks file has no entries. Overwrite stopped to protect existing data."
+    "message": "다운로드한 북마크 파일에 항목이 없습니다. 기존 데이터를 보호하기 위해 덮어쓰기를 중단했습니다."
   },
   "downloadingBookmarks": {
-    "message": "Downloading bookmarks..."
+    "message": "북마크 다운로드 중..."
   },
   "dragSourceNotFound": {
-    "message": "Drag source not found."
+    "message": "드래그 원본을 찾을 수 없습니다."
   },
   "editActionsAria": {
-    "message": "Edit actions"
+    "message": "편집 작업"
   },
   "editBookmarkTitle": {
-    "message": "Edit bookmark"
+    "message": "북마크 편집"
   },
   "editFolder": {
-    "message": "Edit folder"
+    "message": "폴더 편집"
   },
   "editFolderTitle": {
-    "message": "Edit folder"
+    "message": "폴더 편집"
   },
   "editorEdit": {
-    "message": "Edit"
+    "message": "편집"
   },
   "editorName": {
-    "message": "Name"
+    "message": "이름"
   },
   "editorNameRequired": {
-    "message": "Name is required."
+    "message": "이름은 필수입니다."
   },
   "editorUrl": {
     "message": "URL"
   },
   "editorUrlRequired": {
-    "message": "URL is required."
+    "message": "URL은 필수입니다."
   },
   "emptyFaviconData": {
-    "message": "Favicon data is empty."
+    "message": "파비콘 데이터가 비어 있습니다."
   },
   "emptyFolder": {
-    "message": "This folder is empty."
+    "message": "이 폴더는 비어 있습니다."
   },
   "expandAllFolders": {
-    "message": "Expand all folders"
+    "message": "모든 폴더 펼치기"
   },
   "extDescription": {
-    "message": "Manage and sync bookmarks with optional WebDAV support."
+    "message": "선택적 WebDAV 지원으로 북마크를 관리하고 동기화합니다."
   },
   "faviconFetchFailed": {
-    "message": "Failed to fetch favicon."
+    "message": "파비콘을 가져오지 못했습니다."
   },
   "faviconUpdateFailed": {
-    "message": "Failed to update favicon: $1"
+    "message": "파비콘 업데이트 실패: $1"
   },
   "faviconUpdateFailedCount": {
-    "message": "Failed to update favicon ($1)."
+    "message": "파비콘 업데이트 실패 ($1)."
   },
   "faviconUpdateInProgress": {
-    "message": "Favicon update already in progress."
+    "message": "파비콘 업데이트가 이미 진행 중입니다."
   },
   "faviconUpdated": {
-    "message": "Favicon updated."
+    "message": "파비콘을 업데이트했습니다."
   },
   "faviconsUpdatedSuccess": {
-    "message": "Favicons updated: $1 succeeded."
+    "message": "파비콘 업데이트 완료: $1개 성공."
   },
   "faviconsUpdatedSuccessFail": {
-    "message": "Favicons updated: $1 succeeded, $2 failed."
+    "message": "파비콘 업데이트 완료: $1개 성공, $2개 실패."
   },
   "fileNameEmpty": {
-    "message": "File name cannot be empty."
+    "message": "파일 이름은 비워둘 수 없습니다."
   },
   "fileNameNoPathSeparators": {
-    "message": "File name cannot contain path separators."
+    "message": "파일 이름에 경로 구분자를 포함할 수 없습니다."
   },
   "filesInDirectory": {
-    "message": "Files in directory"
+    "message": "디렉터리의 파일"
   },
   "folderBookmarkCount": {
-    "message": "$1 bookmarks"
+    "message": "북마크 $1개"
   },
   "folderContainsBookmarksMessage": {
-    "message": "This folder contains $1 bookmarks. Delete the folder and all contents?"
+    "message": "이 폴더에는 북마크 $1개가 있습니다. 폴더와 모든 내용을 삭제할까요?"
   },
   "folderContainsBookmarksTitle": {
-    "message": "Folder contains bookmarks"
+    "message": "폴더에 북마크가 있습니다"
   },
   "folderCreated": {
-    "message": "Folder created."
+    "message": "폴더를 만들었습니다."
   },
   "folderDeleted": {
-    "message": "Folder deleted."
+    "message": "폴더를 삭제했습니다."
   },
   "folderFolderCount": {
-    "message": "$1 folders"
+    "message": "폴더 $1개"
   },
   "folderName": {
-    "message": "Folder name"
+    "message": "폴더 이름"
   },
   "folderNotFound": {
-    "message": "Folder not found."
+    "message": "폴더를 찾을 수 없습니다."
   },
   "folderSortedAsc": {
-    "message": "Folder sorted ascending."
+    "message": "폴더를 오름차순으로 정렬했습니다."
   },
   "folderSortedDesc": {
-    "message": "Folder sorted descending."
+    "message": "폴더를 내림차순으로 정렬했습니다."
   },
   "folderUpdated": {
-    "message": "Folder updated."
+    "message": "폴더를 업데이트했습니다."
   },
   "hostPermissionDenied": {
-    "message": "Host permission denied: $1"
+    "message": "호스트 권한이 거부되었습니다: $1"
   },
   "hostPermissionRequired": {
-    "message": "Host permission is required: $1"
+    "message": "호스트 권한이 필요합니다: $1"
   },
   "initializationFailed": {
-    "message": "Initialization failed: $1"
+    "message": "초기화 실패: $1"
   },
   "invalidUrlFormat": {
-    "message": "Invalid URL format."
+    "message": "잘못된 URL 형식입니다."
   },
   "languageCurrentTooltip": {
-    "message": "Language: $1"
+    "message": "언어: $1"
   },
   "loadBookmarksFailed": {
-    "message": "Failed to load bookmarks: $1"
+    "message": "북마크 로드 실패: $1"
   },
   "menuAddBookmark": {
-    "message": "Add bookmark"
+    "message": "북마크 추가"
   },
   "menuAddFolder": {
-    "message": "Add folder"
+    "message": "폴더 추가"
   },
   "menuCollapseFolder": {
-    "message": "Collapse folder"
+    "message": "폴더 접기"
   },
   "menuCopyBookmarkUrl": {
-    "message": "Copy bookmark URL"
+    "message": "북마크 URL 복사"
   },
   "menuDeleteBookmark": {
-    "message": "Delete bookmark"
+    "message": "북마크 삭제"
   },
   "menuDeleteFolder": {
-    "message": "Delete folder"
+    "message": "폴더 삭제"
   },
   "menuEditBookmark": {
-    "message": "Edit bookmark"
+    "message": "북마크 편집"
   },
   "menuEditFolder": {
-    "message": "Edit folder"
+    "message": "폴더 편집"
   },
   "menuExpandFolder": {
-    "message": "Expand folder"
+    "message": "폴더 펼치기"
   },
   "menuOpenBookmark": {
-    "message": "Open bookmark"
+    "message": "북마크 열기"
   },
   "menuRefreshFavicon": {
-    "message": "Refresh favicon"
+    "message": "파비콘 새로고침"
   },
   "menuRefreshFolderFavicons": {
-    "message": "Refresh folder favicons"
+    "message": "폴더 파비콘 새로고침"
   },
   "moveFailed": {
-    "message": "Move failed: $1"
+    "message": "이동 실패: $1"
   },
   "movedSuccessfully": {
-    "message": "Moved successfully."
+    "message": "이동했습니다."
   },
   "newFileNameLabel": {
-    "message": "New file name (default: bookmarks.html)"
+    "message": "새 파일 이름 (기본값: bookmarks.html)"
   },
   "newFolderDefault": {
-    "message": "New folder"
+    "message": "새 폴더"
   },
   "noBookmarkFoldersFound": {
-    "message": "No bookmark folders found."
+    "message": "북마크 폴더를 찾지 못했습니다."
   },
   "noBookmarksInFolder": {
-    "message": "No bookmarks in this folder."
+    "message": "이 폴더에 북마크가 없습니다."
   },
   "noCanvasContext": {
-    "message": "Canvas context is unavailable."
+    "message": "Canvas 컨텍스트를 사용할 수 없습니다."
   },
   "notConfigured": {
-    "message": "Not configured"
+    "message": "설정되지 않음"
   },
   "optionsHeading": {
-    "message": "WebDAV Configuration"
+    "message": "WebDAV 설정"
   },
   "optionsPageTitle": {
-    "message": "WebDAV Configuration"
+    "message": "WebDAV 설정"
   },
   "optionsSubtitle": {
-    "message": "Configure the WebDAV directory used for bookmark sync."
+    "message": "북마크 동기화에 사용할 WebDAV 디렉터리를 설정합니다."
   },
   "parseWebdavResponseFailed": {
-    "message": "Failed to parse WebDAV response."
+    "message": "WebDAV 응답을 구문 분석하지 못했습니다."
   },
   "passwordOptional": {
-    "message": "Password (optional)"
+    "message": "비밀번호 (선택)"
   },
   "pastePermissionDenied": {
-    "message": "Paste permission denied."
+    "message": "붙여넣기 권한이 없습니다."
   },
   "promptConfirm": {
-    "message": "Confirm"
+    "message": "확인"
   },
   "promptNotice": {
-    "message": "Notice"
+    "message": "알림"
   },
   "readFailedHttp": {
-    "message": "Read failed (HTTP $1)."
+    "message": "읽기 실패 (HTTP $1)."
   },
   "refresh": {
-    "message": "Refresh"
+    "message": "새로고침"
   },
   "refreshFolderFavicons": {
-    "message": "Refresh folder favicons"
+    "message": "폴더 파비콘 새로고침"
   },
   "rootFolder": {
-    "message": "Root"
+    "message": "루트"
   },
   "save": {
-    "message": "Save"
+    "message": "저장"
   },
   "saveConfiguration": {
-    "message": "Save configuration"
+    "message": "설정 저장"
   },
   "saveFailed": {
-    "message": "Save failed: $1"
+    "message": "저장 실패: $1"
   },
   "selectOrEnterFile": {
-    "message": "Select an existing file or enter a new file name."
+    "message": "기존 파일을 선택하거나 새 파일 이름을 입력하세요."
   },
   "sortAscending": {
-    "message": "Sort ascending"
+    "message": "오름차순 정렬"
   },
   "sortDescending": {
-    "message": "Sort descending"
+    "message": "내림차순 정렬"
   },
   "sortFailed": {
-    "message": "Sort failed: $1"
+    "message": "정렬 실패: $1"
   },
   "sortFolder": {
-    "message": "Sort folder"
+    "message": "폴더 정렬"
   },
   "startUpload": {
-    "message": "Start upload"
+    "message": "업로드 시작"
   },
   "summaryBookmarks": {
-    "message": "Bookmarks: $1"
+    "message": "북마크: $1"
   },
   "summaryBookmarksInitial": {
-    "message": "Bookmarks: -"
+    "message": "북마크: -"
   },
   "summaryFolders": {
-    "message": "Folders: $1"
+    "message": "폴더: $1"
   },
   "summaryFoldersInitial": {
-    "message": "Folders: -"
+    "message": "폴더: -"
   },
   "testBeforeSave": {
-    "message": "Please run and pass the connection test before saving."
+    "message": "저장하기 전에 연결 테스트를 실행해 통과해야 합니다."
   },
   "testConnection": {
-    "message": "Test connection"
+    "message": "연결 테스트"
   },
   "testingConnection": {
-    "message": "Testing connection..."
+    "message": "연결 테스트 중..."
   },
   "testingWebdavConnection": {
-    "message": "Testing WebDAV connection..."
+    "message": "WebDAV 연결 테스트 중..."
   },
   "treeActionsAria": {
-    "message": "Bookmark tree actions"
+    "message": "북마크 트리 작업"
   },
   "unnamedFolder": {
-    "message": "Untitled folder"
+    "message": "제목 없는 폴더"
   },
   "untitled": {
-    "message": "Untitled"
+    "message": "제목 없음"
   },
   "updateBookmarkFailed": {
-    "message": "Failed to update bookmark: $1"
+    "message": "북마크 업데이트 실패: $1"
   },
   "updateFolderFailed": {
-    "message": "Failed to update folder: $1"
+    "message": "폴더 업데이트 실패: $1"
   },
   "uploadFailed": {
-    "message": "Upload failed: $1"
+    "message": "업로드 실패: $1"
   },
   "uploadFailedHttp": {
-    "message": "Upload failed (HTTP $1)."
+    "message": "업로드 실패 (HTTP $1)."
   },
   "uploadSuccessful": {
-    "message": "Upload successful: $1"
+    "message": "업로드 성공: $1"
   },
   "uploadingBookmarks": {
-    "message": "Uploading bookmarks..."
+    "message": "북마크 업로드 중..."
   },
   "urlInvalid": {
-    "message": "Please enter a valid URL."
+    "message": "유효한 URL을 입력하세요."
   },
   "urlNotWebdavDirectory": {
-    "message": "The specified URL is not a WebDAV directory."
+    "message": "지정한 URL은 WebDAV 디렉터리가 아닙니다."
   },
   "urlOnlyHttpHttps": {
-    "message": "Only http/https URLs are supported."
+    "message": "http/https URL만 지원됩니다."
   },
   "urlPlaceholder": {
     "message": "https://example.com"
   },
   "urlRequired": {
-    "message": "URL is required."
+    "message": "URL은 필수입니다."
   },
   "usernameOptional": {
-    "message": "Username (optional)"
+    "message": "사용자 이름 (선택)"
   },
   "webdavEntries": {
-    "message": "WebDAV entries: $1"
+    "message": "WebDAV 항목: $1"
   },
   "webdavEntriesDash": {
-    "message": "WebDAV entries: -"
+    "message": "WebDAV 항목: -"
   },
   "webdavEntriesError": {
-    "message": "WebDAV entries: Error"
+    "message": "WebDAV 항목: 오류"
   },
   "webdavEntriesRefreshing": {
-    "message": "WebDAV entries: Refreshing..."
+    "message": "WebDAV 항목: 새로고침 중..."
   },
   "webdavLabel": {
     "message": "WebDAV"
   },
   "webdavMustUseHttps": {
-    "message": "WebDAV URL must use HTTPS."
+    "message": "WebDAV URL은 HTTPS를 사용해야 합니다."
   },
   "webdavUrlLabel": {
-    "message": "WebDAV URL (directory, HTTPS only)"
+    "message": "WebDAV URL (디렉터리, HTTPS 전용)"
   },
   "webdavUrlPlaceholder": {
     "message": "https://example.com/webdav/"
