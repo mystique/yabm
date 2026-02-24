@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title data-i18n="bookmarksPageTitle">Yet Another Bookmark Manager</title>
+        <link rel="stylesheet" href="bookmarks.css" />
+    </head>
+    <body>
+        <div id="top-toast" class="top-toast hidden" role="status" aria-live="polite"></div>
+        <div id="top-progress" class="top-progress hidden" aria-hidden="true">
+            <span class="top-progress-bar"></span>
+        </div>
+
+        <main class="container">
+            <header>
+                <div class="header-top">
+                    <h1 class="title">
+                        <img
+                            class="title-icon"
+                            src="../../assets/icons/icon128.png"
+                            width="32"
+                            height="32"
+                            alt=""
+                        />
+                        Yet Another Bookmark Manager
+                    </h1>
+                    <span
+                        id="app-version"
+                        class="app-version"
+                        data-i18n-tooltip="appVersionTooltip"
+                        data-tooltip="Extension version"
+                    >v-</span>
+                </div>
+                <div class="tree-actions" data-i18n-aria-label="treeActionsAria" aria-label="Bookmark tree actions">
+                    <span
+                        id="webdav-status-indicator"
+                        class="webdav-status-indicator"
+                        role="img"
+                        aria-label="WebDAV status"
+                        data-tooltip="WebDAV: checking"
+                    >
+                        <img
+                            id="webdav-status-icon"
+                            class="webdav-status-icon"
+                            src="../../assets/twemoji/23f3.svg"
+                            alt=""
+                        />
+                    </span>
+                    <button
+                        id="upload-bookmarks"
+                        class="tree-btn"
+                        type="button"
+                    >
+                        <span class="icon-font" aria-hidden="true">upload</span>
+                        <span data-i18n="btnUpload">Upload</span>
+                    </button>
+                    <button
+                        id="download-bookmarks"
+                        class="tree-btn"
+                        type="button"
+                    >
+                        <span class="icon-font" aria-hidden="true">download</span>
+                        <span data-i18n="btnDownload">Download</span>
+                    </button>
+                    <button
+                        id="open-config"
+                        class="tree-btn tree-btn-soft tree-btn-icon-only"
+                        type="button"
+                        data-i18n-aria-label="btnConfiguration"
+                        data-i18n-tooltip="btnConfiguration"
+                        aria-label="Configuration"
+                        data-tooltip="Configuration"
+                    >
+                        <span class="icon-font" aria-hidden="true">settings</span>
+                    </button>
+                    <button
+                        id="open-language-menu"
+                        class="tree-btn tree-btn-soft tree-btn-icon-only"
+                        type="button"
+                        aria-label="Language"
+                        data-tooltip="Language"
+                    >
+                        <span class="icon-font" aria-hidden="true">translate</span>
+                    </button>
+                </div>
+                <p id="sync-status" class="sync-status is-hidden" aria-live="polite"></p>
+            </header>
+            <section class="bookmark-panel" data-i18n-aria-label="bookmarkPanelAria" aria-label="Bookmarks">
+                <div class="bookmark-panel-head">
+                    <div class="bookmark-summary" aria-live="polite">
+                        <span id="tree-folder-count" class="summary-pill" data-i18n="summaryFoldersInitial">Folders: -</span>
+                        <span id="tree-bookmark-count" class="summary-pill" data-i18n="summaryBookmarksInitial">Bookmarks: -</span>
+                    </div>
+                    <div class="bookmark-panel-actions">
+                        <button
+                            id="expand-all"
+                            class="tree-btn tree-btn-soft tree-btn-icon-only"
+                            type="button"
+                            data-i18n-aria-label="expandAllFolders"
+                            data-i18n-tooltip="expandAllFolders"
+                            aria-label="Expand all folders"
+                            data-tooltip="Expand all folders"
+                        >
+                            <span class="icon-font" aria-hidden="true">unfold_more</span>
+                        </button>
+                        <button
+                            id="collapse-all"
+                            class="tree-btn tree-btn-soft tree-btn-icon-only"
+                            type="button"
+                            data-i18n-aria-label="collapseAllFolders"
+                            data-i18n-tooltip="collapseAllFolders"
+                            aria-label="Collapse all folders"
+                            data-tooltip="Collapse all folders"
+                        >
+                            <span class="icon-font" aria-hidden="true">unfold_less</span>
+                        </button>
+                    </div>
+                </div>
+            <section
+                id="bookmark-list"
+                class="bookmark-list"
+                aria-live="polite"
+            ></section>
+            </section>
+        </main>
+        <div id="bookmark-scrollbar" class="bookmark-scrollbar hidden" aria-hidden="true">
+            <span id="bookmark-scrollbar-thumb" class="bookmark-scrollbar-thumb"></span>
+        </div>
+        <button id="bookmark-scroll-up" class="bookmark-scroll-arrow bookmark-scroll-arrow-up hidden" type="button" aria-label="Scroll up"></button>
+        <button id="bookmark-scroll-down" class="bookmark-scroll-arrow bookmark-scroll-arrow-down hidden" type="button" aria-label="Scroll down"></button>
+
+        <div
+            id="config-modal"
+            class="modal hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="config-title"
+        >
+            <div id="config-backdrop" class="modal-backdrop"></div>
+            <section class="modal-panel">
+                <header class="modal-header">
+                    <h2 id="config-title" data-i18n="optionsHeading">WebDAV Configuration</h2>
+                    <button
+                        id="close-config"
+                        class="icon-btn"
+                        type="button"
+                        data-i18n-aria-label="close"
+                        aria-label="Close"
+                    >
+                        x
+                    </button>
+                </header>
+
+                <div class="modal-body">
+                    <label class="field">
+                        <span data-i18n="webdavUrlLabel">WebDAV URL (directory, HTTPS only)</span>
+                        <input
+                            id="cfg-directory-url"
+                            type="url"
+                            data-i18n-placeholder="webdavUrlPlaceholder"
+                            placeholder="https://example.com/webdav/"
+                        />
+                    </label>
+
+                    <div class="field-row">
+                        <label class="field">
+                            <span data-i18n="usernameOptional">Username (optional)</span>
+                            <input
+                                id="cfg-username"
+                                type="text"
+                                autocomplete="username"
+                            />
+                        </label>
+                        <label class="field">
+                            <span data-i18n="passwordOptional">Password (optional)</span>
+                            <input
+                                id="cfg-password"
+                                type="password"
+                                autocomplete="current-password"
+                            />
+                        </label>
+                    </div>
+
+                    <div class="actions-row">
+                        <button id="cfg-test" class="tree-btn" type="button">
+                            <span data-i18n="testConnection">Test connection</span>
+                        </button>
+                    </div>
+
+                    <section id="cfg-file-section" class="collapsed">
+                        <h3 class="section-title" data-i18n="filesInDirectory">Files in directory</h3>
+                        <div id="cfg-files" class="files"></div>
+                        <label class="field">
+                            <span data-i18n="newFileNameLabel">New file name (default: bookmarks.html)</span>
+                            <input
+                                id="cfg-new-file-name"
+                                type="text"
+                                value="bookmarks.html"
+                            />
+                        </label>
+                    </section>
+
+                    <p
+                        id="cfg-status"
+                        class="sync-status is-hidden"
+                        aria-live="polite"
+                    ></p>
+                </div>
+
+                <footer class="modal-footer modal-footer-actions">
+                    <button
+                        id="cfg-clear"
+                        class="tree-btn tree-btn-soft"
+                        type="button"
+                    >
+                        <span data-i18n="clearConfig">Clear config</span>
+                    </button>
+                    <button
+                        id="cfg-cancel"
+                        class="tree-btn tree-btn-soft"
+                        type="button"
+                    >
+                        <span data-i18n="cancel">Cancel</span>
+                    </button>
+                    <button id="cfg-save" class="tree-btn" type="button">
+                        <span data-i18n="saveConfiguration">Save configuration</span>
+                    </button>
+                </footer>
+            </section>
+        </div>
+
+        <div
+            id="prompt-modal"
+            class="modal hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="prompt-title"
+        >
+            <div class="modal-backdrop"></div>
+            <section class="modal-panel modal-panel-sm">
+                <header class="modal-header">
+                    <h2 id="prompt-title" data-i18n="promptNotice">Notice</h2>
+                </header>
+                <div class="modal-body">
+                    <p id="prompt-message" class="prompt-message"></p>
+                </div>
+                <footer class="modal-footer modal-footer-actions">
+                    <button id="prompt-cancel" class="tree-btn tree-btn-soft" type="button">
+                        <span data-i18n="cancel">Cancel</span>
+                    </button>
+                    <button id="prompt-confirm" class="tree-btn" type="button">
+                        <span data-i18n="promptConfirm">Confirm</span>
+                    </button>
+                </footer>
+            </section>
+        </div>
+
+        <div
+            id="editor-modal"
+            class="modal hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="editor-title"
+        >
+            <div class="modal-backdrop"></div>
+            <section class="modal-panel modal-panel-sm">
+                <header class="modal-header">
+                    <h2 id="editor-title" data-i18n="editorEdit">Edit</h2>
+                </header>
+                <div class="modal-body">
+                    <label class="field">
+                        <span id="editor-name-label" data-i18n="editorName">Name</span>
+                        <input id="editor-name" type="text" />
+                    </label>
+                    <label id="editor-url-field" class="field hidden">
+                        <span data-i18n="editorUrl">URL</span>
+                        <input
+                            id="editor-url"
+                            type="url"
+                            data-i18n-placeholder="urlPlaceholder"
+                            placeholder="https://example.com"
+                        />
+                    </label>
+                    <p id="editor-status" class="sync-status is-hidden" aria-live="polite"></p>
+                </div>
+                <footer class="modal-footer modal-footer-actions">
+                    <button id="editor-cancel" class="tree-btn tree-btn-soft" type="button">
+                        <span data-i18n="cancel">Cancel</span>
+                    </button>
+                    <button id="editor-save" class="tree-btn" type="button">
+                        <span data-i18n="save">Save</span>
+                    </button>
+                </footer>
+            </section>
+        </div>
+
+        <div id="folder-sort-menu" class="sort-menu hidden" role="menu" data-i18n-aria-label="sortFolder" aria-label="Sort folder">
+            <button id="sort-asc" class="sort-menu-item" type="button" role="menuitem">
+                <span class="sort-menu-icon" aria-hidden="true">
+                    <span class="icon-font">arrow_upward</span>
+                </span>
+                <span data-i18n="sortAscending">Sort ascending</span>
+            </button>
+            <button id="sort-desc" class="sort-menu-item" type="button" role="menuitem">
+                <span class="sort-menu-icon" aria-hidden="true">
+                    <span class="icon-font">arrow_downward</span>
+                </span>
+                <span data-i18n="sortDescending">Sort descending</span>
+            </button>
+        </div>
+
+        <div
+            id="tree-context-menu"
+            class="tree-context-menu hidden"
+            role="menu"
+            data-i18n-aria-label="bookmarkActionsAria"
+            aria-label="Bookmark actions"
+        ></div>
+
+        <div
+            id="edit-context-menu"
+            class="tree-context-menu hidden"
+            role="menu"
+            data-i18n-aria-label="editActionsAria"
+            aria-label="Edit actions"
+        ></div>
+        <div id="language-menu" class="sort-menu hidden" role="menu" aria-label="Language"></div>
+        <div id="app-tooltip" class="app-tooltip hidden" role="tooltip"></div>
+
+        <footer class="bottom-status" aria-live="polite">
+            <div class="bottom-status-main">
+                <span class="bottom-status-label" data-i18n="webdavLabel">WebDAV</span>
+                <span id="webdav-url" class="bottom-status-url" data-i18n="notConfigured">Not configured</span>
+                <span id="webdav-count" class="bottom-status-count" data-i18n="webdavEntriesDash">WebDAV entries: -</span>
+                <span id="browser-count" class="bottom-status-count" data-i18n="browserEntriesDash">Browser entries: -</span>
+            </div>
+            <button id="webdav-refresh" class="tree-btn tree-btn-soft" type="button">
+                <span data-i18n="refresh">Refresh</span>
+            </button>
+        </footer>
+
+        <script src="../../lib/i18n.js"></script>
+        <script src="../../lib/sync-utils.js"></script>
+        <script src="bookmarks.js"></script>
+    </body>
+</html>

@@ -1,0 +1,566 @@
+{
+  "actionCopyBookmarkUrl": {
+    "message": "复制书签链接"
+  },
+  "actionDefault": {
+    "message": "操作"
+  },
+  "actionDeleteBookmark": {
+    "message": "删除书签"
+  },
+  "actionEditBookmark": {
+    "message": "编辑书签"
+  },
+  "actionRefreshFavicon": {
+    "message": "刷新网站图标"
+  },
+  "addBookmark": {
+    "message": "添加书签"
+  },
+  "addBookmarkTitle": {
+    "message": "添加书签"
+  },
+  "addFolder": {
+    "message": "添加文件夹"
+  },
+  "addFolderTitle": {
+    "message": "添加文件夹"
+  },
+  "appVersionTooltip": {
+    "message": "扩展版本"
+  },
+  "appVersionTooltipWithValue": {
+    "message": "扩展版本：$1"
+  },
+  "bookmarkActionsAria": {
+    "message": "书签操作"
+  },
+  "bookmarkCreated": {
+    "message": "书签已创建。"
+  },
+  "bookmarkDeleted": {
+    "message": "书签已删除。"
+  },
+  "bookmarkPanelAria": {
+    "message": "书签"
+  },
+  "bookmarkRootNotFound": {
+    "message": "未找到浏览器书签根文件夹。"
+  },
+  "bookmarkTitle": {
+    "message": "书签标题"
+  },
+  "bookmarkUpdated": {
+    "message": "书签已更新。"
+  },
+  "bookmarkUrlCopied": {
+    "message": "书签链接已复制。"
+  },
+  "bookmarksPageTitle": {
+    "message": "Yet Another Bookmark Manager"
+  },
+  "browserEntries": {
+    "message": "浏览器条目：$1"
+  },
+  "browserEntriesDash": {
+    "message": "浏览器条目：-"
+  },
+  "browserEntriesError": {
+    "message": "浏览器条目：错误"
+  },
+  "browserEntriesRefreshing": {
+    "message": "浏览器条目：正在刷新..."
+  },
+  "btnConfiguration": {
+    "message": "配置"
+  },
+  "btnDownload": {
+    "message": "下载"
+  },
+  "btnUpload": {
+    "message": "上传"
+  },
+  "cancel": {
+    "message": "取消"
+  },
+  "cannotDropFolder": {
+    "message": "无法拖放到该文件夹。"
+  },
+  "chooseExistingOrCreate": {
+    "message": "选择已有文件或创建新的导出文件。"
+  },
+  "clear": {
+    "message": "清除"
+  },
+  "clearConfig": {
+    "message": "清除配置"
+  },
+  "clearConfigurationMessage": {
+    "message": "移除当前 WebDAV 配置？"
+  },
+  "clearConfigurationTitle": {
+    "message": "清除配置"
+  },
+  "clearFailed": {
+    "message": "清除失败：$1"
+  },
+  "close": {
+    "message": "关闭"
+  },
+  "collapseAllFolders": {
+    "message": "折叠所有文件夹"
+  },
+  "configurationCleared": {
+    "message": "配置已清除。"
+  },
+  "configurationSaved": {
+    "message": "配置已保存。"
+  },
+  "configureWebdavFirst": {
+    "message": "请先配置 WebDAV。"
+  },
+  "confirmDownloadMessage": {
+    "message": "下载将覆盖当前浏览器书签。确认已备份后继续吗？"
+  },
+  "confirmDownloadTitle": {
+    "message": "确认下载"
+  },
+  "confirmUploadMessage": {
+    "message": "将当前浏览器书签上传到 WebDAV。是否继续？"
+  },
+  "confirmUploadTitle": {
+    "message": "确认上传"
+  },
+  "connSuccessFoundFiles": {
+    "message": "连接成功。找到 $1 个文件。"
+  },
+  "connSuccessNoFiles": {
+    "message": "连接成功。未找到文件。"
+  },
+  "connectionFailed": {
+    "message": "连接失败：$1"
+  },
+  "connectionFailedHttp": {
+    "message": "连接失败（HTTP $1）。"
+  },
+  "contextCopy": {
+    "message": "复制"
+  },
+  "contextCut": {
+    "message": "剪切"
+  },
+  "contextDelete": {
+    "message": "删除"
+  },
+  "contextPaste": {
+    "message": "粘贴"
+  },
+  "contextSelectAll": {
+    "message": "全选"
+  },
+  "continue": {
+    "message": "继续"
+  },
+  "continueDownload": {
+    "message": "继续下载"
+  },
+  "copyBookmarkUrlFailed": {
+    "message": "复制书签链接失败：$1"
+  },
+  "copyBookmarkUrlFailedUnknown": {
+    "message": "未知复制错误"
+  },
+  "create": {
+    "message": "创建"
+  },
+  "createBookmarkFailed": {
+    "message": "创建书签失败：$1"
+  },
+  "createFolderFailed": {
+    "message": "创建文件夹失败：$1"
+  },
+  "createNewFile": {
+    "message": "创建新文件"
+  },
+  "delete": {
+    "message": "删除"
+  },
+  "deleteAll": {
+    "message": "全部删除"
+  },
+  "deleteBookmarkMessage": {
+    "message": "删除书签“$1”？"
+  },
+  "deleteBookmarkTitle": {
+    "message": "删除书签"
+  },
+  "deleteFailed": {
+    "message": "删除失败：$1"
+  },
+  "deleteFolder": {
+    "message": "删除文件夹"
+  },
+  "deleteFolderMessage": {
+    "message": "删除文件夹“$1”？"
+  },
+  "deleteFolderTitle": {
+    "message": "删除文件夹"
+  },
+  "directoryFiles": {
+    "message": "目录文件"
+  },
+  "downloadFailed": {
+    "message": "下载失败：$1"
+  },
+  "downloadFailedHttp": {
+    "message": "下载失败（HTTP $1）。"
+  },
+  "downloadSuccessful": {
+    "message": "下载成功：$1"
+  },
+  "downloadedFileInvalidBookmarks": {
+    "message": "下载的文件不是有效的书签 HTML。"
+  },
+  "downloadedFileNoEntries": {
+    "message": "下载的书签文件没有条目。为保护现有数据，已停止覆盖。"
+  },
+  "downloadingBookmarks": {
+    "message": "正在下载书签..."
+  },
+  "dragSourceNotFound": {
+    "message": "未找到拖拽源。"
+  },
+  "editActionsAria": {
+    "message": "编辑操作"
+  },
+  "editBookmarkTitle": {
+    "message": "编辑书签"
+  },
+  "editFolder": {
+    "message": "编辑文件夹"
+  },
+  "editFolderTitle": {
+    "message": "编辑文件夹"
+  },
+  "editorEdit": {
+    "message": "编辑"
+  },
+  "editorName": {
+    "message": "名称"
+  },
+  "editorNameRequired": {
+    "message": "名称为必填项。"
+  },
+  "editorUrl": {
+    "message": "链接"
+  },
+  "editorUrlRequired": {
+    "message": "链接为必填项。"
+  },
+  "emptyFaviconData": {
+    "message": "网站图标数据为空。"
+  },
+  "emptyFolder": {
+    "message": "此文件夹为空。"
+  },
+  "expandAllFolders": {
+    "message": "展开所有文件夹"
+  },
+  "extDescription": {
+    "message": "管理并同步书签，可选支持 WebDAV。"
+  },
+  "faviconFetchFailed": {
+    "message": "获取网站图标失败。"
+  },
+  "faviconUpdateFailed": {
+    "message": "更新网站图标失败：$1"
+  },
+  "faviconUpdateFailedCount": {
+    "message": "更新网站图标失败（$1）。"
+  },
+  "faviconUpdated": {
+    "message": "网站图标已更新。"
+  },
+  "faviconsUpdatedSuccess": {
+    "message": "网站图标更新完成：成功 $1 个。"
+  },
+  "faviconsUpdatedSuccessFail": {
+    "message": "网站图标更新完成：成功 $1 个，失败 $2 个。"
+  },
+  "fileNameEmpty": {
+    "message": "文件名不能为空。"
+  },
+  "fileNameNoPathSeparators": {
+    "message": "文件名不能包含路径分隔符。"
+  },
+  "filesInDirectory": {
+    "message": "目录中的文件"
+  },
+  "folderBookmarkCount": {
+    "message": "$1 个书签"
+  },
+  "folderContainsBookmarksMessage": {
+    "message": "该文件夹包含 $1 个书签。要删除该文件夹及其全部内容吗？"
+  },
+  "folderContainsBookmarksTitle": {
+    "message": "文件夹包含书签"
+  },
+  "folderCreated": {
+    "message": "文件夹已创建。"
+  },
+  "folderDeleted": {
+    "message": "文件夹已删除。"
+  },
+  "folderFolderCount": {
+    "message": "$1 个文件夹"
+  },
+  "folderName": {
+    "message": "文件夹名称"
+  },
+  "folderNotFound": {
+    "message": "未找到文件夹。"
+  },
+  "folderSortedAsc": {
+    "message": "文件夹已按升序排序。"
+  },
+  "folderSortedDesc": {
+    "message": "文件夹已按降序排序。"
+  },
+  "folderUpdated": {
+    "message": "文件夹已更新。"
+  },
+  "hostPermissionDenied": {
+    "message": "主机权限被拒绝：$1"
+  },
+  "hostPermissionRequired": {
+    "message": "需要主机权限：$1"
+  },
+  "initializationFailed": {
+    "message": "初始化失败：$1"
+  },
+  "invalidUrlFormat": {
+    "message": "链接格式无效。"
+  },
+  "languageCurrentTooltip": {
+    "message": "语言：$1"
+  },
+  "loadBookmarksFailed": {
+    "message": "加载书签失败：$1"
+  },
+  "menuAddBookmark": {
+    "message": "添加书签"
+  },
+  "menuAddFolder": {
+    "message": "添加文件夹"
+  },
+  "menuCollapseFolder": {
+    "message": "折叠文件夹"
+  },
+  "menuCopyBookmarkUrl": {
+    "message": "复制书签链接"
+  },
+  "menuDeleteBookmark": {
+    "message": "删除书签"
+  },
+  "menuDeleteFolder": {
+    "message": "删除文件夹"
+  },
+  "menuEditBookmark": {
+    "message": "编辑书签"
+  },
+  "menuEditFolder": {
+    "message": "编辑文件夹"
+  },
+  "menuExpandFolder": {
+    "message": "展开文件夹"
+  },
+  "menuOpenBookmark": {
+    "message": "打开书签"
+  },
+  "menuRefreshFavicon": {
+    "message": "刷新网站图标"
+  },
+  "menuRefreshFolderFavicons": {
+    "message": "刷新文件夹网站图标"
+  },
+  "moveFailed": {
+    "message": "移动失败：$1"
+  },
+  "movedSuccessfully": {
+    "message": "移动成功。"
+  },
+  "newFileNameLabel": {
+    "message": "新文件名（默认：bookmarks.html）"
+  },
+  "newFolderDefault": {
+    "message": "新建文件夹"
+  },
+  "noBookmarkFoldersFound": {
+    "message": "未找到书签文件夹。"
+  },
+  "noBookmarksInFolder": {
+    "message": "该文件夹中没有书签。"
+  },
+  "noCanvasContext": {
+    "message": "Canvas 上下文不可用。"
+  },
+  "notConfigured": {
+    "message": "未配置"
+  },
+  "optionsHeading": {
+    "message": "WebDAV 配置"
+  },
+  "optionsPageTitle": {
+    "message": "WebDAV 配置"
+  },
+  "optionsSubtitle": {
+    "message": "配置用于书签同步的 WebDAV 目录。"
+  },
+  "parseWebdavResponseFailed": {
+    "message": "解析 WebDAV 响应失败。"
+  },
+  "passwordOptional": {
+    "message": "密码（可选）"
+  },
+  "pastePermissionDenied": {
+    "message": "粘贴权限被拒绝。"
+  },
+  "promptConfirm": {
+    "message": "确认"
+  },
+  "promptNotice": {
+    "message": "提示"
+  },
+  "readFailedHttp": {
+    "message": "读取失败（HTTP $1）。"
+  },
+  "refresh": {
+    "message": "刷新"
+  },
+  "refreshFolderFavicons": {
+    "message": "刷新文件夹网站图标"
+  },
+  "rootFolder": {
+    "message": "根目录"
+  },
+  "save": {
+    "message": "保存"
+  },
+  "saveConfiguration": {
+    "message": "保存配置"
+  },
+  "saveFailed": {
+    "message": "保存失败：$1"
+  },
+  "selectOrEnterFile": {
+    "message": "选择已有文件或输入新文件名。"
+  },
+  "sortAscending": {
+    "message": "升序排序"
+  },
+  "sortDescending": {
+    "message": "降序排序"
+  },
+  "sortFailed": {
+    "message": "排序失败：$1"
+  },
+  "sortFolder": {
+    "message": "排序文件夹"
+  },
+  "startUpload": {
+    "message": "开始上传"
+  },
+  "summaryBookmarks": {
+    "message": "书签：$1"
+  },
+  "summaryBookmarksInitial": {
+    "message": "书签：-"
+  },
+  "summaryFolders": {
+    "message": "文件夹：$1"
+  },
+  "summaryFoldersInitial": {
+    "message": "文件夹：-"
+  },
+  "testBeforeSave": {
+    "message": "保存前请先运行并通过连接测试。"
+  },
+  "testConnection": {
+    "message": "测试连接"
+  },
+  "testingConnection": {
+    "message": "正在测试连接..."
+  },
+  "testingWebdavConnection": {
+    "message": "正在测试 WebDAV 连接..."
+  },
+  "treeActionsAria": {
+    "message": "书签树操作"
+  },
+  "unnamedFolder": {
+    "message": "未命名文件夹"
+  },
+  "untitled": {
+    "message": "未命名"
+  },
+  "updateBookmarkFailed": {
+    "message": "更新书签失败：$1"
+  },
+  "updateFolderFailed": {
+    "message": "更新文件夹失败：$1"
+  },
+  "uploadFailed": {
+    "message": "上传失败：$1"
+  },
+  "uploadFailedHttp": {
+    "message": "上传失败（HTTP $1）。"
+  },
+  "uploadSuccessful": {
+    "message": "上传成功：$1"
+  },
+  "uploadingBookmarks": {
+    "message": "正在上传书签..."
+  },
+  "urlInvalid": {
+    "message": "请输入有效链接。"
+  },
+  "urlNotWebdavDirectory": {
+    "message": "指定的链接不是 WebDAV 目录。"
+  },
+  "urlOnlyHttpHttps": {
+    "message": "仅支持 http/https 链接。"
+  },
+  "urlPlaceholder": {
+    "message": "https://example.com"
+  },
+  "urlRequired": {
+    "message": "链接为必填项。"
+  },
+  "usernameOptional": {
+    "message": "用户名（可选）"
+  },
+  "webdavEntries": {
+    "message": "WebDAV 条目：$1"
+  },
+  "webdavEntriesDash": {
+    "message": "WebDAV 条目：-"
+  },
+  "webdavEntriesError": {
+    "message": "WebDAV 条目：错误"
+  },
+  "webdavEntriesRefreshing": {
+    "message": "WebDAV 条目：正在刷新..."
+  },
+  "webdavLabel": {
+    "message": "WebDAV"
+  },
+  "webdavMustUseHttps": {
+    "message": "WebDAV 链接必须使用 HTTPS。"
+  },
+  "webdavUrlLabel": {
+    "message": "WebDAV 链接（目录，仅支持 HTTPS）"
+  },
+  "webdavUrlPlaceholder": {
+    "message": "https://example.com/webdav/"
+  }
+}

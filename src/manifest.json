@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Yet Another Bookmark Manager",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
+  "version": "0.1.0",
+  "action": {
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "32": "assets/icons/icon32.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    },
+    "default_title": "Yet Another Bookmark Manager"
+  },
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "options_page": "pages/bookmarks/bookmarks.html?openConfig=1",
+  "permissions": [
+    "bookmarks",
+    "storage"
+  ],
+  "optional_host_permissions": [
+    "https://*/*"
+  ],
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "32": "assets/icons/icon32.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  }
+}

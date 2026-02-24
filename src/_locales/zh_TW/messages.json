@@ -1,0 +1,566 @@
+{
+  "actionCopyBookmarkUrl": {
+    "message": "複製書籤連結"
+  },
+  "actionDefault": {
+    "message": "操作"
+  },
+  "actionDeleteBookmark": {
+    "message": "刪除書籤"
+  },
+  "actionEditBookmark": {
+    "message": "編輯書籤"
+  },
+  "actionRefreshFavicon": {
+    "message": "重新整理網站圖示"
+  },
+  "addBookmark": {
+    "message": "新增書籤"
+  },
+  "addBookmarkTitle": {
+    "message": "新增書籤"
+  },
+  "addFolder": {
+    "message": "新增資料夾"
+  },
+  "addFolderTitle": {
+    "message": "新增資料夾"
+  },
+  "appVersionTooltip": {
+    "message": "擴充功能版本"
+  },
+  "appVersionTooltipWithValue": {
+    "message": "擴充功能版本：$1"
+  },
+  "bookmarkActionsAria": {
+    "message": "書籤操作"
+  },
+  "bookmarkCreated": {
+    "message": "書籤已建立。"
+  },
+  "bookmarkDeleted": {
+    "message": "書籤已刪除。"
+  },
+  "bookmarkPanelAria": {
+    "message": "書籤"
+  },
+  "bookmarkRootNotFound": {
+    "message": "找不到瀏覽器書籤根資料夾。"
+  },
+  "bookmarkTitle": {
+    "message": "書籤標題"
+  },
+  "bookmarkUpdated": {
+    "message": "書籤已更新。"
+  },
+  "bookmarkUrlCopied": {
+    "message": "書籤連結已複製。"
+  },
+  "bookmarksPageTitle": {
+    "message": "Yet Another Bookmark Manager"
+  },
+  "browserEntries": {
+    "message": "瀏覽器項目：$1"
+  },
+  "browserEntriesDash": {
+    "message": "瀏覽器項目：-"
+  },
+  "browserEntriesError": {
+    "message": "瀏覽器項目：錯誤"
+  },
+  "browserEntriesRefreshing": {
+    "message": "瀏覽器項目：重新整理中..."
+  },
+  "btnConfiguration": {
+    "message": "設定"
+  },
+  "btnDownload": {
+    "message": "下載"
+  },
+  "btnUpload": {
+    "message": "上傳"
+  },
+  "cancel": {
+    "message": "取消"
+  },
+  "cannotDropFolder": {
+    "message": "無法拖放到此資料夾。"
+  },
+  "chooseExistingOrCreate": {
+    "message": "選擇現有檔案或建立新的匯出檔案。"
+  },
+  "clear": {
+    "message": "清除"
+  },
+  "clearConfig": {
+    "message": "清除設定"
+  },
+  "clearConfigurationMessage": {
+    "message": "要移除目前的 WebDAV 設定嗎？"
+  },
+  "clearConfigurationTitle": {
+    "message": "清除設定"
+  },
+  "clearFailed": {
+    "message": "清除失敗：$1"
+  },
+  "close": {
+    "message": "關閉"
+  },
+  "collapseAllFolders": {
+    "message": "收合所有資料夾"
+  },
+  "configurationCleared": {
+    "message": "設定已清除。"
+  },
+  "configurationSaved": {
+    "message": "設定已儲存。"
+  },
+  "configureWebdavFirst": {
+    "message": "請先設定 WebDAV。"
+  },
+  "confirmDownloadMessage": {
+    "message": "下載將覆蓋目前瀏覽器書籤。確認已備份後要繼續嗎？"
+  },
+  "confirmDownloadTitle": {
+    "message": "確認下載"
+  },
+  "confirmUploadMessage": {
+    "message": "將目前瀏覽器書籤上傳到 WebDAV。要繼續嗎？"
+  },
+  "confirmUploadTitle": {
+    "message": "確認上傳"
+  },
+  "connSuccessFoundFiles": {
+    "message": "連線成功。找到 $1 個檔案。"
+  },
+  "connSuccessNoFiles": {
+    "message": "連線成功。未找到檔案。"
+  },
+  "connectionFailed": {
+    "message": "連線失敗：$1"
+  },
+  "connectionFailedHttp": {
+    "message": "連線失敗（HTTP $1）。"
+  },
+  "contextCopy": {
+    "message": "複製"
+  },
+  "contextCut": {
+    "message": "剪下"
+  },
+  "contextDelete": {
+    "message": "刪除"
+  },
+  "contextPaste": {
+    "message": "貼上"
+  },
+  "contextSelectAll": {
+    "message": "全選"
+  },
+  "continue": {
+    "message": "繼續"
+  },
+  "continueDownload": {
+    "message": "繼續下載"
+  },
+  "copyBookmarkUrlFailed": {
+    "message": "複製書籤連結失敗：$1"
+  },
+  "copyBookmarkUrlFailedUnknown": {
+    "message": "未知的複製錯誤"
+  },
+  "create": {
+    "message": "建立"
+  },
+  "createBookmarkFailed": {
+    "message": "建立書籤失敗：$1"
+  },
+  "createFolderFailed": {
+    "message": "建立資料夾失敗：$1"
+  },
+  "createNewFile": {
+    "message": "建立新檔案"
+  },
+  "delete": {
+    "message": "刪除"
+  },
+  "deleteAll": {
+    "message": "全部刪除"
+  },
+  "deleteBookmarkMessage": {
+    "message": "要刪除書籤「$1」嗎？"
+  },
+  "deleteBookmarkTitle": {
+    "message": "刪除書籤"
+  },
+  "deleteFailed": {
+    "message": "刪除失敗：$1"
+  },
+  "deleteFolder": {
+    "message": "刪除資料夾"
+  },
+  "deleteFolderMessage": {
+    "message": "要刪除資料夾「$1」嗎？"
+  },
+  "deleteFolderTitle": {
+    "message": "刪除資料夾"
+  },
+  "directoryFiles": {
+    "message": "目錄檔案"
+  },
+  "downloadFailed": {
+    "message": "下載失敗：$1"
+  },
+  "downloadFailedHttp": {
+    "message": "下載失敗（HTTP $1）。"
+  },
+  "downloadSuccessful": {
+    "message": "下載成功：$1"
+  },
+  "downloadedFileInvalidBookmarks": {
+    "message": "下載的檔案不是有效的書籤 HTML。"
+  },
+  "downloadedFileNoEntries": {
+    "message": "下載的書籤檔案沒有項目。為保護既有資料，已停止覆蓋。"
+  },
+  "downloadingBookmarks": {
+    "message": "正在下載書籤..."
+  },
+  "dragSourceNotFound": {
+    "message": "找不到拖曳來源。"
+  },
+  "editActionsAria": {
+    "message": "編輯操作"
+  },
+  "editBookmarkTitle": {
+    "message": "編輯書籤"
+  },
+  "editFolder": {
+    "message": "編輯資料夾"
+  },
+  "editFolderTitle": {
+    "message": "編輯資料夾"
+  },
+  "editorEdit": {
+    "message": "編輯"
+  },
+  "editorName": {
+    "message": "名稱"
+  },
+  "editorNameRequired": {
+    "message": "名稱為必填。"
+  },
+  "editorUrl": {
+    "message": "連結"
+  },
+  "editorUrlRequired": {
+    "message": "連結為必填。"
+  },
+  "emptyFaviconData": {
+    "message": "網站圖示資料為空。"
+  },
+  "emptyFolder": {
+    "message": "此資料夾為空。"
+  },
+  "expandAllFolders": {
+    "message": "展開所有資料夾"
+  },
+  "extDescription": {
+    "message": "管理與同步書籤，可選擇支援 WebDAV。"
+  },
+  "faviconFetchFailed": {
+    "message": "取得網站圖示失敗。"
+  },
+  "faviconUpdateFailed": {
+    "message": "更新網站圖示失敗：$1"
+  },
+  "faviconUpdateFailedCount": {
+    "message": "更新網站圖示失敗（$1）。"
+  },
+  "faviconUpdated": {
+    "message": "網站圖示已更新。"
+  },
+  "faviconsUpdatedSuccess": {
+    "message": "網站圖示更新完成：成功 $1 個。"
+  },
+  "faviconsUpdatedSuccessFail": {
+    "message": "網站圖示更新完成：成功 $1 個，失敗 $2 個。"
+  },
+  "fileNameEmpty": {
+    "message": "檔名不可為空。"
+  },
+  "fileNameNoPathSeparators": {
+    "message": "檔名不可包含路徑分隔符號。"
+  },
+  "filesInDirectory": {
+    "message": "目錄中的檔案"
+  },
+  "folderBookmarkCount": {
+    "message": "$1 個書籤"
+  },
+  "folderContainsBookmarksMessage": {
+    "message": "此資料夾包含 $1 個書籤。要刪除此資料夾及所有內容嗎？"
+  },
+  "folderContainsBookmarksTitle": {
+    "message": "資料夾包含書籤"
+  },
+  "folderCreated": {
+    "message": "資料夾已建立。"
+  },
+  "folderDeleted": {
+    "message": "資料夾已刪除。"
+  },
+  "folderFolderCount": {
+    "message": "$1 個資料夾"
+  },
+  "folderName": {
+    "message": "資料夾名稱"
+  },
+  "folderNotFound": {
+    "message": "找不到資料夾。"
+  },
+  "folderSortedAsc": {
+    "message": "資料夾已依升冪排序。"
+  },
+  "folderSortedDesc": {
+    "message": "資料夾已依降冪排序。"
+  },
+  "folderUpdated": {
+    "message": "資料夾已更新。"
+  },
+  "hostPermissionDenied": {
+    "message": "主機權限遭拒：$1"
+  },
+  "hostPermissionRequired": {
+    "message": "需要主機權限：$1"
+  },
+  "initializationFailed": {
+    "message": "初始化失敗：$1"
+  },
+  "invalidUrlFormat": {
+    "message": "連結格式無效。"
+  },
+  "languageCurrentTooltip": {
+    "message": "語言：$1"
+  },
+  "loadBookmarksFailed": {
+    "message": "載入書籤失敗：$1"
+  },
+  "menuAddBookmark": {
+    "message": "新增書籤"
+  },
+  "menuAddFolder": {
+    "message": "新增資料夾"
+  },
+  "menuCollapseFolder": {
+    "message": "收合資料夾"
+  },
+  "menuCopyBookmarkUrl": {
+    "message": "複製書籤連結"
+  },
+  "menuDeleteBookmark": {
+    "message": "刪除書籤"
+  },
+  "menuDeleteFolder": {
+    "message": "刪除資料夾"
+  },
+  "menuEditBookmark": {
+    "message": "編輯書籤"
+  },
+  "menuEditFolder": {
+    "message": "編輯資料夾"
+  },
+  "menuExpandFolder": {
+    "message": "展開資料夾"
+  },
+  "menuOpenBookmark": {
+    "message": "開啟書籤"
+  },
+  "menuRefreshFavicon": {
+    "message": "重新整理網站圖示"
+  },
+  "menuRefreshFolderFavicons": {
+    "message": "重新整理資料夾網站圖示"
+  },
+  "moveFailed": {
+    "message": "移動失敗：$1"
+  },
+  "movedSuccessfully": {
+    "message": "移動成功。"
+  },
+  "newFileNameLabel": {
+    "message": "新檔名（預設：bookmarks.html）"
+  },
+  "newFolderDefault": {
+    "message": "新資料夾"
+  },
+  "noBookmarkFoldersFound": {
+    "message": "找不到書籤資料夾。"
+  },
+  "noBookmarksInFolder": {
+    "message": "此資料夾中沒有書籤。"
+  },
+  "noCanvasContext": {
+    "message": "Canvas 上下文無法使用。"
+  },
+  "notConfigured": {
+    "message": "尚未設定"
+  },
+  "optionsHeading": {
+    "message": "WebDAV 設定"
+  },
+  "optionsPageTitle": {
+    "message": "WebDAV 設定"
+  },
+  "optionsSubtitle": {
+    "message": "設定用於書籤同步的 WebDAV 目錄。"
+  },
+  "parseWebdavResponseFailed": {
+    "message": "解析 WebDAV 回應失敗。"
+  },
+  "passwordOptional": {
+    "message": "密碼（選填）"
+  },
+  "pastePermissionDenied": {
+    "message": "貼上權限遭拒。"
+  },
+  "promptConfirm": {
+    "message": "確認"
+  },
+  "promptNotice": {
+    "message": "提示"
+  },
+  "readFailedHttp": {
+    "message": "讀取失敗（HTTP $1）。"
+  },
+  "refresh": {
+    "message": "重新整理"
+  },
+  "refreshFolderFavicons": {
+    "message": "重新整理資料夾網站圖示"
+  },
+  "rootFolder": {
+    "message": "根目錄"
+  },
+  "save": {
+    "message": "儲存"
+  },
+  "saveConfiguration": {
+    "message": "儲存設定"
+  },
+  "saveFailed": {
+    "message": "儲存失敗：$1"
+  },
+  "selectOrEnterFile": {
+    "message": "選擇現有檔案或輸入新檔名。"
+  },
+  "sortAscending": {
+    "message": "升冪排序"
+  },
+  "sortDescending": {
+    "message": "降冪排序"
+  },
+  "sortFailed": {
+    "message": "排序失敗：$1"
+  },
+  "sortFolder": {
+    "message": "排序資料夾"
+  },
+  "startUpload": {
+    "message": "開始上傳"
+  },
+  "summaryBookmarks": {
+    "message": "書籤：$1"
+  },
+  "summaryBookmarksInitial": {
+    "message": "書籤：-"
+  },
+  "summaryFolders": {
+    "message": "資料夾：$1"
+  },
+  "summaryFoldersInitial": {
+    "message": "資料夾：-"
+  },
+  "testBeforeSave": {
+    "message": "儲存前請先執行並通過連線測試。"
+  },
+  "testConnection": {
+    "message": "測試連線"
+  },
+  "testingConnection": {
+    "message": "正在測試連線..."
+  },
+  "testingWebdavConnection": {
+    "message": "正在測試 WebDAV 連線..."
+  },
+  "treeActionsAria": {
+    "message": "書籤樹操作"
+  },
+  "unnamedFolder": {
+    "message": "未命名資料夾"
+  },
+  "untitled": {
+    "message": "未命名"
+  },
+  "updateBookmarkFailed": {
+    "message": "更新書籤失敗：$1"
+  },
+  "updateFolderFailed": {
+    "message": "更新資料夾失敗：$1"
+  },
+  "uploadFailed": {
+    "message": "上傳失敗：$1"
+  },
+  "uploadFailedHttp": {
+    "message": "上傳失敗（HTTP $1）。"
+  },
+  "uploadSuccessful": {
+    "message": "上傳成功：$1"
+  },
+  "uploadingBookmarks": {
+    "message": "正在上傳書籤..."
+  },
+  "urlInvalid": {
+    "message": "請輸入有效連結。"
+  },
+  "urlNotWebdavDirectory": {
+    "message": "指定的連結不是 WebDAV 目錄。"
+  },
+  "urlOnlyHttpHttps": {
+    "message": "僅支援 http/https 連結。"
+  },
+  "urlPlaceholder": {
+    "message": "https://example.com"
+  },
+  "urlRequired": {
+    "message": "連結為必填。"
+  },
+  "usernameOptional": {
+    "message": "使用者名稱（選填）"
+  },
+  "webdavEntries": {
+    "message": "WebDAV 項目：$1"
+  },
+  "webdavEntriesDash": {
+    "message": "WebDAV 項目：-"
+  },
+  "webdavEntriesError": {
+    "message": "WebDAV 項目：錯誤"
+  },
+  "webdavEntriesRefreshing": {
+    "message": "WebDAV 項目：重新整理中..."
+  },
+  "webdavLabel": {
+    "message": "WebDAV"
+  },
+  "webdavMustUseHttps": {
+    "message": "WebDAV 連結必須使用 HTTPS。"
+  },
+  "webdavUrlLabel": {
+    "message": "WebDAV 連結（目錄，僅支援 HTTPS）"
+  },
+  "webdavUrlPlaceholder": {
+    "message": "https://example.com/webdav/"
+  }
+}

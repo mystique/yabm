@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n="optionsPageTitle">WebDAV Configuration</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <main class="container">
+    <h1 data-i18n="optionsHeading">WebDAV Configuration</h1>
+    <p class="subtitle" data-i18n="optionsSubtitle">Configure the WebDAV directory used for bookmark sync.</p>
+
+    <section class="card">
+      <label class="field">
+        <span data-i18n="webdavUrlLabel">WebDAV URL (directory, HTTPS only)</span>
+        <input id="directory-url" type="url" data-i18n-placeholder="webdavUrlPlaceholder" placeholder="https://example.com/webdav/" required />
+      </label>
+
+      <div class="field-row">
+        <label class="field">
+          <span data-i18n="usernameOptional">Username (optional)</span>
+          <input id="username" type="text" autocomplete="username" />
+        </label>
+        <label class="field">
+          <span data-i18n="passwordOptional">Password (optional)</span>
+          <input id="password" type="password" autocomplete="current-password" />
+        </label>
+      </div>
+
+      <div class="actions">
+        <button id="test-connection" type="button" class="btn" data-i18n="testConnection">Test connection</button>
+      </div>
+    </section>
+
+    <section id="file-section" class="card hidden">
+      <h2 data-i18n="directoryFiles">Directory files</h2>
+      <p class="help" data-i18n="chooseExistingOrCreate">Choose an existing file or create a new export file.</p>
+
+      <div id="files-container" class="files"></div>
+
+      <label class="field">
+        <span data-i18n="newFileNameLabel">New file name (default: bookmarks.html)</span>
+        <input id="new-file-name" type="text" value="bookmarks.html" />
+      </label>
+
+      <div class="actions">
+        <button id="save-config" type="button" class="btn" data-i18n="saveConfiguration">Save configuration</button>
+      </div>
+    </section>
+
+    <p id="status" class="status is-hidden" aria-live="polite"></p>
+  </main>
+
+  <script src="../../lib/i18n.js"></script>
+  <script src="../../lib/sync-utils.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
