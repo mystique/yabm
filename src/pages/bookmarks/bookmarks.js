@@ -3,6 +3,7 @@ const faviconCacheState = {
   loaded: false,
   map: {},
 };
+let faviconUpdateInFlight = false;
 const t = (key, substitutions) => window.YABMI18n.t(key, substitutions);
 const LANGUAGE_OPTIONS = [
   { value: window.YABMI18n.AUTO_LANGUAGE, label: "Auto (Browser)", flag: "🌐" },
@@ -21,7 +22,11 @@ const LANGUAGE_OPTIONS = [
 const flagIconCache = new Map();
 const TWEMOJI_BASE_PATH = "assets/twemoji";
 const WEBDAV_ICON_STATES = {
-  notConfigured: { cssClass: "is-not-configured", codepoint: "26aa", fallback: "?" },
+  notConfigured: {
+    cssClass: "is-not-configured",
+    codepoint: "26aa",
+    fallback: "?",
+  },
   checking: { cssClass: "is-checking", codepoint: "23f3", fallback: "..." },
   ready: { cssClass: "is-ready", codepoint: "1f7e2", fallback: "OK" },
   error: { cssClass: "is-error", codepoint: "1f534", fallback: "!" },
@@ -103,7 +108,9 @@ async function copyBookmarkUrl(node) {
     setStatus(t("bookmarkUrlCopied"), "success");
   } catch (error) {
     setStatus(
-      t("copyBookmarkUrlFailed", [error?.message || t("copyBookmarkUrlFailedUnknown")]),
+      t("copyBookmarkUrlFailed", [
+        error?.message || t("copyBookmarkUrlFailedUnknown"),
+      ]),
       "error",
     );
   }
@@ -130,6 +137,43 @@ function getBookmarkNodesInFolder(node) {
   };
   walk(node);
   return bookmarks;
+}
+
+function collectBookmarkIds(tree) {
+  const ids = new Set();
+  const walk = (nodes) => {
+    for (const node of nodes || []) {
+      if (node?.url) {
+        ids.add(String(node.id));
+      } else if (node?.children) {
+        walk(node.children);
+      }
+    }
+  };
+  walk(tree);
+  return ids;
+}
+
+async function pruneFaviconCacheForTree(tree) {
+  await ensureFaviconCacheLoaded();
+  const cache = faviconCacheState.map || {};
+  const cachedIds = Object.keys(cache);
+  if (!cachedIds.length) {
+    return;
+  }
+
+  const validIds = collectBookmarkIds(tree);
+  let changed = false;
+  for (const id of cachedIds) {
+    if (!validIds.has(id)) {
+      delete cache[id];
+      changed = true;
+    }
+  }
+
+  if (changed) {
+    await persistFaviconCache();
+  }
 }
 
 async function loadImageAsDataUrl(src) {
@@ -197,6 +241,12 @@ async function fetchFaviconDataUrlForBookmark(node) {
 }
 
 async function refreshBookmarkFavicon(node, { silent = false } = {}) {
+  if (faviconUpdateInFlight) {
+    setStatus(t("faviconUpdateInProgress"), "");
+    showTopToast(t("faviconUpdateInProgress"), "");
+    return;
+  }
+  faviconUpdateInFlight = true;
   showTopProgress();
   try {
     await ensureFaviconCacheLoaded();
@@ -212,15 +262,23 @@ async function refreshBookmarkFavicon(node, { silent = false } = {}) {
       await rerenderAfterTreeChange([node.parentId].filter(Boolean));
     }
   } finally {
+    faviconUpdateInFlight = false;
     hideTopProgress();
   }
 }
 
 async function refreshFolderFavicons(folderNode) {
+  if (faviconUpdateInFlight) {
+    setStatus(t("faviconUpdateInProgress"), "");
+    showTopToast(t("faviconUpdateInProgress"), "");
+    return;
+  }
+  faviconUpdateInFlight = true;
   await ensureFaviconCacheLoaded();
   const bookmarks = getBookmarkNodesInFolder(folderNode);
   if (!bookmarks.length) {
     setStatus(t("noBookmarksInFolder"), "error");
+    faviconUpdateInFlight = false;
     return;
   }
 
@@ -261,6 +319,7 @@ async function refreshFolderFavicons(folderNode) {
     }
     await rerenderAfterTreeChange([folderNode.id]);
   } finally {
+    faviconUpdateInFlight = false;
     hideTopProgress();
   }
 }
@@ -1797,7 +1856,6 @@ function updateBookmarkListScrollbar() {
   track.style.top = `${trackTop}px`;
   track.style.left = `${trackLeft}px`;
   track.style.height = `${trackHeight}px`;
-  const arrowGap = 3;
   const arrowWidth = upArrow.offsetWidth || 16;
   const arrowHeight = upArrow.offsetHeight || 14;
   const arrowLeft = Math.round(
@@ -1805,8 +1863,8 @@ function updateBookmarkListScrollbar() {
   );
   upArrow.style.left = `${arrowLeft - 2}px`;
   downArrow.style.left = `${arrowLeft - 2}px`;
-  upArrow.style.top = `${Math.round(trackTop - arrowHeight - arrowGap)}px`;
-  downArrow.style.top = `${Math.round(trackTop + trackHeight + arrowGap)}px`;
+  upArrow.style.top = `${Math.round(trackTop - arrowHeight)}px`;
+  downArrow.style.top = `${Math.round(trackTop + trackHeight - 2)}px`;
   const thumbInsetTop = BOOKMARK_SCROLLBAR_METRICS.thumbInsetTop;
   const thumbInsetBottom = BOOKMARK_SCROLLBAR_METRICS.thumbInsetBottom;
   const thumbTrackHeight = Math.max(
@@ -2560,7 +2618,8 @@ function setWebdavStatusIndicator(stateKey, tooltipText) {
     return;
   }
 
-  const state = WEBDAV_ICON_STATES[stateKey] || WEBDAV_ICON_STATES.notConfigured;
+  const state =
+    WEBDAV_ICON_STATES[stateKey] || WEBDAV_ICON_STATES.notConfigured;
   indicator.classList.remove(...WEBDAV_ICON_STATE_CLASSES);
   indicator.classList.add(state.cssClass);
   indicator.dataset.tooltip = getWebdavIndicatorTooltip(tooltipText);
@@ -2660,12 +2719,15 @@ async function refreshWebdavStatusBar({ interactive = false } = {}) {
 
     const [browserCount, webdavEntries] = await Promise.all([
       getBrowserBookmarkEntryCount(),
-      window.YABMSync.getWebDavBookmarkEntryCount({
-        directoryUrl: config.directoryUrl,
-        fileName: config.fileName,
-        username: config.username || "",
-        password: config.password || "",
-      }, { interactive }),
+      window.YABMSync.getWebDavBookmarkEntryCount(
+        {
+          directoryUrl: config.directoryUrl,
+          fileName: config.fileName,
+          username: config.username || "",
+          password: config.password || "",
+        },
+        { interactive },
+      ),
     ]);
 
     setWebdavStatusBarState({
@@ -2954,12 +3016,19 @@ function bindTreeActions() {
     event.preventDefault(),
   );
   scrollbarTrack?.addEventListener("pointerdown", (event) => {
-    if (scrollbarThumb && event.target && scrollbarThumb.contains(event.target)) {
+    if (
+      scrollbarThumb &&
+      event.target &&
+      scrollbarThumb.contains(event.target)
+    ) {
       return;
     }
     startBookmarkTrackPressScroll(event);
   });
-  scrollbarThumb?.addEventListener("pointerdown", handleBookmarkThumbPointerDown);
+  scrollbarThumb?.addEventListener(
+    "pointerdown",
+    handleBookmarkThumbPointerDown,
+  );
   scrollbarThumb?.addEventListener("dragstart", (event) =>
     event.preventDefault(),
   );
@@ -3191,6 +3260,7 @@ async function renderBookmarksWithOpenState(openFolderIds) {
   await ensureFaviconCacheLoaded();
   const container = document.getElementById("bookmark-list");
   const tree = await chrome.bookmarks.getTree();
+  await pruneFaviconCacheForTree(tree);
   const folders = getTopLevelFolders(tree);
   updateTreeSummaryStats(folders);
 
@@ -3229,7 +3299,11 @@ async function initPage() {
   const currentUrl = new URL(window.location.href);
   if (currentUrl.searchParams.get("openConfig") === "1") {
     currentUrl.searchParams.delete("openConfig");
-    window.history.replaceState(null, "", `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`);
+    window.history.replaceState(
+      null,
+      "",
+      `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`,
+    );
     await openConfigModal();
   }
 }

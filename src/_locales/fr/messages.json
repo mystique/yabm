@@ -278,6 +278,9 @@
   "faviconUpdateFailedCount": {
     "message": "Failed to update favicon ($1)."
   },
+  "faviconUpdateInProgress": {
+    "message": "Favicon update already in progress."
+  },
   "faviconUpdated": {
     "message": "Favicon updated."
   },

@@ -40,7 +40,8 @@
     --viewport-gap-side: 16px;
     --bottom-status-space: 84px;
     --bookmark-head-height: 44px;
-    font-family: "Space Grotesk", "Segoe UI", "PingFang SC", "Microsoft YaHei",
+    font-family:
+        "Space Grotesk", "Segoe UI", "PingFang SC", "Microsoft YaHei",
         sans-serif;
 }
 
@@ -274,8 +275,11 @@ header {
     padding: 12px;
     border: 1px solid #d4e1f1;
     border-radius: 14px;
-    background:
-        linear-gradient(120deg, rgba(230, 241, 255, 0.9), rgba(255, 255, 255, 0.92));
+    background: linear-gradient(
+        120deg,
+        rgba(230, 241, 255, 0.9),
+        rgba(255, 255, 255, 0.92)
+    );
 }
 
 h1 {
@@ -495,7 +499,7 @@ h1 {
     top: 0;
     left: 0;
     height: 0;
-    width: 8px;
+    width: 7px;
     border-radius: 999px;
     background: rgba(191, 210, 231, 0.78);
     border: 1px solid rgba(156, 183, 210, 0.82);
@@ -507,7 +511,9 @@ h1 {
     cursor: pointer;
     opacity: 1;
     visibility: visible;
-    transition: opacity 180ms ease, visibility 180ms ease;
+    transition:
+        opacity 180ms ease,
+        visibility 180ms ease;
     will-change: opacity;
 }
 
@@ -543,7 +549,9 @@ h1 {
     pointer-events: auto;
     opacity: 1;
     visibility: visible;
-    transition: opacity 180ms ease, visibility 180ms ease;
+    transition:
+        opacity 180ms ease,
+        visibility 180ms ease;
     will-change: opacity;
 }
 
@@ -1035,7 +1043,11 @@ h1 {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at 20% 20%, rgba(143, 182, 226, 0.22), transparent 38%),
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(143, 182, 226, 0.22),
+            transparent 38%
+        ),
         rgba(20, 29, 43, 0.44);
     transition: opacity 160ms ease;
     opacity: 0;
@@ -1048,7 +1060,11 @@ h1 {
     overflow: auto;
     margin: 0;
     background:
-        linear-gradient(180deg, rgba(240, 247, 255, 0.78), rgba(255, 255, 255, 0.98) 24%),
+        linear-gradient(
+            180deg,
+            rgba(240, 247, 255, 0.78),
+            rgba(255, 255, 255, 0.98) 24%
+        ),
         #fff;
     border: 1px solid #ccdbec;
     border-radius: 14px;
@@ -1086,7 +1102,11 @@ h1 {
 .modal-footer {
     padding: 12px 14px;
     border-bottom: 1px solid var(--line);
-    background: linear-gradient(90deg, rgba(239, 247, 255, 0.95), rgba(255, 255, 255, 0.92));
+    background: linear-gradient(
+        90deg,
+        rgba(239, 247, 255, 0.95),
+        rgba(255, 255, 255, 0.92)
+    );
 }
 
 .modal-footer {

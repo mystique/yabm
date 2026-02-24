@@ -278,6 +278,9 @@
   "faviconUpdateFailedCount": {
     "message": "更新網站圖示失敗（$1）。"
   },
+  "faviconUpdateInProgress": {
+    "message": "網站圖示正在更新中。"
+  },
   "faviconUpdated": {
     "message": "網站圖示已更新。"
   },
