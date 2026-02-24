@@ -787,6 +787,7 @@ function createActionButton({ ariaLabel, icon, onClick, danger = false }) {
 const dragState = {
   nodeId: null,
   nodeType: null,
+  parentId: null,
 };
 let dragGhostEl = null;
 
@@ -808,6 +809,7 @@ function clearFolderDragOverStyles() {
 function handleNodeDragStart(event, node, nodeType) {
   dragState.nodeId = node.id;
   dragState.nodeType = nodeType;
+  dragState.parentId = node.parentId;
   event.dataTransfer.effectAllowed = "move";
   event.dataTransfer.setData("text/plain", node.id);
   const sourceEl = event.currentTarget;
@@ -850,6 +852,8 @@ function handleFolderDragEnter(event, details) {
     return;
   }
   event.preventDefault();
+  // Clear other folders' highlight first
+  clearFolderDragOverStyles();
   details.classList.add("drag-over");
 }
 
@@ -859,12 +863,10 @@ function handleFolderDragOver(event, details) {
   }
   event.preventDefault();
   event.dataTransfer.dropEffect = "move";
-  details.classList.add("drag-over");
 }
 
 function handleFolderDragLeave(event, details) {
-  const relatedTarget = event.relatedTarget;
-  if (relatedTarget && details.contains(relatedTarget)) {
+  if (event.relatedTarget && details.contains(event.relatedTarget)) {
     return;
   }
   details.classList.remove("drag-over");
@@ -3034,6 +3036,28 @@ function bindTreeActions() {
   );
   bookmarkListEl?.addEventListener("scroll", updateBookmarkListScrollbar, {
     passive: true,
+  });
+  bookmarkListEl?.addEventListener("dragover", (event) => {
+    if (!dragState.nodeId) {
+      return;
+    }
+    const folder = event.target?.closest?.(".folder");
+    if (!folder) {
+      return;
+    }
+    const folderId = folder.dataset.folderId;
+    // Skip if target is the source's own parent folder
+    if (String(folderId) === String(dragState.parentId)) {
+      return;
+    }
+    // Skip if dragging a folder into its own descendant
+    if (dragState.nodeType === "folder" && folder.contains(document.querySelector(`[data-folder-id="${dragState.nodeId}"]`))) {
+      return;
+    }
+    if (!folder.classList.contains("drag-over")) {
+      clearFolderDragOverStyles();
+      folder.classList.add("drag-over");
+    }
   });
   if (!bookmarkScrollbarState.globalEventsBound) {
     bookmarkScrollbarState.globalEventsBound = true;
