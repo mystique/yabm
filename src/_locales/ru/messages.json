@@ -1,567 +1,567 @@
 {
   "actionCopyBookmarkUrl": {
-    "message": "Copy bookmark URL"
+    "message": "Копировать URL закладки"
   },
   "actionDefault": {
-    "message": "Action"
+    "message": "Действие"
   },
   "actionDeleteBookmark": {
-    "message": "Delete bookmark"
+    "message": "Удалить закладку"
   },
   "actionEditBookmark": {
-    "message": "Edit bookmark"
+    "message": "Изменить закладку"
   },
   "actionRefreshFavicon": {
-    "message": "Refresh favicon"
+    "message": "Обновить значок"
   },
   "addBookmark": {
-    "message": "Add bookmark"
+    "message": "Добавить закладку"
   },
   "addBookmarkTitle": {
-    "message": "Add bookmark"
+    "message": "Добавить закладку"
   },
   "addFolder": {
-    "message": "Add folder"
+    "message": "Добавить папку"
   },
   "addFolderTitle": {
-    "message": "Add folder"
+    "message": "Добавить папку"
   },
   "appVersionTooltip": {
-    "message": "Extension version"
+    "message": "Версия расширения"
   },
   "appVersionTooltipWithValue": {
-    "message": "Extension version: $1"
+    "message": "Версия расширения: $1"
   },
   "bookmarkActionsAria": {
-    "message": "Bookmark actions"
+    "message": "Действия с закладками"
   },
   "bookmarkCreated": {
-    "message": "Bookmark created."
+    "message": "Закладка создана."
   },
   "bookmarkDeleted": {
-    "message": "Bookmark deleted."
+    "message": "Закладка удалена."
   },
   "bookmarkPanelAria": {
-    "message": "Bookmarks"
+    "message": "Закладки"
   },
   "bookmarkRootNotFound": {
-    "message": "Browser bookmark root folder not found."
+    "message": "Корневая папка закладок браузера не найдена."
   },
   "bookmarkTitle": {
-    "message": "Bookmark title"
+    "message": "Название закладки"
   },
   "bookmarkUpdated": {
-    "message": "Bookmark updated."
+    "message": "Закладка обновлена."
   },
   "bookmarkUrlCopied": {
-    "message": "Bookmark URL copied."
+    "message": "URL закладки скопирован."
   },
   "bookmarksPageTitle": {
     "message": "Yet Another Bookmark Manager"
   },
   "browserEntries": {
-    "message": "Browser entries: $1"
+    "message": "Записи браузера: $1"
   },
   "browserEntriesDash": {
-    "message": "Browser entries: -"
+    "message": "Записи браузера: -"
   },
   "browserEntriesError": {
-    "message": "Browser entries: Error"
+    "message": "Записи браузера: Ошибка"
   },
   "browserEntriesRefreshing": {
-    "message": "Browser entries: Refreshing..."
+    "message": "Записи браузера: Обновление..."
   },
   "btnConfiguration": {
-    "message": "Configuration"
+    "message": "Конфигурация"
   },
   "btnDownload": {
-    "message": "Download"
+    "message": "Загрузить"
   },
   "btnUpload": {
-    "message": "Upload"
+    "message": "Выгрузить"
   },
   "cancel": {
-    "message": "Cancel"
+    "message": "Отмена"
   },
   "cannotDropFolder": {
-    "message": "Cannot drop into this folder."
+    "message": "Невозможно поместить в эту папку."
   },
   "chooseExistingOrCreate": {
-    "message": "Choose an existing file or create a new export file."
+    "message": "Выберите существующий файл или создайте новый файл экспорта."
   },
   "clear": {
-    "message": "Clear"
+    "message": "Очистить"
   },
   "clearConfig": {
-    "message": "Clear config"
+    "message": "Очистить конфигурацию"
   },
   "clearConfigurationMessage": {
-    "message": "Remove the current WebDAV configuration?"
+    "message": "Удалить текущую конфигурацию WebDAV?"
   },
   "clearConfigurationTitle": {
-    "message": "Clear configuration"
+    "message": "Очистить конфигурацию"
   },
   "clearFailed": {
-    "message": "Clear failed: $1"
+    "message": "Ошибка при очистке: $1"
   },
   "close": {
-    "message": "Close"
+    "message": "Закрыть"
   },
   "collapseAllFolders": {
-    "message": "Collapse all folders"
+    "message": "Свернуть все папки"
   },
   "configurationCleared": {
-    "message": "Configuration cleared."
+    "message": "Конфигурация очищена."
   },
   "configurationSaved": {
-    "message": "Configuration saved."
+    "message": "Конфигурация сохранена."
   },
   "configureWebdavFirst": {
-    "message": "Please configure WebDAV first."
+    "message": "Сначала настройте WebDAV."
   },
   "confirmDownloadMessage": {
-    "message": "Downloading will overwrite current browser bookmarks. Continue after confirming your backup?"
+    "message": "Загрузка перезапишет текущие закладки браузера. Продолжить после подтверждения резервной копии?"
   },
   "confirmDownloadTitle": {
-    "message": "Confirm download"
+    "message": "Подтвердить загрузку"
   },
   "confirmUploadMessage": {
-    "message": "Upload current browser bookmarks to WebDAV. Continue?"
+    "message": "Выгрузить текущие закладки браузера на WebDAV. Продолжить?"
   },
   "confirmUploadTitle": {
-    "message": "Confirm upload"
+    "message": "Подтвердить выгрузку"
   },
   "connSuccessFoundFiles": {
-    "message": "Connection successful. Found $1 files."
+    "message": "Соединение установлено. Найдено файлов: $1."
   },
   "connSuccessNoFiles": {
-    "message": "Connection successful. No files found."
+    "message": "Соединение установлено. Файлы не найдены."
   },
   "connectionFailed": {
-    "message": "Connection failed: $1"
+    "message": "Ошибка соединения: $1"
   },
   "connectionFailedHttp": {
-    "message": "Connection failed (HTTP $1)."
+    "message": "Ошибка соединения (HTTP $1)."
   },
   "contextCopy": {
-    "message": "Copy"
+    "message": "Копировать"
   },
   "contextCut": {
-    "message": "Cut"
+    "message": "Вырезать"
   },
   "contextDelete": {
-    "message": "Delete"
+    "message": "Удалить"
   },
   "contextPaste": {
-    "message": "Paste"
+    "message": "Вставить"
   },
   "contextSelectAll": {
-    "message": "Select all"
+    "message": "Выделить всё"
   },
   "continue": {
-    "message": "Continue"
+    "message": "Продолжить"
   },
   "continueDownload": {
-    "message": "Continue download"
+    "message": "Продолжить загрузку"
   },
   "copyBookmarkUrlFailed": {
-    "message": "Failed to copy bookmark URL: $1"
+    "message": "Ошибка при копировании URL закладки: $1"
   },
   "copyBookmarkUrlFailedUnknown": {
-    "message": "Unknown copy error"
+    "message": "Неизвестная ошибка копирования"
   },
   "create": {
-    "message": "Create"
+    "message": "Создать"
   },
   "createBookmarkFailed": {
-    "message": "Failed to create bookmark: $1"
+    "message": "Ошибка при создании закладки: $1"
   },
   "createFolderFailed": {
-    "message": "Failed to create folder: $1"
+    "message": "Ошибка при создании папки: $1"
   },
   "createNewFile": {
-    "message": "Create a new file"
+    "message": "Создать новый файл"
   },
   "delete": {
-    "message": "Delete"
+    "message": "Удалить"
   },
   "deleteAll": {
-    "message": "Delete all"
+    "message": "Удалить всё"
   },
   "deleteBookmarkMessage": {
-    "message": "Delete bookmark \"$1\"?"
+    "message": "Удалить закладку \"$1\"?"
   },
   "deleteBookmarkTitle": {
-    "message": "Delete bookmark"
+    "message": "Удалить закладку"
   },
   "deleteFailed": {
-    "message": "Delete failed: $1"
+    "message": "Ошибка при удалении: $1"
   },
   "deleteFolder": {
-    "message": "Delete folder"
+    "message": "Удалить папку"
   },
   "deleteFolderMessage": {
-    "message": "Delete folder \"$1\"?"
+    "message": "Удалить папку \"$1\"?"
   },
   "deleteFolderTitle": {
-    "message": "Delete folder"
+    "message": "Удалить папку"
   },
   "directoryFiles": {
-    "message": "Directory files"
+    "message": "Файлы в каталоге"
   },
   "downloadFailed": {
-    "message": "Download failed: $1"
+    "message": "Ошибка при загрузке: $1"
   },
   "downloadFailedHttp": {
-    "message": "Download failed (HTTP $1)."
+    "message": "Ошибка при загрузке (HTTP $1)."
   },
   "downloadSuccessful": {
-    "message": "Download successful: $1"
+    "message": "Загрузка успешна: $1"
   },
   "downloadedFileInvalidBookmarks": {
-    "message": "Downloaded file is not valid bookmarks HTML."
+    "message": "Загруженный файл не является корректным HTML с закладками."
   },
   "downloadedFileNoEntries": {
-    "message": "Downloaded bookmarks file has no entries. Overwrite stopped to protect existing data."
+    "message": "Загруженный файл закладок не содержит записей. Перезапись остановлена для защиты существующих данных."
   },
   "downloadingBookmarks": {
-    "message": "Downloading bookmarks..."
+    "message": "Загрузка закладок..."
   },
   "dragSourceNotFound": {
-    "message": "Drag source not found."
+    "message": "Источник перетаскивания не найден."
   },
   "editActionsAria": {
-    "message": "Edit actions"
+    "message": "Действия редактирования"
   },
   "editBookmarkTitle": {
-    "message": "Edit bookmark"
+    "message": "Изменить закладку"
   },
   "editFolder": {
-    "message": "Edit folder"
+    "message": "Изменить папку"
   },
   "editFolderTitle": {
-    "message": "Edit folder"
+    "message": "Изменить папку"
   },
   "editorEdit": {
-    "message": "Edit"
+    "message": "Изменить"
   },
   "editorName": {
-    "message": "Name"
+    "message": "Название"
   },
   "editorNameRequired": {
-    "message": "Name is required."
+    "message": "Название обязательно."
   },
   "editorUrl": {
     "message": "URL"
   },
   "editorUrlRequired": {
-    "message": "URL is required."
+    "message": "URL обязателен."
   },
   "emptyFaviconData": {
-    "message": "Favicon data is empty."
+    "message": "Данные значка пусты."
   },
   "emptyFolder": {
-    "message": "This folder is empty."
+    "message": "Эта папка пуста."
   },
   "expandAllFolders": {
-    "message": "Expand all folders"
+    "message": "Развернуть все папки"
   },
   "extDescription": {
-    "message": "Manage and sync bookmarks with optional WebDAV support."
+    "message": "Управление и синхронизация закладок с поддержкой WebDAV."
   },
   "faviconFetchFailed": {
-    "message": "Failed to fetch favicon."
+    "message": "Ошибка при получении значка."
   },
   "faviconUpdateFailed": {
-    "message": "Failed to update favicon: $1"
+    "message": "Ошибка при обновлении значка: $1"
   },
   "faviconUpdateFailedCount": {
-    "message": "Failed to update favicon ($1)."
+    "message": "Ошибка при обновлении значка ($1)."
   },
   "faviconUpdateInProgress": {
-    "message": "Favicon update already in progress."
+    "message": "Обновление значка уже в процессе."
   },
   "faviconUpdated": {
-    "message": "Favicon updated."
+    "message": "Значок обновлён."
   },
   "faviconsUpdatedSuccess": {
-    "message": "Favicons updated: $1 succeeded."
+    "message": "Значки обновлены: успешно $1."
   },
   "faviconsUpdatedSuccessFail": {
-    "message": "Favicons updated: $1 succeeded, $2 failed."
+    "message": "Значки обновлены: успешно $1, ошибок $2."
   },
   "fileNameEmpty": {
-    "message": "File name cannot be empty."
+    "message": "Имя файла не может быть пусто."
   },
   "fileNameNoPathSeparators": {
-    "message": "File name cannot contain path separators."
+    "message": "Имя файла не может содержать разделители пути."
   },
   "filesInDirectory": {
-    "message": "Files in directory"
+    "message": "Файлы в каталоге"
   },
   "folderBookmarkCount": {
-    "message": "$1 bookmarks"
+    "message": "$1 закладок"
   },
   "folderContainsBookmarksMessage": {
-    "message": "This folder contains $1 bookmarks. Delete the folder and all contents?"
+    "message": "Эта папка содержит $1 закладок. Удалить папку и всё содержимое?"
   },
   "folderContainsBookmarksTitle": {
-    "message": "Folder contains bookmarks"
+    "message": "Папка содержит закладки"
   },
   "folderCreated": {
-    "message": "Folder created."
+    "message": "Папка создана."
   },
   "folderDeleted": {
-    "message": "Folder deleted."
+    "message": "Папка удалена."
   },
   "folderFolderCount": {
-    "message": "$1 folders"
+    "message": "$1 папок"
   },
   "folderName": {
-    "message": "Folder name"
+    "message": "Название папки"
   },
   "folderNotFound": {
-    "message": "Folder not found."
+    "message": "Папка не найдена."
   },
   "folderSortedAsc": {
-    "message": "Folder sorted ascending."
+    "message": "Папка отсортирована по возрастанию."
   },
   "folderSortedDesc": {
-    "message": "Folder sorted descending."
+    "message": "Папка отсортирована по убыванию."
   },
   "folderUpdated": {
-    "message": "Folder updated."
+    "message": "Папка обновлена."
   },
   "hostPermissionDenied": {
-    "message": "Host permission denied: $1"
+    "message": "Доступ к хосту запрещён: $1"
   },
   "hostPermissionRequired": {
-    "message": "Host permission is required: $1"
+    "message": "Требуется доступ к хосту: $1"
   },
   "initializationFailed": {
-    "message": "Initialization failed: $1"
+    "message": "Ошибка инициализации: $1"
   },
   "invalidUrlFormat": {
-    "message": "Invalid URL format."
+    "message": "Неверный формат URL."
   },
   "languageCurrentTooltip": {
-    "message": "Language: $1"
+    "message": "Язык: $1"
   },
   "loadBookmarksFailed": {
-    "message": "Failed to load bookmarks: $1"
+    "message": "Ошибка при загрузке закладок: $1"
   },
   "menuAddBookmark": {
-    "message": "Add bookmark"
+    "message": "Добавить закладку"
   },
   "menuAddFolder": {
-    "message": "Add folder"
+    "message": "Добавить папку"
   },
   "menuCollapseFolder": {
-    "message": "Collapse folder"
+    "message": "Свернуть папку"
   },
   "menuCopyBookmarkUrl": {
-    "message": "Copy bookmark URL"
+    "message": "Копировать URL закладки"
   },
   "menuDeleteBookmark": {
-    "message": "Delete bookmark"
+    "message": "Удалить закладку"
   },
   "menuDeleteFolder": {
-    "message": "Delete folder"
+    "message": "Удалить папку"
   },
   "menuEditBookmark": {
-    "message": "Edit bookmark"
+    "message": "Изменить закладку"
   },
   "menuEditFolder": {
-    "message": "Edit folder"
+    "message": "Изменить папку"
   },
   "menuExpandFolder": {
-    "message": "Expand folder"
+    "message": "Развернуть папку"
   },
   "menuOpenBookmark": {
-    "message": "Open bookmark"
+    "message": "Открыть закладку"
   },
   "menuRefreshFavicon": {
-    "message": "Refresh favicon"
+    "message": "Обновить значок"
   },
   "menuRefreshFolderFavicons": {
-    "message": "Refresh folder favicons"
+    "message": "Обновить значки в папке"
   },
   "moveFailed": {
-    "message": "Move failed: $1"
+    "message": "Ошибка при перемещении: $1"
   },
   "movedSuccessfully": {
-    "message": "Moved successfully."
+    "message": "Успешно перемещено."
   },
   "newFileNameLabel": {
-    "message": "New file name (default: bookmarks.html)"
+    "message": "Новое имя файла (по умолчанию: bookmarks.html)"
   },
   "newFolderDefault": {
-    "message": "New folder"
+    "message": "Новая папка"
   },
   "noBookmarkFoldersFound": {
-    "message": "No bookmark folders found."
+    "message": "Папки закладок не найдены."
   },
   "noBookmarksInFolder": {
-    "message": "No bookmarks in this folder."
+    "message": "В этой папке нет закладок."
   },
   "noCanvasContext": {
-    "message": "Canvas context is unavailable."
+    "message": "Контекст Canvas недоступен."
   },
   "notConfigured": {
-    "message": "Not configured"
+    "message": "Не настроено"
   },
   "optionsHeading": {
-    "message": "WebDAV Configuration"
+    "message": "Конфигурация WebDAV"
   },
   "optionsPageTitle": {
-    "message": "WebDAV Configuration"
+    "message": "Конфигурация WebDAV"
   },
   "optionsSubtitle": {
-    "message": "Configure the WebDAV directory used for bookmark sync."
+    "message": "Настройте каталог WebDAV для синхронизации закладок."
   },
   "parseWebdavResponseFailed": {
-    "message": "Failed to parse WebDAV response."
+    "message": "Ошибка при разборе ответа WebDAV."
   },
   "passwordOptional": {
-    "message": "Password (optional)"
+    "message": "Пароль (опционально)"
   },
   "pastePermissionDenied": {
-    "message": "Paste permission denied."
+    "message": "Вставка запрещена."
   },
   "promptConfirm": {
-    "message": "Confirm"
+    "message": "Подтвердить"
   },
   "promptNotice": {
-    "message": "Notice"
+    "message": "Уведомление"
   },
   "readFailedHttp": {
-    "message": "Read failed (HTTP $1)."
+    "message": "Ошибка чтения (HTTP $1)."
   },
   "refresh": {
-    "message": "Refresh"
+    "message": "Обновить"
   },
   "refreshFolderFavicons": {
-    "message": "Refresh folder favicons"
+    "message": "Обновить значки в папке"
   },
   "rootFolder": {
-    "message": "Root"
+    "message": "Корень"
   },
   "save": {
-    "message": "Save"
+    "message": "Сохранить"
   },
   "saveConfiguration": {
-    "message": "Save configuration"
+    "message": "Сохранить конфигурацию"
   },
   "saveFailed": {
-    "message": "Save failed: $1"
+    "message": "Ошибка при сохранении: $1"
   },
   "selectOrEnterFile": {
-    "message": "Select an existing file or enter a new file name."
+    "message": "Выберите существующий файл или введите новое имя файла."
   },
   "sortAscending": {
-    "message": "Sort ascending"
+    "message": "Сортировать по возрастанию"
   },
   "sortDescending": {
-    "message": "Sort descending"
+    "message": "Сортировать по убыванию"
   },
   "sortFailed": {
-    "message": "Sort failed: $1"
+    "message": "Ошибка при сортировке: $1"
   },
   "sortFolder": {
-    "message": "Sort folder"
+    "message": "Сортировать папку"
   },
   "startUpload": {
-    "message": "Start upload"
+    "message": "Начать выгрузку"
   },
   "summaryBookmarks": {
-    "message": "Bookmarks: $1"
+    "message": "Закладки: $1"
   },
   "summaryBookmarksInitial": {
-    "message": "Bookmarks: -"
+    "message": "Закладки: -"
   },
   "summaryFolders": {
-    "message": "Folders: $1"
+    "message": "Папки: $1"
   },
   "summaryFoldersInitial": {
-    "message": "Folders: -"
+    "message": "Папки: -"
   },
   "testBeforeSave": {
-    "message": "Please run and pass the connection test before saving."
+    "message": "Сначала выполните и пройдите тест соединения перед сохранением."
   },
   "testConnection": {
-    "message": "Test connection"
+    "message": "Тест соединения"
   },
   "testingConnection": {
-    "message": "Testing connection..."
+    "message": "Проверка соединения..."
   },
   "testingWebdavConnection": {
-    "message": "Testing WebDAV connection..."
+    "message": "Проверка соединения WebDAV..."
   },
   "treeActionsAria": {
-    "message": "Bookmark tree actions"
+    "message": "Действия с деревом закладок"
   },
   "unnamedFolder": {
-    "message": "Untitled folder"
+    "message": "Папка без названия"
   },
   "untitled": {
-    "message": "Untitled"
+    "message": "Без названия"
   },
   "updateBookmarkFailed": {
-    "message": "Failed to update bookmark: $1"
+    "message": "Ошибка при обновлении закладки: $1"
   },
   "updateFolderFailed": {
-    "message": "Failed to update folder: $1"
+    "message": "Ошибка при обновлении папки: $1"
   },
   "uploadFailed": {
-    "message": "Upload failed: $1"
+    "message": "Ошибка при выгрузке: $1"
   },
   "uploadFailedHttp": {
-    "message": "Upload failed (HTTP $1)."
+    "message": "Ошибка при выгрузке (HTTP $1)."
   },
   "uploadSuccessful": {
-    "message": "Upload successful: $1"
+    "message": "Выгрузка успешна: $1"
   },
   "uploadingBookmarks": {
-    "message": "Uploading bookmarks..."
+    "message": "Выгрузка закладок..."
   },
   "urlInvalid": {
-    "message": "Please enter a valid URL."
+    "message": "Введите корректный URL."
   },
   "urlNotWebdavDirectory": {
-    "message": "The specified URL is not a WebDAV directory."
+    "message": "Указанный URL не является каталогом WebDAV."
   },
   "urlOnlyHttpHttps": {
-    "message": "Only http/https URLs are supported."
+    "message": "Поддерживаются только URL с протоколами http/https."
   },
   "urlPlaceholder": {
     "message": "https://example.com"
   },
   "urlRequired": {
-    "message": "URL is required."
+    "message": "URL обязателен."
   },
   "usernameOptional": {
-    "message": "Username (optional)"
+    "message": "Имя пользователя (опционально)"
   },
   "webdavEntries": {
-    "message": "WebDAV entries: $1"
+    "message": "Записи WebDAV: $1"
   },
   "webdavEntriesDash": {
-    "message": "WebDAV entries: -"
+    "message": "Записи WebDAV: -"
   },
   "webdavEntriesError": {
-    "message": "WebDAV entries: Error"
+    "message": "Записи WebDAV: Ошибка"
   },
   "webdavEntriesRefreshing": {
-    "message": "WebDAV entries: Refreshing..."
+    "message": "Записи WebDAV: Обновление..."
   },
   "webdavLabel": {
     "message": "WebDAV"
   },
   "webdavMustUseHttps": {
-    "message": "WebDAV URL must use HTTPS."
+    "message": "URL WebDAV должен использовать HTTPS."
   },
   "webdavUrlLabel": {
-    "message": "WebDAV URL (directory, HTTPS only)"
+    "message": "URL WebDAV (каталог, только HTTPS)"
   },
   "webdavUrlPlaceholder": {
     "message": "https://example.com/webdav/"

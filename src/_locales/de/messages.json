@@ -1,567 +1,567 @@
 {
   "actionCopyBookmarkUrl": {
-    "message": "Copy bookmark URL"
+    "message": "Lesezeichen-URL kopieren"
   },
   "actionDefault": {
-    "message": "Action"
+    "message": "Aktion"
   },
   "actionDeleteBookmark": {
-    "message": "Delete bookmark"
+    "message": "Lesezeichen löschen"
   },
   "actionEditBookmark": {
-    "message": "Edit bookmark"
+    "message": "Lesezeichen bearbeiten"
   },
   "actionRefreshFavicon": {
-    "message": "Refresh favicon"
+    "message": "Favicon aktualisieren"
   },
   "addBookmark": {
-    "message": "Add bookmark"
+    "message": "Lesezeichen hinzufügen"
   },
   "addBookmarkTitle": {
-    "message": "Add bookmark"
+    "message": "Lesezeichen hinzufügen"
   },
   "addFolder": {
-    "message": "Add folder"
+    "message": "Ordner hinzufügen"
   },
   "addFolderTitle": {
-    "message": "Add folder"
+    "message": "Ordner hinzufügen"
   },
   "appVersionTooltip": {
-    "message": "Extension version"
+    "message": "Erweiterungsversion"
   },
   "appVersionTooltipWithValue": {
-    "message": "Extension version: $1"
+    "message": "Erweiterungsversion: $1"
   },
   "bookmarkActionsAria": {
-    "message": "Bookmark actions"
+    "message": "Lesezeichen-Aktionen"
   },
   "bookmarkCreated": {
-    "message": "Bookmark created."
+    "message": "Lesezeichen erstellt."
   },
   "bookmarkDeleted": {
-    "message": "Bookmark deleted."
+    "message": "Lesezeichen gelöscht."
   },
   "bookmarkPanelAria": {
-    "message": "Bookmarks"
+    "message": "Lesezeichen"
   },
   "bookmarkRootNotFound": {
-    "message": "Browser bookmark root folder not found."
+    "message": "Browser-Lesezeichen-Stammordner nicht gefunden."
   },
   "bookmarkTitle": {
-    "message": "Bookmark title"
+    "message": "Lesezeichen-Titel"
   },
   "bookmarkUpdated": {
-    "message": "Bookmark updated."
+    "message": "Lesezeichen aktualisiert."
   },
   "bookmarkUrlCopied": {
-    "message": "Bookmark URL copied."
+    "message": "Lesezeichen-URL kopiert."
   },
   "bookmarksPageTitle": {
     "message": "Yet Another Bookmark Manager"
   },
   "browserEntries": {
-    "message": "Browser entries: $1"
+    "message": "Browser-Einträge: $1"
   },
   "browserEntriesDash": {
-    "message": "Browser entries: -"
+    "message": "Browser-Einträge: -"
   },
   "browserEntriesError": {
-    "message": "Browser entries: Error"
+    "message": "Browser-Einträge: Fehler"
   },
   "browserEntriesRefreshing": {
-    "message": "Browser entries: Refreshing..."
+    "message": "Browser-Einträge: Wird aktualisiert..."
   },
   "btnConfiguration": {
-    "message": "Configuration"
+    "message": "Konfiguration"
   },
   "btnDownload": {
-    "message": "Download"
+    "message": "Herunterladen"
   },
   "btnUpload": {
-    "message": "Upload"
+    "message": "Hochladen"
   },
   "cancel": {
-    "message": "Cancel"
+    "message": "Abbrechen"
   },
   "cannotDropFolder": {
-    "message": "Cannot drop into this folder."
+    "message": "Kann nicht in diesen Ordner ablegen."
   },
   "chooseExistingOrCreate": {
-    "message": "Choose an existing file or create a new export file."
+    "message": "Wählen Sie eine vorhandene Datei oder erstellen Sie eine neue Exportdatei."
   },
   "clear": {
-    "message": "Clear"
+    "message": "Löschen"
   },
   "clearConfig": {
-    "message": "Clear config"
+    "message": "Konfiguration löschen"
   },
   "clearConfigurationMessage": {
-    "message": "Remove the current WebDAV configuration?"
+    "message": "Aktuelle WebDAV-Konfiguration entfernen?"
   },
   "clearConfigurationTitle": {
-    "message": "Clear configuration"
+    "message": "Konfiguration löschen"
   },
   "clearFailed": {
-    "message": "Clear failed: $1"
+    "message": "Löschen fehlgeschlagen: $1"
   },
   "close": {
-    "message": "Close"
+    "message": "Schließen"
   },
   "collapseAllFolders": {
-    "message": "Collapse all folders"
+    "message": "Alle Ordner einklappen"
   },
   "configurationCleared": {
-    "message": "Configuration cleared."
+    "message": "Konfiguration gelöscht."
   },
   "configurationSaved": {
-    "message": "Configuration saved."
+    "message": "Konfiguration gespeichert."
   },
   "configureWebdavFirst": {
-    "message": "Please configure WebDAV first."
+    "message": "Bitte konfigurieren Sie zuerst WebDAV."
   },
   "confirmDownloadMessage": {
-    "message": "Downloading will overwrite current browser bookmarks. Continue after confirming your backup?"
+    "message": "Das Herunterladen überschreibt aktuelle Browser-Lesezeichen. Nach Bestätigung Ihrer Sicherung fortfahren?"
   },
   "confirmDownloadTitle": {
-    "message": "Confirm download"
+    "message": "Herunterladen bestätigen"
   },
   "confirmUploadMessage": {
-    "message": "Upload current browser bookmarks to WebDAV. Continue?"
+    "message": "Aktuelle Browser-Lesezeichen zu WebDAV hochladen. Fortfahren?"
   },
   "confirmUploadTitle": {
-    "message": "Confirm upload"
+    "message": "Hochladen bestätigen"
   },
   "connSuccessFoundFiles": {
-    "message": "Connection successful. Found $1 files."
+    "message": "Verbindung erfolgreich. $1 Dateien gefunden."
   },
   "connSuccessNoFiles": {
-    "message": "Connection successful. No files found."
+    "message": "Verbindung erfolgreich. Keine Dateien gefunden."
   },
   "connectionFailed": {
-    "message": "Connection failed: $1"
+    "message": "Verbindung fehlgeschlagen: $1"
   },
   "connectionFailedHttp": {
-    "message": "Connection failed (HTTP $1)."
+    "message": "Verbindung fehlgeschlagen (HTTP $1)."
   },
   "contextCopy": {
-    "message": "Copy"
+    "message": "Kopieren"
   },
   "contextCut": {
-    "message": "Cut"
+    "message": "Ausschneiden"
   },
   "contextDelete": {
-    "message": "Delete"
+    "message": "Löschen"
   },
   "contextPaste": {
-    "message": "Paste"
+    "message": "Einfügen"
   },
   "contextSelectAll": {
-    "message": "Select all"
+    "message": "Alles auswählen"
   },
   "continue": {
-    "message": "Continue"
+    "message": "Fortfahren"
   },
   "continueDownload": {
-    "message": "Continue download"
+    "message": "Herunterladen fortfahren"
   },
   "copyBookmarkUrlFailed": {
-    "message": "Failed to copy bookmark URL: $1"
+    "message": "Fehler beim Kopieren der Lesezeichen-URL: $1"
   },
   "copyBookmarkUrlFailedUnknown": {
-    "message": "Unknown copy error"
+    "message": "Unbekannter Kopierfehler"
   },
   "create": {
-    "message": "Create"
+    "message": "Erstellen"
   },
   "createBookmarkFailed": {
-    "message": "Failed to create bookmark: $1"
+    "message": "Fehler beim Erstellen des Lesezeichens: $1"
   },
   "createFolderFailed": {
-    "message": "Failed to create folder: $1"
+    "message": "Fehler beim Erstellen des Ordners: $1"
   },
   "createNewFile": {
-    "message": "Create a new file"
+    "message": "Neue Datei erstellen"
   },
   "delete": {
-    "message": "Delete"
+    "message": "Löschen"
   },
   "deleteAll": {
-    "message": "Delete all"
+    "message": "Alles löschen"
   },
   "deleteBookmarkMessage": {
-    "message": "Delete bookmark \"$1\"?"
+    "message": "Lesezeichen \"$1\" löschen?"
   },
   "deleteBookmarkTitle": {
-    "message": "Delete bookmark"
+    "message": "Lesezeichen löschen"
   },
   "deleteFailed": {
-    "message": "Delete failed: $1"
+    "message": "Löschen fehlgeschlagen: $1"
   },
   "deleteFolder": {
-    "message": "Delete folder"
+    "message": "Ordner löschen"
   },
   "deleteFolderMessage": {
-    "message": "Delete folder \"$1\"?"
+    "message": "Ordner \"$1\" löschen?"
   },
   "deleteFolderTitle": {
-    "message": "Delete folder"
+    "message": "Ordner löschen"
   },
   "directoryFiles": {
-    "message": "Directory files"
+    "message": "Verzeichnisdateien"
   },
   "downloadFailed": {
-    "message": "Download failed: $1"
+    "message": "Herunterladen fehlgeschlagen: $1"
   },
   "downloadFailedHttp": {
-    "message": "Download failed (HTTP $1)."
+    "message": "Herunterladen fehlgeschlagen (HTTP $1)."
   },
   "downloadSuccessful": {
-    "message": "Download successful: $1"
+    "message": "Herunterladen erfolgreich: $1"
   },
   "downloadedFileInvalidBookmarks": {
-    "message": "Downloaded file is not valid bookmarks HTML."
+    "message": "Heruntergeladene Datei ist keine gültige Lesezeichen-HTML."
   },
   "downloadedFileNoEntries": {
-    "message": "Downloaded bookmarks file has no entries. Overwrite stopped to protect existing data."
+    "message": "Heruntergeladene Lesezeichen-Datei hat keine Einträge. Überschreiben gestoppt zum Schutz vorhandener Daten."
   },
   "downloadingBookmarks": {
-    "message": "Downloading bookmarks..."
+    "message": "Lesezeichen werden heruntergeladen..."
   },
   "dragSourceNotFound": {
-    "message": "Drag source not found."
+    "message": "Ziehquelle nicht gefunden."
   },
   "editActionsAria": {
-    "message": "Edit actions"
+    "message": "Bearbeitungsaktionen"
   },
   "editBookmarkTitle": {
-    "message": "Edit bookmark"
+    "message": "Lesezeichen bearbeiten"
   },
   "editFolder": {
-    "message": "Edit folder"
+    "message": "Ordner bearbeiten"
   },
   "editFolderTitle": {
-    "message": "Edit folder"
+    "message": "Ordner bearbeiten"
   },
   "editorEdit": {
-    "message": "Edit"
+    "message": "Bearbeiten"
   },
   "editorName": {
     "message": "Name"
   },
   "editorNameRequired": {
-    "message": "Name is required."
+    "message": "Name ist erforderlich."
   },
   "editorUrl": {
     "message": "URL"
   },
   "editorUrlRequired": {
-    "message": "URL is required."
+    "message": "URL ist erforderlich."
   },
   "emptyFaviconData": {
-    "message": "Favicon data is empty."
+    "message": "Favicon-Daten sind leer."
   },
   "emptyFolder": {
-    "message": "This folder is empty."
+    "message": "Dieser Ordner ist leer."
   },
   "expandAllFolders": {
-    "message": "Expand all folders"
+    "message": "Alle Ordner ausklappen"
   },
   "extDescription": {
-    "message": "Manage and sync bookmarks with optional WebDAV support."
+    "message": "Verwalten und synchronisieren Sie Lesezeichen mit optionaler WebDAV-Unterstützung."
   },
   "faviconFetchFailed": {
-    "message": "Failed to fetch favicon."
+    "message": "Fehler beim Abrufen des Favicons."
   },
   "faviconUpdateFailed": {
-    "message": "Failed to update favicon: $1"
+    "message": "Fehler beim Aktualisieren des Favicons: $1"
   },
   "faviconUpdateFailedCount": {
-    "message": "Failed to update favicon ($1)."
+    "message": "Fehler beim Aktualisieren des Favicons ($1)."
   },
   "faviconUpdateInProgress": {
-    "message": "Favicon update already in progress."
+    "message": "Favicon-Aktualisierung läuft bereits."
   },
   "faviconUpdated": {
-    "message": "Favicon updated."
+    "message": "Favicon aktualisiert."
   },
   "faviconsUpdatedSuccess": {
-    "message": "Favicons updated: $1 succeeded."
+    "message": "Favicons aktualisiert: $1 erfolgreich."
   },
   "faviconsUpdatedSuccessFail": {
-    "message": "Favicons updated: $1 succeeded, $2 failed."
+    "message": "Favicons aktualisiert: $1 erfolgreich, $2 fehlgeschlagen."
   },
   "fileNameEmpty": {
-    "message": "File name cannot be empty."
+    "message": "Dateiname darf nicht leer sein."
   },
   "fileNameNoPathSeparators": {
-    "message": "File name cannot contain path separators."
+    "message": "Dateiname darf keine Pfadtrennzeichen enthalten."
   },
   "filesInDirectory": {
-    "message": "Files in directory"
+    "message": "Dateien im Verzeichnis"
   },
   "folderBookmarkCount": {
-    "message": "$1 bookmarks"
+    "message": "$1 Lesezeichen"
   },
   "folderContainsBookmarksMessage": {
-    "message": "This folder contains $1 bookmarks. Delete the folder and all contents?"
+    "message": "Dieser Ordner enthält $1 Lesezeichen. Ordner und alle Inhalte löschen?"
   },
   "folderContainsBookmarksTitle": {
-    "message": "Folder contains bookmarks"
+    "message": "Ordner enthält Lesezeichen"
   },
   "folderCreated": {
-    "message": "Folder created."
+    "message": "Ordner erstellt."
   },
   "folderDeleted": {
-    "message": "Folder deleted."
+    "message": "Ordner gelöscht."
   },
   "folderFolderCount": {
-    "message": "$1 folders"
+    "message": "$1 Ordner"
   },
   "folderName": {
-    "message": "Folder name"
+    "message": "Ordnername"
   },
   "folderNotFound": {
-    "message": "Folder not found."
+    "message": "Ordner nicht gefunden."
   },
   "folderSortedAsc": {
-    "message": "Folder sorted ascending."
+    "message": "Ordner aufsteigend sortiert."
   },
   "folderSortedDesc": {
-    "message": "Folder sorted descending."
+    "message": "Ordner absteigend sortiert."
   },
   "folderUpdated": {
-    "message": "Folder updated."
+    "message": "Ordner aktualisiert."
   },
   "hostPermissionDenied": {
-    "message": "Host permission denied: $1"
+    "message": "Host-Berechtigung verweigert: $1"
   },
   "hostPermissionRequired": {
-    "message": "Host permission is required: $1"
+    "message": "Host-Berechtigung erforderlich: $1"
   },
   "initializationFailed": {
-    "message": "Initialization failed: $1"
+    "message": "Initialisierung fehlgeschlagen: $1"
   },
   "invalidUrlFormat": {
-    "message": "Invalid URL format."
+    "message": "Ungültiges URL-Format."
   },
   "languageCurrentTooltip": {
-    "message": "Language: $1"
+    "message": "Sprache: $1"
   },
   "loadBookmarksFailed": {
-    "message": "Failed to load bookmarks: $1"
+    "message": "Fehler beim Laden der Lesezeichen: $1"
   },
   "menuAddBookmark": {
-    "message": "Add bookmark"
+    "message": "Lesezeichen hinzufügen"
   },
   "menuAddFolder": {
-    "message": "Add folder"
+    "message": "Ordner hinzufügen"
   },
   "menuCollapseFolder": {
-    "message": "Collapse folder"
+    "message": "Ordner einklappen"
   },
   "menuCopyBookmarkUrl": {
-    "message": "Copy bookmark URL"
+    "message": "Lesezeichen-URL kopieren"
   },
   "menuDeleteBookmark": {
-    "message": "Delete bookmark"
+    "message": "Lesezeichen löschen"
   },
   "menuDeleteFolder": {
-    "message": "Delete folder"
+    "message": "Ordner löschen"
   },
   "menuEditBookmark": {
-    "message": "Edit bookmark"
+    "message": "Lesezeichen bearbeiten"
   },
   "menuEditFolder": {
-    "message": "Edit folder"
+    "message": "Ordner bearbeiten"
   },
   "menuExpandFolder": {
-    "message": "Expand folder"
+    "message": "Ordner ausklappen"
   },
   "menuOpenBookmark": {
-    "message": "Open bookmark"
+    "message": "Lesezeichen öffnen"
   },
   "menuRefreshFavicon": {
-    "message": "Refresh favicon"
+    "message": "Favicon aktualisieren"
   },
   "menuRefreshFolderFavicons": {
-    "message": "Refresh folder favicons"
+    "message": "Ordner-Favicons aktualisieren"
   },
   "moveFailed": {
-    "message": "Move failed: $1"
+    "message": "Verschieben fehlgeschlagen: $1"
   },
   "movedSuccessfully": {
-    "message": "Moved successfully."
+    "message": "Erfolgreich verschoben."
   },
   "newFileNameLabel": {
-    "message": "New file name (default: bookmarks.html)"
+    "message": "Neuer Dateiname (Standard: bookmarks.html)"
   },
   "newFolderDefault": {
-    "message": "New folder"
+    "message": "Neuer Ordner"
   },
   "noBookmarkFoldersFound": {
-    "message": "No bookmark folders found."
+    "message": "Keine Lesezeichen-Ordner gefunden."
   },
   "noBookmarksInFolder": {
-    "message": "No bookmarks in this folder."
+    "message": "Keine Lesezeichen in diesem Ordner."
   },
   "noCanvasContext": {
-    "message": "Canvas context is unavailable."
+    "message": "Canvas-Kontext ist nicht verfügbar."
   },
   "notConfigured": {
-    "message": "Not configured"
+    "message": "Nicht konfiguriert"
   },
   "optionsHeading": {
-    "message": "WebDAV Configuration"
+    "message": "WebDAV-Konfiguration"
   },
   "optionsPageTitle": {
-    "message": "WebDAV Configuration"
+    "message": "WebDAV-Konfiguration"
   },
   "optionsSubtitle": {
-    "message": "Configure the WebDAV directory used for bookmark sync."
+    "message": "Konfigurieren Sie das WebDAV-Verzeichnis für die Lesezeichen-Synchronisierung."
   },
   "parseWebdavResponseFailed": {
-    "message": "Failed to parse WebDAV response."
+    "message": "Fehler beim Analysieren der WebDAV-Antwort."
   },
   "passwordOptional": {
-    "message": "Password (optional)"
+    "message": "Passwort (optional)"
   },
   "pastePermissionDenied": {
-    "message": "Paste permission denied."
+    "message": "Einfügen-Berechtigung verweigert."
   },
   "promptConfirm": {
-    "message": "Confirm"
+    "message": "Bestätigen"
   },
   "promptNotice": {
-    "message": "Notice"
+    "message": "Hinweis"
   },
   "readFailedHttp": {
-    "message": "Read failed (HTTP $1)."
+    "message": "Lesen fehlgeschlagen (HTTP $1)."
   },
   "refresh": {
-    "message": "Refresh"
+    "message": "Aktualisieren"
   },
   "refreshFolderFavicons": {
-    "message": "Refresh folder favicons"
+    "message": "Ordner-Favicons aktualisieren"
   },
   "rootFolder": {
-    "message": "Root"
+    "message": "Stamm"
   },
   "save": {
-    "message": "Save"
+    "message": "Speichern"
   },
   "saveConfiguration": {
-    "message": "Save configuration"
+    "message": "Konfiguration speichern"
   },
   "saveFailed": {
-    "message": "Save failed: $1"
+    "message": "Speichern fehlgeschlagen: $1"
   },
   "selectOrEnterFile": {
-    "message": "Select an existing file or enter a new file name."
+    "message": "Wählen Sie eine vorhandene Datei oder geben Sie einen neuen Dateinamen ein."
   },
   "sortAscending": {
-    "message": "Sort ascending"
+    "message": "Aufsteigend sortieren"
   },
   "sortDescending": {
-    "message": "Sort descending"
+    "message": "Absteigend sortieren"
   },
   "sortFailed": {
-    "message": "Sort failed: $1"
+    "message": "Sortieren fehlgeschlagen: $1"
   },
   "sortFolder": {
-    "message": "Sort folder"
+    "message": "Ordner sortieren"
   },
   "startUpload": {
-    "message": "Start upload"
+    "message": "Hochladen starten"
   },
   "summaryBookmarks": {
-    "message": "Bookmarks: $1"
+    "message": "Lesezeichen: $1"
   },
   "summaryBookmarksInitial": {
-    "message": "Bookmarks: -"
+    "message": "Lesezeichen: -"
   },
   "summaryFolders": {
-    "message": "Folders: $1"
+    "message": "Ordner: $1"
   },
   "summaryFoldersInitial": {
-    "message": "Folders: -"
+    "message": "Ordner: -"
   },
   "testBeforeSave": {
-    "message": "Please run and pass the connection test before saving."
+    "message": "Bitte führen Sie den Verbindungstest durch und bestätigen Sie ihn vor dem Speichern."
   },
   "testConnection": {
-    "message": "Test connection"
+    "message": "Verbindung testen"
   },
   "testingConnection": {
-    "message": "Testing connection..."
+    "message": "Verbindung wird getestet..."
   },
   "testingWebdavConnection": {
-    "message": "Testing WebDAV connection..."
+    "message": "WebDAV-Verbindung wird getestet..."
   },
   "treeActionsAria": {
-    "message": "Bookmark tree actions"
+    "message": "Lesezeichen-Baum-Aktionen"
   },
   "unnamedFolder": {
-    "message": "Untitled folder"
+    "message": "Unbenannter Ordner"
   },
   "untitled": {
-    "message": "Untitled"
+    "message": "Unbenannt"
   },
   "updateBookmarkFailed": {
-    "message": "Failed to update bookmark: $1"
+    "message": "Fehler beim Aktualisieren des Lesezeichens: $1"
   },
   "updateFolderFailed": {
-    "message": "Failed to update folder: $1"
+    "message": "Fehler beim Aktualisieren des Ordners: $1"
   },
   "uploadFailed": {
-    "message": "Upload failed: $1"
+    "message": "Hochladen fehlgeschlagen: $1"
   },
   "uploadFailedHttp": {
-    "message": "Upload failed (HTTP $1)."
+    "message": "Hochladen fehlgeschlagen (HTTP $1)."
   },
   "uploadSuccessful": {
-    "message": "Upload successful: $1"
+    "message": "Hochladen erfolgreich: $1"
   },
   "uploadingBookmarks": {
-    "message": "Uploading bookmarks..."
+    "message": "Lesezeichen werden hochgeladen..."
   },
   "urlInvalid": {
-    "message": "Please enter a valid URL."
+    "message": "Bitte geben Sie eine gültige URL ein."
   },
   "urlNotWebdavDirectory": {
-    "message": "The specified URL is not a WebDAV directory."
+    "message": "Die angegebene URL ist kein WebDAV-Verzeichnis."
   },
   "urlOnlyHttpHttps": {
-    "message": "Only http/https URLs are supported."
+    "message": "Nur http/https-URLs werden unterstützt."
   },
   "urlPlaceholder": {
     "message": "https://example.com"
   },
   "urlRequired": {
-    "message": "URL is required."
+    "message": "URL ist erforderlich."
   },
   "usernameOptional": {
-    "message": "Username (optional)"
+    "message": "Benutzername (optional)"
   },
   "webdavEntries": {
-    "message": "WebDAV entries: $1"
+    "message": "WebDAV-Einträge: $1"
   },
   "webdavEntriesDash": {
-    "message": "WebDAV entries: -"
+    "message": "WebDAV-Einträge: -"
   },
   "webdavEntriesError": {
-    "message": "WebDAV entries: Error"
+    "message": "WebDAV-Einträge: Fehler"
   },
   "webdavEntriesRefreshing": {
-    "message": "WebDAV entries: Refreshing..."
+    "message": "WebDAV-Einträge: Wird aktualisiert..."
   },
   "webdavLabel": {
     "message": "WebDAV"
   },
   "webdavMustUseHttps": {
-    "message": "WebDAV URL must use HTTPS."
+    "message": "WebDAV-URL muss HTTPS verwenden."
   },
   "webdavUrlLabel": {
-    "message": "WebDAV URL (directory, HTTPS only)"
+    "message": "WebDAV-URL (Verzeichnis, nur HTTPS)"
   },
   "webdavUrlPlaceholder": {
     "message": "https://example.com/webdav/"
