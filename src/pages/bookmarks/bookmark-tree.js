@@ -280,6 +280,27 @@
       return node.title || (node.url ? node.url : t("untitled"));
     }
 
+    async function runBookmarkMutation(run, options) {
+      const { successKey, errorKey, afterSuccess } = options || {};
+      try {
+        await run();
+        if (successKey) {
+          setStatus(t(successKey), "success");
+        }
+        if (typeof afterSuccess === "function") {
+          await afterSuccess();
+        }
+      } catch (error) {
+        setStatus(t(errorKey, [error.message]), "error");
+      }
+    }
+
+    async function refreshBookmarkFaviconWithStatus(node) {
+      await runBookmarkMutation(() => refreshBookmarkFavicon(node), {
+        errorKey: "faviconUpdateFailed",
+      });
+    }
+
     async function deleteBookmarkNode(node) {
       const title = getNameForNode(node);
       const confirmed = await openPromptModal({
@@ -292,15 +313,18 @@
         return;
       }
 
-      try {
-        const openFolderIds = getOpenFolderIds();
+      const openFolderIds = getOpenFolderIds();
+      await runBookmarkMutation(
+        async () => {
         await removeFaviconsByBookmarkIds([node.id]);
         await chrome.bookmarks.remove(node.id);
-        setStatus(t("bookmarkDeleted"), "success");
-        await renderBookmarks(openFolderIds);
-      } catch (error) {
-        setStatus(t("deleteFailed", [error.message]), "error");
-      }
+        },
+        {
+          successKey: "bookmarkDeleted",
+          errorKey: "deleteFailed",
+          afterSuccess: () => renderBookmarks(openFolderIds),
+        },
+      );
     }
 
     async function deleteFolderNode(node) {
@@ -330,16 +354,19 @@
         }
       }
 
-      try {
-        const openFolderIds = getOpenFolderIds();
+      const openFolderIds = getOpenFolderIds();
+      await runBookmarkMutation(
+        async () => {
         const bookmarkIds = getBookmarkNodesInFolder(node).map((item) => item.id);
         await removeFaviconsByBookmarkIds(bookmarkIds);
         await chrome.bookmarks.removeTree(node.id);
-        setStatus(t("folderDeleted"), "success");
-        await renderBookmarks(openFolderIds);
-      } catch (error) {
-        setStatus(t("deleteFailed", [error.message]), "error");
-      }
+        },
+        {
+          successKey: "folderDeleted",
+          errorKey: "deleteFailed",
+          afterSuccess: () => renderBookmarks(openFolderIds),
+        },
+      );
     }
 
     async function rerenderAfterTreeChange(extraOpenFolderIds = []) {
@@ -411,16 +438,18 @@
         return;
       }
 
-      try {
-        await chrome.bookmarks.create({
-          parentId: parentNode.id,
-          title: result.name || t("newFolderDefault"),
-        });
-        setStatus(t("folderCreated"), "success");
-        await rerenderAfterTreeChange([parentNode.id]);
-      } catch (error) {
-        setStatus(t("createFolderFailed", [error.message]), "error");
-      }
+      await runBookmarkMutation(
+        () =>
+          chrome.bookmarks.create({
+            parentId: parentNode.id,
+            title: result.name || t("newFolderDefault"),
+          }),
+        {
+          successKey: "folderCreated",
+          errorKey: "createFolderFailed",
+          afterSuccess: () => rerenderAfterTreeChange([parentNode.id]),
+        },
+      );
     }
 
     async function editFolderNode(node) {
@@ -434,15 +463,17 @@
         return;
       }
 
-      try {
-        await chrome.bookmarks.update(node.id, {
-          title: result.name || t("untitled"),
-        });
-        setStatus(t("folderUpdated"), "success");
-        await rerenderAfterTreeChange([node.id]);
-      } catch (error) {
-        setStatus(t("updateFolderFailed", [error.message]), "error");
-      }
+      await runBookmarkMutation(
+        () =>
+          chrome.bookmarks.update(node.id, {
+            title: result.name || t("untitled"),
+          }),
+        {
+          successKey: "folderUpdated",
+          errorKey: "updateFolderFailed",
+          afterSuccess: () => rerenderAfterTreeChange([node.id]),
+        },
+      );
     }
 
     async function addBookmarkNode(parentNode) {
@@ -458,18 +489,21 @@
         return;
       }
 
-      try {
-        const url = ensureValidUrl(result.url);
-        await chrome.bookmarks.create({
-          parentId: parentNode.id,
-          title: result.name || url,
-          url,
-        });
-        setStatus(t("bookmarkCreated"), "success");
-        await rerenderAfterTreeChange([parentNode.id]);
-      } catch (error) {
-        setStatus(t("createBookmarkFailed", [error.message]), "error");
-      }
+      await runBookmarkMutation(
+        async () => {
+          const url = ensureValidUrl(result.url);
+          await chrome.bookmarks.create({
+            parentId: parentNode.id,
+            title: result.name || url,
+            url,
+          });
+        },
+        {
+          successKey: "bookmarkCreated",
+          errorKey: "createBookmarkFailed",
+          afterSuccess: () => rerenderAfterTreeChange([parentNode.id]),
+        },
+      );
     }
 
     async function editBookmarkNode(node) {
@@ -485,20 +519,23 @@
         return;
       }
 
-      try {
-        const url = ensureValidUrl(result.url);
-        if (node.url !== url) {
-          await removeFaviconsByBookmarkIds([node.id]);
-        }
-        await chrome.bookmarks.update(node.id, {
-          title: result.name || url,
-          url,
-        });
-        setStatus(t("bookmarkUpdated"), "success");
-        await rerenderAfterTreeChange();
-      } catch (error) {
-        setStatus(t("updateBookmarkFailed", [error.message]), "error");
-      }
+      await runBookmarkMutation(
+        async () => {
+          const url = ensureValidUrl(result.url);
+          if (node.url !== url) {
+            await removeFaviconsByBookmarkIds([node.id]);
+          }
+          await chrome.bookmarks.update(node.id, {
+            title: result.name || url,
+            url,
+          });
+        },
+        {
+          successKey: "bookmarkUpdated",
+          errorKey: "updateBookmarkFailed",
+          afterSuccess: () => rerenderAfterTreeChange(),
+        },
+      );
     }
 
     let sortMenuContext = null;
@@ -635,6 +672,17 @@
       }
     }
 
+    async function sortFolderAndRerender(folderId, descending) {
+      await runBookmarkMutation(
+        () => sortFolderChildren(folderId, descending),
+        {
+          successKey: descending ? "folderSortedDesc" : "folderSortedAsc",
+          errorKey: "sortFailed",
+          afterSuccess: () => rerenderAfterTreeChange([folderId]),
+        },
+      );
+    }
+
     async function handleSortMenuApply(descending) {
       if (!sortMenuContext?.folderId) {
         closeSortMenu();
@@ -642,16 +690,7 @@
       }
       const folderId = sortMenuContext.folderId;
       closeSortMenu();
-      try {
-        await sortFolderChildren(folderId, descending);
-        setStatus(
-          descending ? t("folderSortedDesc") : t("folderSortedAsc"),
-          "success",
-        );
-        await rerenderAfterTreeChange([folderId]);
-      } catch (error) {
-        setStatus(t("sortFailed", [error.message]), "error");
-      }
+      await sortFolderAndRerender(folderId, descending);
     }
 
     function getTopLevelFolders(tree) {
@@ -698,13 +737,7 @@
             {
               label: t("menuRefreshFavicon"),
               icon: "image",
-              onClick: async () => {
-                try {
-                  await refreshBookmarkFavicon(node);
-                } catch (error) {
-                  setStatus(t("faviconUpdateFailed", [error.message]), "error");
-                }
-              },
+              onClick: () => refreshBookmarkFaviconWithStatus(node),
             },
             { type: "divider" },
             {
@@ -779,13 +812,7 @@
         createActionButton({
           ariaLabel: t("actionRefreshFavicon"),
           icon: "favicon",
-          onClick: async () => {
-            try {
-              await refreshBookmarkFavicon(node);
-            } catch (error) {
-              setStatus(t("faviconUpdateFailed", [error.message]), "error");
-            }
-          },
+          onClick: () => refreshBookmarkFaviconWithStatus(node),
         }),
         createActionButton({
           ariaLabel: t("actionDeleteBookmark"),
@@ -852,28 +879,12 @@
             {
               label: t("sortAscending"),
               icon: "arrow_upward",
-              onClick: async () => {
-                try {
-                  await sortFolderChildren(node.id, false);
-                  setStatus(t("folderSortedAsc"), "success");
-                  await rerenderAfterTreeChange([node.id]);
-                } catch (error) {
-                  setStatus(t("sortFailed", [error.message]), "error");
-                }
-              },
+              onClick: () => sortFolderAndRerender(node.id, false),
             },
             {
               label: t("sortDescending"),
               icon: "arrow_downward",
-              onClick: async () => {
-                try {
-                  await sortFolderChildren(node.id, true);
-                  setStatus(t("folderSortedDesc"), "success");
-                  await rerenderAfterTreeChange([node.id]);
-                } catch (error) {
-                  setStatus(t("sortFailed", [error.message]), "error");
-                }
-              },
+              onClick: () => sortFolderAndRerender(node.id, true),
             },
             {
               label: t("menuRefreshFolderFavicons"),
