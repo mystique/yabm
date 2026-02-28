@@ -11,6 +11,7 @@
     <h1 data-i18n="optionsHeading">WebDAV Configuration</h1>
     <p class="subtitle" data-i18n="optionsSubtitle">Configure the WebDAV directory used for bookmark sync.</p>
 
+    <!-- WebDAV Server Settings Card -->
     <section class="card">
       <label class="field">
         <span data-i18n="webdavUrlLabel">WebDAV URL (directory, HTTPS only)</span>
@@ -33,6 +34,7 @@
       </div>
     </section>
 
+    <!-- File Selection Section (Hidden until connection test succeeds) -->
     <section id="file-section" class="card hidden">
       <h2 data-i18n="directoryFiles">Directory files</h2>
       <p class="help" data-i18n="chooseExistingOrCreate">Choose an existing file or create a new export file.</p>
@@ -49,9 +51,11 @@
       </div>
     </section>
 
+    <!-- Feedback/Status messages -->
     <p id="status" class="status is-hidden" aria-live="polite"></p>
   </main>
 
+  <!-- Scripts: External libs must be loaded before local logic -->
   <script src="../../lib/i18n.js"></script>
   <script src="../../lib/sync-utils.js"></script>
   <script src="options.js"></script>

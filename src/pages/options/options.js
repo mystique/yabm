@@ -1,15 +1,50 @@
+/**
+ * options.js
+ * 
+ * WebDAV configuration page for Yet Another Bookmark Manager.
+ * Manages connection settings, directory browsing, and file selection.
+ * Loaded directly by the extension as a standalone page.
+ */
+
+/**
+ * @typedef {object} FileMetadata
+ * @property {string} name - File name
+ * @property {string} lastModified - ISO 8601 date string
+ * @property {number|string} size - File size in bytes
+ */
+
+/**
+ * State object to track test results and available files
+ * @type {{ tested: boolean, directoryUrl: string, files: FileMetadata[] }}
+ */
 const state = {
-  tested: false,
-  directoryUrl: "",
-  files: []
+  tested: false,           // Whether connection test succeeded
+  directoryUrl: "",        // Normalized WebDAV directory URL from last test
+  files: []                // Array of file metadata from directory listing
 };
 
+/**
+ * Translate a message key using the i18n library
+ * @param {string} key - The i18n message key
+ * @param {string[]} [substitutions] - Optional substitutions for the message
+ * @returns {string} - Translated message
+ */
 const t = (key, substitutions) => window.YABMI18n.t(key, substitutions);
 
+/**
+ * Get a DOM element by ID
+ * @param {string} id - Element ID
+ * @returns {HTMLElement|null}
+ */
 function $(id) {
   return document.getElementById(id);
 }
 
+/**
+ * Set the status message and visibility
+ * @param {string} message - Status text to display
+ * @param {string} type - CSS class: "success", "error", or empty string
+ */
 function setStatus(message, type) {
   const el = $("status");
   const hasMessage = Boolean(message && String(message).trim());
@@ -27,6 +62,11 @@ function setStatus(message, type) {
   }
 }
 
+/**
+ * Normalize a file name to standard Netscape bookmark HTML format
+ * @param {string} fileName - Input file name
+ * @returns {string} - Normalized file name (lowercase, .html extension)
+ */
 function normalizeFileName(fileName) {
   const value = (fileName || "").trim();
   if (!value) {
@@ -35,6 +75,11 @@ function normalizeFileName(fileName) {
   return value.toLowerCase().endsWith(".html") ? value : `${value}.html`;
 }
 
+/**
+ * Format byte size to human-readable string (B, KB, MB, GB, TB)
+ * @param {number|string} sizeValue - Size in bytes
+ * @returns {string} - Formatted size string
+ */
 function formatFileSize(sizeValue) {
   const bytes = Number.parseInt(sizeValue, 10);
   if (!Number.isFinite(bytes) || bytes < 0) {
@@ -54,6 +99,11 @@ function formatFileSize(sizeValue) {
   return `${text.replace(/\.?0+$/, "")} ${units[unitIndex]}`;
 }
 
+/**
+ * Parse ISO date string and format as date and time components
+ * @param {string} lastModifiedValue - ISO 8601 date string
+ * @returns {object} - { dateText: "YYYY-MM-DD", timeText: "HH:MM:SS" }
+ */
 function formatLastModifiedParts(lastModifiedValue) {
   const date = new Date(lastModifiedValue);
   if (!lastModifiedValue || Number.isNaN(date.getTime())) {
@@ -69,16 +119,27 @@ function formatLastModifiedParts(lastModifiedValue) {
   };
 }
 
+/**
+ * Build HTML fragment for file size and modification timestamp
+ * @param {object} file - File metadata object with size and lastModified
+ * @returns {string} - HTML string with file-size and file-datetime spans
+ */
 function buildFileMetaHtml(file) {
   const sizeText = formatFileSize(file?.size);
   const { dateText, timeText } = formatLastModifiedParts(file?.lastModified);
   return `<span class="file-size">${sizeText}</span><span class="file-datetime"><span>${dateText}</span><span>${timeText}</span></span>`;
 }
 
+/**
+ * Render the file list UI with radio buttons for selection
+ * @param {FileMetadata[]} files - Array of file metadata objects
+ * @param {string} [selectedName] - File name to pre-select (if present)
+ */
 function renderFileList(files, selectedName) {
   const container = $("files-container");
   container.innerHTML = "";
 
+  // Create a new file entry
   const createOption = document.createElement("div");
   createOption.className = "file-item";
   createOption.innerHTML =
@@ -86,6 +147,7 @@ function renderFileList(files, selectedName) {
     `<span>${t("createNewFile")}</span></label>`;
   container.appendChild(createOption);
 
+  // List each discovered file from the directory
   for (const file of files) {
     const item = document.createElement("div");
     item.className = "file-item";
@@ -111,10 +173,12 @@ function renderFileList(files, selectedName) {
     container.appendChild(item);
   }
 
+  // Set the default selection logic
   const target = selectedName || "bookmarks.html";
   const radios = container.querySelectorAll('input[name="file-select"]');
   let selected = false;
 
+  // Try to find the exact file name
   for (const radio of radios) {
     if (radio.value === target) {
       radio.checked = true;
@@ -123,6 +187,7 @@ function renderFileList(files, selectedName) {
     }
   }
 
+  // Fallback to "Create New" option if target file is not found
   if (!selected) {
     const newRadio = container.querySelector('input[value="__new__"]');
     if (newRadio) {
@@ -131,6 +196,10 @@ function renderFileList(files, selectedName) {
   }
 }
 
+/**
+ * Get the currently selected file name from the radio button group
+ * @returns {string} - Selected file name (normalized if creating new)
+ */
 function getSelectedFileName() {
   const checked = document.querySelector('input[name="file-select"]:checked');
   if (!checked) {
@@ -144,6 +213,9 @@ function getSelectedFileName() {
   return checked.value;
 }
 
+/**
+ * Load saved WebDAV configuration from chrome.storage.local
+ */
 async function loadSavedConfig() {
   const config = await window.YABMSync.getConfig();
   if (!config) {
@@ -156,6 +228,9 @@ async function loadSavedConfig() {
   $("new-file-name").value = config.fileName || "bookmarks.html";
 }
 
+/**
+ * Test WebDAV connection and list available files
+ */
 async function testConnection() {
   const testBtn = $("test-connection");
   testBtn.disabled = true;
@@ -195,6 +270,10 @@ async function testConnection() {
   }
 }
 
+/**
+ * Save the WebDAV configuration to chrome.storage.local
+ * Requires a successful connection test first
+ */
 async function saveConfig() {
   if (!state.tested) {
     setStatus(t("testBeforeSave"), "error");
@@ -222,10 +301,14 @@ async function saveConfig() {
   }
 }
 
+/**
+ * Attach event listeners to form controls for interactivity
+ */
 function bindEvents() {
   $("test-connection").addEventListener("click", testConnection);
   $("save-config").addEventListener("click", saveConfig);
 
+  // Auto-switch radio when typing in new file name input
   $("new-file-name").addEventListener("input", () => {
     const newRadio = document.querySelector('input[value="__new__"]');
     if (newRadio) {
@@ -233,6 +316,10 @@ function bindEvents() {
     }
   });
 
+  /**
+   * Reset test status when settings are manually changed
+   * Prevents saving outdated connection state.
+   */
   const invalidate = () => {
     state.tested = false;
     state.directoryUrl = "";
@@ -245,6 +332,9 @@ function bindEvents() {
   $("password").addEventListener("input", invalidate);
 }
 
+/**
+ * Initialize the page: load i18n, bind events, restore saved config
+ */
 async function init() {
   await window.YABMI18n.init();
   window.YABMI18n.apply();
@@ -252,6 +342,7 @@ async function init() {
   await loadSavedConfig();
 }
 
+// Entry point
 init().catch((error) => {
   setStatus(t("initializationFailed", [error.message]), "error");
 });
