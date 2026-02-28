@@ -20,265 +20,24 @@
       refreshWebdavStatusBar,
     } = deps;
 
-    function getFolderStats(node) {
-      let bookmarkCount = 0;
-      let folderCount = 0;
-
-      for (const child of node.children || []) {
-        if (child.url) {
-          bookmarkCount += 1;
-          continue;
-        }
-
-        if (child.children) {
-          folderCount += 1;
-          const nested = getFolderStats(child);
-          bookmarkCount += nested.bookmarkCount;
-          folderCount += nested.folderCount;
-        }
-      }
-
-      return { bookmarkCount, folderCount };
-    }
-
-    function getTreeSummaryStats(folders) {
-      let folderCount = 0;
-      let bookmarkCount = 0;
-
-      const visit = (node) => {
-        if (!node) {
-          return;
-        }
-        if (node.url) {
-          bookmarkCount += 1;
-          return;
-        }
-        if (node.children) {
-          folderCount += 1;
-          for (const child of node.children) {
-            visit(child);
-          }
-        }
-      };
-
-      for (const folder of folders || []) {
-        visit(folder);
-      }
-
-      return { folderCount, bookmarkCount };
-    }
-
-    function updateTreeSummaryStats(folders) {
-      const folderCountEl = document.getElementById("tree-folder-count");
-      const bookmarkCountEl = document.getElementById("tree-bookmark-count");
-      const stats = getTreeSummaryStats(folders);
-      if (folderCountEl) {
-        folderCountEl.textContent = t("summaryFolders", [
-          String(stats.folderCount),
-        ]);
-      }
-      if (bookmarkCountEl) {
-        bookmarkCountEl.textContent = t("summaryBookmarks", [
-          String(stats.bookmarkCount),
-        ]);
-      }
-    }
-
-    const ICON_NAMES = {
-      trash: "delete",
-      edit: "edit",
-      copy: "content_copy",
-      sort: "sort_by_alpha",
-      "folder-plus": "create_new_folder",
-      "bookmark-plus": "bookmark_add",
-      favicon: "image",
-      "folder-favicon": "imagesmode",
-    };
-
-    function createActionButton({ ariaLabel, icon, onClick, danger = false }) {
-      const button = document.createElement("button");
-      button.className = danger ? "action-btn action-btn-danger" : "action-btn";
-      button.type = "button";
-      button.setAttribute("aria-label", ariaLabel);
-      button.dataset.tooltip = ariaLabel;
-      const iconName = ICON_NAMES[icon] || ICON_NAMES.edit;
-      button.innerHTML = `<span class="icon-font" aria-hidden="true">${iconName}</span>`;
-
-      button.addEventListener("click", async (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        await onClick(event);
-      });
-
-      return button;
-    }
-
-    const dragState = {
-      nodeId: null,
-      nodeType: null,
-      parentId: null,
-    };
-    let dragGhostEl = null;
-
-    function removeDragGhost() {
-      if (dragGhostEl?.parentNode) {
-        dragGhostEl.parentNode.removeChild(dragGhostEl);
-      }
-      dragGhostEl = null;
-    }
-
-    function clearFolderDragOverStyles() {
-      for (const folder of document.querySelectorAll(
-        "#bookmark-list .folder.drag-over",
-      )) {
-        folder.classList.remove("drag-over");
-      }
-    }
-
-    function handleNodeDragStart(event, node, nodeType) {
-      dragState.nodeId = node.id;
-      dragState.nodeType = nodeType;
-      dragState.parentId = node.parentId;
-      event.dataTransfer.effectAllowed = "move";
-      event.dataTransfer.setData("text/plain", node.id);
-      const sourceEl = event.currentTarget;
-      sourceEl?.classList.add("drag-source");
-
-      removeDragGhost();
-      const previewSource =
-        nodeType === "bookmark"
-          ? sourceEl?.querySelector(".bookmark-item") || sourceEl
-          : sourceEl;
-      if (previewSource && event.dataTransfer?.setDragImage) {
-        const rect = previewSource.getBoundingClientRect();
-        const ghost = previewSource.cloneNode(true);
-        ghost.classList.remove("drag-source", "drag-over");
-        ghost.classList.add("drag-ghost");
-        ghost.style.width = `${Math.max(140, Math.round(rect.width))}px`;
-        ghost.style.position = "fixed";
-        ghost.style.top = "-10000px";
-        ghost.style.left = "-10000px";
-        document.body.appendChild(ghost);
-        dragGhostEl = ghost;
-        event.dataTransfer.setDragImage(
-          ghost,
-          Math.min(26, Math.round(rect.width * 0.2)),
-          14,
-        );
-      }
-    }
-
-    function handleNodeDragEnd(event) {
-      dragState.nodeId = null;
-      dragState.nodeType = null;
-      event.currentTarget?.classList.remove("drag-source");
-      clearFolderDragOverStyles();
-      removeDragGhost();
-    }
-
-    function handleFolderDragEnter(event, details) {
-      if (!dragState.nodeId) {
-        return;
-      }
-      event.preventDefault();
-      clearFolderDragOverStyles();
-      details.classList.add("drag-over");
-    }
-
-    function handleFolderDragOver(event) {
-      if (!dragState.nodeId) {
-        return;
-      }
-      event.preventDefault();
-      event.dataTransfer.dropEffect = "move";
-    }
-
-    function handleFolderDragLeave(event, details) {
-      if (event.relatedTarget && details.contains(event.relatedTarget)) {
-        return;
-      }
-      details.classList.remove("drag-over");
-    }
-
-    function folderTreeContainsFolder(node, targetId) {
-      if (!node?.children?.length) {
-        return false;
-      }
-      for (const child of node.children) {
-        if (child.id === targetId) {
-          return true;
-        }
-        if (folderTreeContainsFolder(child, targetId)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    async function canDropNodeInFolder(dragNodeId, dragNodeType, targetFolderId) {
-      if (!dragNodeId || !targetFolderId) {
-        return false;
-      }
-      if (dragNodeId === targetFolderId) {
-        return false;
-      }
-      if (dragNodeType !== "folder") {
-        return true;
-      }
-
-      const [dragSubTree] = await chrome.bookmarks.getSubTree(dragNodeId);
-      return !folderTreeContainsFolder(dragSubTree, targetFolderId);
-    }
-
-    async function handleFolderDrop(event, targetFolderNode) {
-      if (!dragState.nodeId) {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
-      clearFolderDragOverStyles();
-
-      const dragNodeId = dragState.nodeId;
-      const dragNodeType = dragState.nodeType;
-      dragState.nodeId = null;
-      dragState.nodeType = null;
-
-      try {
-        const canDrop = await canDropNodeInFolder(
-          dragNodeId,
-          dragNodeType,
-          targetFolderNode.id,
-        );
-        if (!canDrop) {
-          setStatus(t("cannotDropFolder"), "error");
-          return;
-        }
-
-        const [dragNode] = await chrome.bookmarks.get(dragNodeId);
-        if (!dragNode) {
-          setStatus(t("dragSourceNotFound"), "error");
-          return;
-        }
-        if (dragNode.parentId === targetFolderNode.id) {
-          return;
-        }
-
-        const children = await chrome.bookmarks.getChildren(targetFolderNode.id);
-        await chrome.bookmarks.move(dragNodeId, {
-          parentId: targetFolderNode.id,
-          index: children.length,
-        });
-
-        setStatus(t("movedSuccessfully"), "success");
-        await rerenderAfterTreeChange([targetFolderNode.id]);
-      } catch (error) {
-        setStatus(t("moveFailed", [error.message]), "error");
-      }
-    }
-
-    function getNameForNode(node) {
-      return node.title || (node.url ? node.url : t("untitled"));
-    }
+    const stateModule = window.YABMBookmarkTreeStateModule.createBookmarkTreeStateModule(
+      {
+        t,
+        updateBookmarkListScrollbar,
+      },
+    );
+    const {
+      applyOpenFolderIds,
+      createActionButton,
+      getFolderStats,
+      getNameForNode,
+      getOpenFolderIds,
+      getTopLevelFolders,
+      setAllFoldersOpen,
+      setFolderOpen,
+      toggleFolder,
+      updateTreeSummaryStats,
+    } = stateModule;
 
     async function runBookmarkMutation(run, options) {
       const { successKey, errorKey, afterSuccess } = options || {};
@@ -316,8 +75,8 @@
       const openFolderIds = getOpenFolderIds();
       await runBookmarkMutation(
         async () => {
-        await removeFaviconsByBookmarkIds([node.id]);
-        await chrome.bookmarks.remove(node.id);
+          await removeFaviconsByBookmarkIds([node.id]);
+          await chrome.bookmarks.remove(node.id);
         },
         {
           successKey: "bookmarkDeleted",
@@ -357,9 +116,9 @@
       const openFolderIds = getOpenFolderIds();
       await runBookmarkMutation(
         async () => {
-        const bookmarkIds = getBookmarkNodesInFolder(node).map((item) => item.id);
-        await removeFaviconsByBookmarkIds(bookmarkIds);
-        await chrome.bookmarks.removeTree(node.id);
+          const bookmarkIds = getBookmarkNodesInFolder(node).map((item) => item.id);
+          await removeFaviconsByBookmarkIds(bookmarkIds);
+          await chrome.bookmarks.removeTree(node.id);
         },
         {
           successKey: "folderDeleted",
@@ -377,6 +136,21 @@
       await renderBookmarks(openFolderIds);
       await refreshWebdavStatusBar();
     }
+
+    const dndModule = window.YABMBookmarkTreeDndModule.createBookmarkTreeDndModule({
+      t,
+      setStatus,
+      rerenderAfterTreeChange,
+    });
+    const {
+      handleBookmarkListDragOver,
+      handleFolderDragEnter,
+      handleFolderDragLeave,
+      handleFolderDragOver,
+      handleFolderDrop,
+      handleNodeDragEnd,
+      handleNodeDragStart,
+    } = dndModule;
 
     let treeChangeDebounceTimer = null;
     let treeChangeRefreshInFlight = false;
@@ -673,14 +447,11 @@
     }
 
     async function sortFolderAndRerender(folderId, descending) {
-      await runBookmarkMutation(
-        () => sortFolderChildren(folderId, descending),
-        {
-          successKey: descending ? "folderSortedDesc" : "folderSortedAsc",
-          errorKey: "sortFailed",
-          afterSuccess: () => rerenderAfterTreeChange([folderId]),
-        },
-      );
+      await runBookmarkMutation(() => sortFolderChildren(folderId, descending), {
+        successKey: descending ? "folderSortedDesc" : "folderSortedAsc",
+        errorKey: "sortFailed",
+        afterSuccess: () => rerenderAfterTreeChange([folderId]),
+      });
     }
 
     async function handleSortMenuApply(descending) {
@@ -691,15 +462,6 @@
       const folderId = sortMenuContext.folderId;
       closeSortMenu();
       await sortFolderAndRerender(folderId, descending);
-    }
-
-    function getTopLevelFolders(tree) {
-      const root = tree?.[0];
-      if (!root?.children) {
-        return [];
-      }
-
-      return root.children.filter((node) => node.children);
     }
 
     function createBookmarkLink(node) {
@@ -1027,114 +789,6 @@
       return details;
     }
 
-    const FOLDER_TOGGLE_ANIM_MS = 150;
-
-    function setAllFoldersOpen(open) {
-      const folders = document.querySelectorAll("#bookmark-list details.folder");
-      for (const folder of folders) {
-        setFolderOpen(folder, open, true);
-      }
-      requestAnimationFrame(() => {
-        updateBookmarkListScrollbar();
-        window.setTimeout(
-          updateBookmarkListScrollbar,
-          FOLDER_TOGGLE_ANIM_MS + 20,
-        );
-      });
-    }
-
-    function setFolderOpen(details, open, animate = true) {
-      const content = details.querySelector(":scope > .folder-content");
-      if (!content) {
-        details.open = open;
-        return;
-      }
-
-      if (details.open === open) {
-        return;
-      }
-
-      if (!animate) {
-        details.open = open;
-        requestAnimationFrame(() => {
-          updateBookmarkListScrollbar();
-          window.setTimeout(updateBookmarkListScrollbar, 30);
-        });
-        return;
-      }
-
-      if (open) {
-        details.open = true;
-        content.style.maxHeight = "0px";
-        content.style.opacity = "0";
-        content.style.transform = "translateY(-4px)";
-        requestAnimationFrame(() => {
-          content.style.maxHeight = `${content.scrollHeight}px`;
-          content.style.opacity = "1";
-          content.style.transform = "translateY(0)";
-        });
-        window.setTimeout(() => {
-          content.style.maxHeight = "";
-          content.style.opacity = "";
-          content.style.transform = "";
-          updateBookmarkListScrollbar();
-        }, FOLDER_TOGGLE_ANIM_MS);
-        requestAnimationFrame(() => {
-          updateBookmarkListScrollbar();
-          window.setTimeout(
-            updateBookmarkListScrollbar,
-            FOLDER_TOGGLE_ANIM_MS + 20,
-          );
-        });
-        return;
-      }
-
-      content.style.maxHeight = `${content.scrollHeight}px`;
-      content.style.opacity = "1";
-      content.style.transform = "translateY(0)";
-      requestAnimationFrame(() => {
-        content.style.maxHeight = "0px";
-        content.style.opacity = "0";
-        content.style.transform = "translateY(-4px)";
-      });
-      window.setTimeout(() => {
-        details.open = false;
-        content.style.maxHeight = "";
-        content.style.opacity = "";
-        content.style.transform = "";
-        updateBookmarkListScrollbar();
-      }, FOLDER_TOGGLE_ANIM_MS);
-      requestAnimationFrame(() => {
-        updateBookmarkListScrollbar();
-        window.setTimeout(updateBookmarkListScrollbar, FOLDER_TOGGLE_ANIM_MS + 20);
-      });
-    }
-
-    function toggleFolder(details) {
-      setFolderOpen(details, !details.open, true);
-    }
-
-    function getOpenFolderIds() {
-      return new Set(
-        Array.from(document.querySelectorAll("#bookmark-list details.folder[open]"))
-          .map((el) => el.dataset.folderId)
-          .filter(Boolean),
-      );
-    }
-
-    function applyOpenFolderIds(openFolderIds) {
-      if (!openFolderIds || !openFolderIds.size) {
-        return;
-      }
-
-      const folders = document.querySelectorAll("#bookmark-list details.folder");
-      for (const folder of folders) {
-        if (openFolderIds.has(folder.dataset.folderId)) {
-          setFolderOpen(folder, true, false);
-        }
-      }
-    }
-
     async function renderBookmarksWithOpenState(openFolderIds) {
       closeEditContextMenu();
       closeTreeContextMenu();
@@ -1166,32 +820,6 @@
     async function renderBookmarks(openFolderIds = null) {
       const targetOpenIds = openFolderIds ?? getOpenFolderIds();
       return renderBookmarksWithOpenState(targetOpenIds);
-    }
-
-    function handleBookmarkListDragOver(event) {
-      if (!dragState.nodeId) {
-        return;
-      }
-      const folder = event.target?.closest?.(".folder");
-      if (!folder) {
-        return;
-      }
-      const folderId = folder.dataset.folderId;
-      if (String(folderId) === String(dragState.parentId)) {
-        return;
-      }
-      if (
-        dragState.nodeType === "folder" &&
-        folder.contains(
-          document.querySelector(`[data-folder-id="${dragState.nodeId}"]`),
-        )
-      ) {
-        return;
-      }
-      if (!folder.classList.contains("drag-over")) {
-        clearFolderDragOverStyles();
-        folder.classList.add("drag-over");
-      }
     }
 
     function isTreeContextMenuOpen() {
