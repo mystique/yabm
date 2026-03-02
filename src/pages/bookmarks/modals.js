@@ -1,4 +1,16 @@
+/**
+ * @file modals.js
+ * Modal dialog management for the bookmarks page.
+ * Handles config/WebDAV setup, confirmation prompts, and the bookmark/folder editor.
+ * Each modal uses a CSS open/close animation; a WeakMap tracks pending close timers.
+ * Exposed as `window.YABMModalsModule`.
+ */
 (function () {
+  /**
+   * Factory that creates the modals module.
+   * @param {{ t: Function, setStatus: Function, showTopToast: Function, setWebdavStatusIndicator: Function, refreshWebdavStatusBar: Function }} deps
+   * @returns {{ openModal: Function, closeModal: Function, openConfigModal: Function, closeConfigModal: Function, openPromptModal: Function, openEditorModal: Function, testConfigConnection: Function, saveConfigFromModal: Function, clearConfigFromModal: Function, invalidateConfigTest: Function }}
+   */
   function createModalsModule(deps) {
     const {
       t,
@@ -8,15 +20,31 @@
       refreshWebdavStatusBar,
     } = deps;
 
+    /** CSS transition duration for modal open/close animations (ms). */
     const MODAL_ANIM_MS = 180;
+    // Maps each modal element to its pending close-animation cleanup timer.
     const modalCloseTimers = new WeakMap();
 
+    /**
+     * Transient state for the WebDAV config wizard.
+     * `tested` must be true before the user can save; it is reset whenever
+     * any credential field changes in a way that invalidates the connection test.
+     * @type {{ tested: boolean, directoryUrl: string, files: Array<{name: string, size?: number, lastModified?: string}> }}
+     */
     const configState = {
       tested: false,
       directoryUrl: "",
       files: [],
     };
 
+    /**
+     * Updates a status element's text, visibility, and type modifier class.
+     * Passing an empty or whitespace-only message hides the element.
+     * @param {HTMLElement|null} statusEl
+     * @param {string} baseClassName - Class list reset value applied before modifiers.
+     * @param {string} message - Status text; empty = hidden.
+     * @param {'success'|'error'|''} type - Optional CSS modifier class.
+     */
     function updateStatusElement(statusEl, baseClassName, message, type) {
       if (!statusEl) {
         return;
@@ -36,6 +64,12 @@
       }
     }
 
+    /**
+     * Sets the status message inside the config/WebDAV modal.
+     * Also shows a toast for success and error outcomes.
+     * @param {string} message
+     * @param {'success'|'error'|''} type
+     */
     function setConfigStatus(message, type) {
       const statusEl = document.getElementById("cfg-status");
       updateStatusElement(statusEl, "sync-status", message, type);
@@ -44,6 +78,12 @@
       }
     }
 
+    /**
+     * Sets the status message inside the bookmark/folder editor modal.
+     * Also shows a toast for success and error outcomes.
+     * @param {string} message
+     * @param {'success'|'error'|''} type
+     */
     function setEditorStatus(message, type) {
       const statusEl = document.getElementById("editor-status");
       updateStatusElement(statusEl, "sync-status", message, type);
@@ -52,6 +92,10 @@
       }
     }
 
+    /**
+     * Cancels the pending close-animation cleanup timer for `modal`, if any.
+     * @param {HTMLElement} modal
+     */
     function clearModalCloseTimer(modal) {
       const activeTimer = modalCloseTimers.get(modal);
       if (activeTimer) {
@@ -60,6 +104,11 @@
       }
     }
 
+    /**
+     * Opens a modal: removes "hidden" and "is-closing", then adds "is-open" on the
+     * next animation frame so the CSS enter transition runs.
+     * @param {HTMLElement|null} modal
+     */
     function openModal(modal) {
       if (!modal) {
         return;
@@ -71,6 +120,10 @@
       });
     }
 
+    /**
+     * Closes a modal with a CSS exit animation, then sets "hidden" after `MODAL_ANIM_MS`.
+     * @param {HTMLElement|null} modal
+     */
     function closeModal(modal) {
       if (!modal || modal.classList.contains("hidden")) {
         return;
@@ -86,6 +139,12 @@
       modalCloseTimers.set(modal, timer);
     }
 
+    /**
+     * Normalises a file name to lowercase with a `.html` extension.
+     * Defaults to `"bookmarks.html"` when the input is blank.
+     * @param {string} fileName
+     * @returns {string}
+     */
     function normalizeFileName(fileName) {
       const value = (fileName || "").trim();
       if (!value) {
@@ -94,6 +153,12 @@
       return value.toLowerCase().endsWith(".html") ? value : `${value}.html`;
     }
 
+    /**
+     * Formats a byte count as a human-readable size string (B / KB / MB / GB / TB).
+     * Returns `"-"` for invalid or negative values.
+     * @param {number|string} sizeValue
+     * @returns {string}
+     */
     function formatFileSize(sizeValue) {
       const bytes = Number.parseInt(sizeValue, 10);
       if (!Number.isFinite(bytes) || bytes < 0) {
@@ -113,6 +178,12 @@
       return `${text.replace(/\.?0+$/, "")} ${units[unitIndex]}`;
     }
 
+    /**
+     * Formats a last-modified value into separate date and time strings.
+     * Returns placeholder dashes when the value is missing or unparseable.
+     * @param {string|number|null} lastModifiedValue
+     * @returns {{ dateText: string, timeText: string }}
+     */
     function formatLastModifiedParts(lastModifiedValue) {
       const date = new Date(lastModifiedValue);
       if (!lastModifiedValue || Number.isNaN(date.getTime())) {
@@ -128,12 +199,23 @@
       };
     }
 
+    /**
+     * Builds the inner HTML string for a file-list item's metadata section.
+     * @param {{ size?: number, lastModified?: string }} file
+     * @returns {string}
+     */
     function buildFileMetaHtml(file) {
       const sizeText = formatFileSize(file?.size);
       const { dateText, timeText } = formatLastModifiedParts(file?.lastModified);
       return `<span class="file-size">${sizeText}</span><span class="file-datetime"><span>${dateText}</span><span>${timeText}</span></span>`;
     }
 
+    /**
+     * Populates the config modal's file selection list with existing WebDAV files
+     * plus a "Create new file" option, pre-selecting `selectedName` when possible.
+     * @param {Array<{name: string, size?: number, lastModified?: string}>} files
+     * @param {string} selectedName - File name to pre-select.
+     */
     function renderConfigFileList(files, selectedName) {
       const container = document.getElementById("cfg-files");
       container.innerHTML = "";
@@ -188,6 +270,11 @@
       }
     }
 
+    /**
+     * Returns the currently selected file name from the config file-picker.
+     * When "Create new file" is selected, derives the name from the filename input.
+     * @returns {string}
+     */
     function getSelectedConfigFileName() {
       const checked = document.querySelector(
         'input[name="cfg-file-select"]:checked',
@@ -205,6 +292,11 @@
       return checked.value;
     }
 
+    /**
+     * Resets the config test state and collapses the file selection section.
+     * Must be called whenever the user changes credentials so stale test results
+     * cannot be used to save a config to a different server.
+     */
     function invalidateConfigTest() {
       configState.tested = false;
       configState.directoryUrl = "";
@@ -213,6 +305,10 @@
       section.classList.remove("is-open");
     }
 
+    /**
+     * Opens the WebDAV configuration modal and pre-fills it with the stored config.
+     * @returns {Promise<void>}
+     */
     async function openConfigModal() {
       const modal = document.getElementById("config-modal");
       openModal(modal);
@@ -233,11 +329,20 @@
       invalidateConfigTest();
     }
 
+    /**
+     * Closes the WebDAV configuration modal.
+     */
     function closeConfigModal() {
       const modal = document.getElementById("config-modal");
       closeModal(modal);
     }
 
+    /**
+     * Tests the WebDAV connection using the credentials currently entered in the form.
+     * On success, populates the file selection list and marks the config as tested.
+     * On failure, invalidates the test state so the user cannot save stale results.
+     * @returns {Promise<void>}
+     */
     async function testConfigConnection() {
       const testBtn = document.getElementById("cfg-test");
       testBtn.disabled = true;
@@ -282,6 +387,11 @@
       }
     }
 
+    /**
+     * Saves the WebDAV config after validating that a connection test was performed
+     * and a target file has been selected or entered.
+     * @returns {Promise<void>}
+     */
     async function saveConfigFromModal() {
       if (!configState.tested) {
         setConfigStatus(t("testBeforeSave"), "error");
@@ -312,6 +422,11 @@
       }
     }
 
+    /**
+     * Prompts for confirmation, then clears the stored WebDAV config and
+     * resets all form fields to their defaults.
+     * @returns {Promise<void>}
+     */
     async function clearConfigFromModal() {
       const confirmed = await openPromptModal({
         title: t("clearConfigurationTitle"),
@@ -338,6 +453,13 @@
       }
     }
 
+    /**
+     * Shows a confirmation-style prompt modal and returns a Promise that resolves
+     * to `true` (confirmed) or `false` (cancelled/dismissed).
+     * One-shot: event listeners are cleaned up after the user responds.
+     * @param {{ title?: string, message?: string, confirmLabel?: string, cancelLabel?: string }} options
+     * @returns {Promise<boolean>}
+     */
     function openPromptModal({
       title,
       message,
@@ -379,6 +501,13 @@
       });
     }
 
+    /**
+     * Shows the bookmark/folder editor modal pre-filled with the given values.
+     * Returns a Promise that resolves to `{ name, url }` when saved, or `null` when cancelled.
+     * Keyboard shortcuts: Enter submits the form, Escape cancels.
+     * @param {{ title?: string, nameLabel?: string, nameValue?: string, urlValue?: string, urlVisible?: boolean, saveLabel?: string }} options
+     * @returns {Promise<{name: string, url: string}|null>}
+     */
     function openEditorModal({
       title,
       nameLabel,

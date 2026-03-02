@@ -1,10 +1,26 @@
+/**
+ * @file bookmark-tree-menu.js
+ * Context menu and sort-menu management for the bookmark tree.
+ * Handles rendering, positioning, open/close lifecycle, and sort operations.
+ * Exposed as `window.YABMBookmarkTreeMenuModule`.
+ */
 (function () {
+  /**
+   * Factory that creates the bookmark tree menu module.
+   * @param {{ t: Function, runBookmarkMutation: Function, rerenderAfterTreeChange: Function }} deps
+   * @returns {{ closeSortMenu: Function, closeTreeContextMenu: Function, handleSortMenuApply: Function, isTreeContextMenuOpen: Function, openSortMenu: Function, openTreeContextMenu: Function, sortFolderAndRerender: Function }}
+   */
   function createBookmarkTreeMenuModule(deps) {
     const { t, runBookmarkMutation, rerenderAfterTreeChange } = deps;
 
+    // Stores the folder ID of the currently open sort menu, or null when closed.
     let sortMenuContext = null;
+    // Tracks whether the right-click context menu is currently open.
     let treeContextMenuOpen = false;
 
+    /**
+     * Closes and empties the bookmark tree context menu.
+     */
     function closeTreeContextMenu() {
       const menu = document.getElementById("tree-context-menu");
       if (!menu) {
@@ -15,6 +31,12 @@
       treeContextMenuOpen = false;
     }
 
+    /**
+     * Builds and displays the right-click context menu at the given screen coordinates.
+     * Closes any open sort menu before rendering the new menu items.
+     * The menu is clamped to the viewport edges to prevent overflow.
+     * @param {{ x: number, y: number, items: Array<{label?: string, icon?: string, danger?: boolean, type?: string, onClick?: Function}> }} options
+     */
     function openTreeContextMenu({ x, y, items }) {
       const menu = document.getElementById("tree-context-menu");
       if (!menu) {
@@ -64,6 +86,9 @@
       menu.style.top = `${top}px`;
     }
 
+    /**
+     * Closes the folder sort menu and clears its context.
+     */
     function closeSortMenu() {
       const menu = document.getElementById("folder-sort-menu");
       if (!menu) {
@@ -73,6 +98,13 @@
       sortMenuContext = null;
     }
 
+    /**
+     * Opens the sort menu anchored to `anchorEl`.
+     * If the same folder's sort menu is already open, calling this toggles it closed.
+     * The menu is clamped to the viewport to avoid overflow.
+     * @param {chrome.bookmarks.BookmarkTreeNode} folderNode - The folder to sort.
+     * @param {HTMLElement} anchorEl - The button that triggered the menu.
+     */
     function openSortMenu(folderNode, anchorEl) {
       const menu = document.getElementById("folder-sort-menu");
       if (!menu || !anchorEl) {
@@ -107,6 +139,14 @@
       menu.style.top = `${top}px`;
     }
 
+    /**
+     * Sorts the direct children of a folder alphabetically.
+     * Folders always appear before bookmarks; ties use locale-aware, numeric comparison.
+     * Moves each child to its new index via the Chrome bookmarks API sequentially.
+     * @param {string} folderId - Chrome bookmark ID of the folder to sort.
+     * @param {boolean} descending - When true, sorts Z → A instead of A → Z.
+     * @returns {Promise<void>}
+     */
     async function sortFolderChildren(folderId, descending) {
       const [folderNode] = await chrome.bookmarks.get(folderId);
       if (!folderNode) {
@@ -136,6 +176,13 @@
       }
     }
 
+    /**
+     * Wraps `sortFolderChildren` in the shared mutation helper, which handles
+     * status reporting and triggers a re-render after a successful sort.
+     * @param {string} folderId
+     * @param {boolean} descending
+     * @returns {Promise<void>}
+     */
     async function sortFolderAndRerender(folderId, descending) {
       await runBookmarkMutation(() => sortFolderChildren(folderId, descending), {
         successKey: descending ? "folderSortedDesc" : "folderSortedAsc",
@@ -144,6 +191,12 @@
       });
     }
 
+    /**
+     * Called when the user clicks an Ascending/Descending button in the sort menu.
+     * Closes the menu and runs the sort operation for the currently open folder context.
+     * @param {boolean} descending
+     * @returns {Promise<void>}
+     */
     async function handleSortMenuApply(descending) {
       if (!sortMenuContext?.folderId) {
         closeSortMenu();
@@ -154,6 +207,10 @@
       await sortFolderAndRerender(folderId, descending);
     }
 
+    /**
+     * Returns whether the right-click context menu is currently open.
+     * @returns {boolean}
+     */
     function isTreeContextMenuOpen() {
       return treeContextMenuOpen;
     }

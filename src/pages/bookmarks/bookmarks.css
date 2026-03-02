@@ -1,3 +1,39 @@
+/*
+ * bookmarks.css
+ * Styles for the YABM bookmarks page (main extension UI).
+ *
+ * Sections:
+ *   1. Custom Fonts
+ *   2. Design Tokens  (:root custom properties)
+ *   3. Base / Reset
+ *   4. Layout Container
+ *   5. Notifications  (toast, top progress bar)
+ *   6. Bottom Status Bar
+ *   7. App Header
+ *   8. Toolbar Buttons  (.tree-btn group)
+ *   9. Sync Status Message
+ *  10. Bookmark Panel & List
+ *  11. Custom Scrollbar
+ *  12. Folder Tree
+ *  13. Drag-and-Drop States
+ *  14. Bookmark Items
+ *  15. Utility & State Classes
+ *  16. Tooltip
+ *  17. Modals
+ *  18. Config Modal — Form Fields
+ *  19. Contextual Menus  (sort, context)
+ *  20. Language Menu
+ *  21. Responsive / Media Queries
+ */
+
+/* ============================================================
+ * 1. CUSTOM FONTS
+ * Space Grotesk is used for all UI text.
+ * Material Symbols Outlined is used for icon ligatures via
+ * the .icon-font utility class.
+ * font-display:block prevents invisible text flash for icons.
+ * ============================================================ */
+
 @font-face {
     font-family: "Space Grotesk";
     font-style: normal;
@@ -14,6 +50,7 @@
     src: url("../../assets/fonts/space-grotesk-700.woff2") format("woff2");
 }
 
+/* Material Symbols Outlined — icon font loaded locally to avoid network requests */
 @font-face {
     font-family: "Material Symbols Outlined";
     font-style: normal;
@@ -23,9 +60,23 @@
         format("woff2");
 }
 
+/* ============================================================
+ * 2. DESIGN TOKENS
+ * All shared color, spacing, and shadow values are declared
+ * here as CSS custom properties so they can be referenced
+ * throughout the stylesheet without repetition.
+ * ============================================================ */
+
 :root {
     color-scheme: light;
-    --bg: #eef4fb;
+    --bg: #eef4fb;                          /* page background */
+    /* --card / --card-soft: surface layers for elevated components */
+    /* --line / --panel-border: border tints, keyed to the accent hue */
+    /* --accent / --accent-soft: interactive blue */
+    /* --shadow: default box-shadow for card-level elevation */
+    /* --viewport-gap-*: margins between the panel and the viewport edge */
+    /* --bottom-status-space: reserved height for the fixed bottom bar */
+    /* --bookmark-head-height: locked height for the panel toolbar row */
     --card: #ffffff;
     --card-soft: #f3f8ff;
     --text: #1a2633;
@@ -45,6 +96,10 @@
         sans-serif;
 }
 
+/* ============================================================
+ * 3. BASE / RESET
+ * ============================================================ */
+
 * {
     box-sizing: border-box;
 }
@@ -63,16 +118,18 @@ body {
     -webkit-user-select: none;
 }
 
+/* Decorative inner frame drawn around the entire viewport edge */
 body::before {
     content: "";
     position: fixed;
     inset: 10px;
     border: 1px solid #d6e3f1;
     border-radius: 18px;
-    pointer-events: none;
+    pointer-events: none;   /* must not intercept clicks */
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
+/* Propagate the page font to all form controls (browser default is system UI) */
 button,
 input,
 select,
@@ -80,12 +137,21 @@ textarea {
     font-family: inherit;
 }
 
+/* Re-enable text selection inside editable nodes
+   (body has user-select:none for a native-app feel) */
 input,
 textarea,
 [contenteditable="true"] {
     user-select: text;
     -webkit-user-select: text;
 }
+
+/* ============================================================
+ * 4. LAYOUT CONTAINER
+ * The main panel is centered horizontally and capped at 980 px
+ * wide so it looks good on ultra-wide monitors without
+ * stretching the bookmark tree uncomfortably.
+ * ============================================================ */
 
 .container {
     position: fixed;
@@ -107,6 +173,13 @@ textarea,
         inset 0 1px 0 rgba(255, 255, 255, 0.72);
     backdrop-filter: blur(2px);
 }
+
+/* ============================================================
+ * 5. NOTIFICATIONS
+ * 5a. Toast — slides down from the top edge.
+ *     .is-open drives the entrance animation via transform + opacity.
+ *     .success / .error apply semantic colour variants.
+ * ============================================================ */
 
 .top-toast {
     position: fixed;
@@ -137,7 +210,7 @@ textarea,
 .top-toast.success {
     border-color: #9fd7b9;
     background: #edf9f1;
-    color: #0b7a44;
+    color: #0b7a44;   /* WCAG AA on the light green bg */
 }
 
 .top-toast.error {
@@ -146,6 +219,14 @@ textarea,
     color: #b42318;
 }
 
+/*
+ * 5b. Top progress bar.
+ *     Indeterminate mode: .top-progress-bar slides end-to-end via
+ *       @keyframes top-progress-slide.
+ *     Determinate mode (.is-determinate): width is set inline by JS,
+ *       animate: none, transitions smoothly via CSS transition.
+ *     z-index 1450 keeps it above modals (z 1000) and menus (z 1300–1350).
+ */
 .top-progress {
     position: fixed;
     top: 0;
@@ -168,8 +249,8 @@ textarea,
 .top-progress-bar {
     position: absolute;
     top: 0;
-    left: -42%;
-    width: 42%;
+    left: -42%;     /* starts fully off-screen to the left */
+    width: 42%;     /* chosen so the glowing bar covers ~40 % of the track */
     height: 100%;
     background: linear-gradient(
         90deg,
@@ -181,9 +262,10 @@ textarea,
     box-shadow:
         0 0 10px rgba(77, 164, 237, 0.7),
         0 0 2px rgba(189, 234, 255, 0.95);
-    animation: top-progress-slide 980ms ease-in-out infinite;
+    animation: top-progress-slide 980ms ease-in-out infinite; /* looping shimmer */
 }
 
+/* In determinate mode the bar does not animate; JS sets its width directly */
 .top-progress.is-determinate .top-progress-bar {
     left: 0;
     width: 0%;
@@ -195,6 +277,7 @@ textarea,
     transition: width 140ms ease-out;
 }
 
+/* Slide the 42%-wide bar across 340 % of its own width to cross the full track */
 @keyframes top-progress-slide {
     from {
         transform: translateX(0);
@@ -203,6 +286,13 @@ textarea,
         transform: translateX(340%);
     }
 }
+
+/* ============================================================
+ * 6. BOTTOM STATUS BAR
+ * Fixed footer strip that shows the active WebDAV URL and
+ * entry-count comparison badges.
+ * z-index 900 keeps it below modals (1000+) but above the tree.
+ * ============================================================ */
 
 .bottom-status {
     position: fixed;
@@ -242,7 +332,7 @@ textarea,
 
 .bottom-status-url {
     min-width: 0;
-    max-width: 54vw;
+    max-width: 54vw; /* prevent the URL from pushing count badges off-screen */
     font-size: 12px;
     color: var(--muted);
     white-space: nowrap;
@@ -267,6 +357,13 @@ textarea,
     border: 1px solid #d9e6f5;
     background: #f5f9ff;
 }
+
+/* ============================================================
+ * 7. APP HEADER
+ * Contains the app title, version badge, toolbar row
+ * (WebDAV indicator + action buttons), and the inline sync
+ * status message.
+ * ============================================================ */
 
 header {
     display: grid;
@@ -368,6 +465,13 @@ h1 {
     background: linear-gradient(180deg, #f8fafd, #edf2f8);
 }
 
+/* ============================================================
+ * 8. TOOLBAR BUTTONS (.tree-btn)
+ * Primary style: solid blue pill.
+ * .tree-btn-soft: ghost/secondary variant (light fill, muted text).
+ * .tree-btn-icon-only: square variant for icon-only buttons.
+ * ============================================================ */
+
 .tree-btn {
     display: inline-flex;
     align-items: center;
@@ -416,6 +520,13 @@ h1 {
     margin-left: auto;
 }
 
+/* ============================================================
+ * 9. SYNC STATUS MESSAGE
+ * Collapsible status strip below the toolbar.
+ * .is-hidden: collapses height and fades out via CSS transitions
+ *   so the surrounding layout reflows smoothly without JS.
+ * ============================================================ */
+
 .sync-status {
     min-height: 20px;
     margin: 0;
@@ -459,6 +570,13 @@ h1 {
     color: #b42318;
 }
 
+/* ============================================================
+ * 10. BOOKMARK PANEL & LIST
+ * .bookmark-panel: flex column wrapper (fills remaining height).
+ * .bookmark-list: the scrollable tree root; native scrollbar is
+ *   hidden (scrollbar-width:none) in favour of the custom one.
+ * ============================================================ */
+
 .bookmark-list {
     display: flex;
     flex-direction: column;
@@ -476,6 +594,7 @@ h1 {
     -ms-overflow-style: none;
 }
 
+/* Hide native scrollbar in WebKit/Blink; replaced by .bookmark-scrollbar */
 .bookmark-list::-webkit-scrollbar {
     width: 0;
     height: 0;
@@ -494,11 +613,20 @@ h1 {
     position: relative;
 }
 
+/* ============================================================
+ * 11. CUSTOM SCROLLBAR
+ * Thin vertical track + thumb, positioned by custom-scrollbar.js
+ * at runtime (top / left / height set via inline styles).
+ * .hidden uses opacity+visibility instead of display:none so the
+ *   fade-out transition still plays when it hides.
+ * z-index 1100 keeps it above the bookmark list but below modals.
+ * ============================================================ */
+
 .bookmark-scrollbar {
     position: fixed;
     top: 0;
     left: 0;
-    height: 0;
+    height: 0;   /* overridden by JS; 0 prevents layout shift before first paint */
     width: 7px;
     border-radius: 999px;
     background: rgba(191, 210, 231, 0.78);
@@ -555,6 +683,7 @@ h1 {
     will-change: opacity;
 }
 
+/* Chevron arrows drawn purely with CSS borders (no SVG required) */
 .bookmark-scroll-arrow::before,
 .bookmark-scroll-arrow::after {
     content: "";
@@ -625,6 +754,16 @@ h1 {
     gap: 6px;
 }
 
+/* ============================================================
+ * 12. FOLDER TREE
+ * .folder: a <details> element; top-level ones get the full card
+ *   treatment (shadow, large radius).  Nested ones (.folder:not
+ *   ([data-level="0"])) are visually subdued to reduce noise.
+ * .folder-content: the collapsible children area; max-height
+ *   animation is used instead of display toggle so transitions
+ *   can play.
+ * ============================================================ */
+
 .folder {
     margin: 0;
     margin-left: 0;
@@ -638,6 +777,14 @@ h1 {
 .folder[open] {
     border-color: #bed3ea;
 }
+
+/* ============================================================
+ * 13. DRAG-AND-DROP STATES
+ * .drag-over  — valid drop target highlighted with blue ring.
+ * .drag-source — the element currently being dragged (dimmed).
+ * .drag-ghost  — the clone element attached to the pointer;
+ *                must look elevated (strong shadow, no transparency).
+ * ============================================================ */
 
 .folder.drag-over,
 .folder:not([data-level="0"]).drag-over {
@@ -729,6 +876,7 @@ h1 {
     transform: none !important;
 }
 
+/* Hide the native <details> triangle in Safari / Chrome */
 .folder-header::-webkit-details-marker {
     display: none;
 }
@@ -814,6 +962,11 @@ h1 {
     display: none;
 }
 
+/*
+ * Material Symbols icon utility class.
+ * font-feature-settings:"liga" enables ligature-based icon rendering
+ * (each icon keyword is a ligature in the font file).
+ */
 .icon-font {
     font-family: "Material Symbols Outlined";
     font-weight: normal;
@@ -867,6 +1020,12 @@ h1 {
     background: #eaf2ff;
 }
 
+/*
+ * Folder content area.
+ * max-height:0 / none toggle drives the open/close animation;
+ * will-change hints to the browser to promote this element to
+ * its own GPU layer for smoother transitions.
+ */
 .folder-content {
     display: grid;
     gap: 8px;
@@ -894,6 +1053,15 @@ h1 {
     opacity: 1;
     transform: translateY(0);
 }
+
+/* ============================================================
+ * 14. BOOKMARK ITEMS
+ * .bookmark-row: grid wrapper that reserves space for the
+ *   action buttons column to the right of the bookmark card.
+ * .bookmark-item: the anchor (<a>) styled as a card.
+ * .bookmark-favicon-fallback: shown when the cached favicon
+ *   cannot be loaded; uses a generic bookmark icon instead.
+ * ============================================================ */
 
 .bookmark-item {
     display: grid;
@@ -976,6 +1144,10 @@ h1 {
     white-space: nowrap;
 }
 
+/* ============================================================
+ * 15. UTILITY & STATE CLASSES
+ * ============================================================ */
+
 .empty,
 .empty-subfolder {
     padding: 12px;
@@ -985,10 +1157,16 @@ h1 {
     background: #fbfdfc;
 }
 
+/* Generic display:none toggle */
 .hidden {
     display: none;
 }
 
+/*
+ * Scrollbar hidden state deliberately keeps display:block so that
+ * the CSS opacity + visibility fade-out animation still fires before
+ * the element disappears from the stacking context.
+ */
 .bookmark-scrollbar.hidden,
 .bookmark-scroll-arrow.hidden {
     display: block;
@@ -996,6 +1174,13 @@ h1 {
     visibility: hidden;
     pointer-events: none;
 }
+
+/* ============================================================
+ * 16. TOOLTIP
+ * Positioned near the hovered element by bookmarks.js.
+ * z-index 2200: highest layer, above all modals and menus.
+ * pointer-events:none prevents it from stealing hover events.
+ * ============================================================ */
 
 .app-tooltip {
     position: fixed;
@@ -1014,6 +1199,10 @@ h1 {
     backdrop-filter: blur(3px);
 }
 
+/*
+ * Generic collapsible section (used in the config modal file list).
+ * Same max-height animation pattern as .folder-content.
+ */
 .collapsed {
     display: block;
     overflow: hidden;
@@ -1031,6 +1220,19 @@ h1 {
     opacity: 1;
     transform: translateY(0);
 }
+
+/* ============================================================
+ * 17. MODALS
+ * All three modal dialogs (config, prompt, editor) share this
+ * base structure:
+ *   .modal         — full-screen positioning layer (z-index 1000)
+ *   .modal-backdrop — semi-transparent overlay behind the panel
+ *   .modal-panel   — the visible dialog card
+ *
+ * Visibility is controlled via .is-open / .is-closing classes
+ * so that enter and exit CSS transitions both play fully before
+ * the element is removed from the viewport.
+ * ============================================================ */
 
 .modal {
     position: fixed;
@@ -1068,6 +1270,7 @@ h1 {
     opacity: 0;
 }
 
+/* Default modal width capped at 820 px; .modal-panel-sm overrides to 520 px */
 .modal-panel {
     position: relative;
     width: min(820px, calc(100vw - 24px));
@@ -1166,6 +1369,15 @@ h1 {
     justify-content: flex-end;
     gap: 8px;
 }
+
+/* ============================================================
+ * 18. CONFIG MODAL — FORM FIELDS
+ * .field         — label + input stacked vertically.
+ * .field-row     — two .field elements side by side (collapses to
+ *                  1-column on narrow screens via media query).
+ * .files / .file-item — WebDAV file list rendered after a
+ *                  successful connection test.
+ * ============================================================ */
 
 .field {
     display: grid;
@@ -1278,6 +1490,16 @@ h1 {
     line-height: 1.2;
 }
 
+/* ============================================================
+ * 19. CONTEXTUAL MENUS
+ * .sort-menu        — folder sort dropdown (z-index 1300).
+ * .tree-context-menu — right-click action menu (z-index 1350);
+ *                     slightly higher so it layers over sort.
+ * .tree-context-item — individual menu row; .tree-context-item-danger
+ *                     applies a red destructive-action tint.
+ * .tree-context-divider — visual separator between menu sections.
+ * ============================================================ */
+
 .sort-menu {
     position: fixed;
     z-index: 1300;
@@ -1382,10 +1604,18 @@ h1 {
     font-size: 16px;
 }
 
+/* ============================================================
+ * 20. LANGUAGE MENU
+ * Reuses .sort-menu and .sort-menu-item base styles;
+ * the flag icon column is borderless here to let the emoji/image
+ * show without a container box.
+ * ============================================================ */
+
 .language-menu-item-active {
     background: #edf4ff;
 }
 
+/* Override sort-menu-icon appearance for flag thumbnails */
 #language-menu .sort-menu-icon {
     border: 0;
     background: transparent;
@@ -1429,6 +1659,15 @@ h1 {
     height: 16px;
     margin: 0 auto;
 }
+
+/* ============================================================
+ * 21. RESPONSIVE / MEDIA QUERIES
+ * Below 700 px (typical mobile screen width) the layout tightens:
+ *   - Container margins and padding reduced
+ *   - Header folder-meta wraps instead of overflowing
+ *   - Config modal field-row stacks to a single column
+ *   - Bottom status bar URL truncation is stricter
+ * ============================================================ */
 
 @media (max-width: 700px) {
     .container {

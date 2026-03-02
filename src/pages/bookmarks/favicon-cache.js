@@ -1,4 +1,16 @@
+/**
+ * @file favicon-cache.js
+ * Manages a persistent favicon cache stored in `chrome.storage.local`.
+ * Handles loading, saving, pruning stale entries, and fetching fresh favicons
+ * from multiple fallback sources (chrome://favicon2, Google S2, etc.).
+ * Exposed as `window.YABMFaviconCacheModule`.
+ */
 (function () {
+  /**
+   * Factory that creates the favicon cache module.
+   * @param {{ t: Function, setStatus: Function, showTopToast: Function, showTopProgress: Function, hideTopProgress: Function, updateTopProgress: Function, rerenderAfterTreeChange: Function }} deps
+   * @returns {{ ensureFaviconCacheLoaded: Function, getCachedFaviconForBookmark: Function, getBookmarkNodesInFolder: Function, pruneFaviconCacheForTree: Function, refreshBookmarkFavicon: Function, refreshFolderFavicons: Function, removeFaviconsByBookmarkIds: Function, ensureValidUrl: Function }}
+   */
   function createFaviconCacheModule(deps) {
     const {
       t,
@@ -10,13 +22,24 @@
       rerenderAfterTreeChange,
     } = deps;
 
+    /** `chrome.storage.local` key under which the favicon map is persisted. */
     const FAVICON_CACHE_KEY = "bookmarkFavicons";
+    /**
+     * In-memory favicon cache.
+     * @type {{ loaded: boolean, map: Record<string, { url: string, dataUrl: string, updatedAt: number }> }}
+     */
     const faviconCacheState = {
       loaded: false,
       map: {},
     };
+    // Prevents concurrent favicon fetch operations from overlapping.
     let faviconUpdateInFlight = false;
 
+    /**
+     * Lazily loads the favicon map from `chrome.storage.local` into memory.
+     * Subsequent calls are no-ops once the cache has been loaded.
+     * @returns {Promise<void>}
+     */
     async function ensureFaviconCacheLoaded() {
       if (faviconCacheState.loaded) {
         return;
@@ -30,12 +53,22 @@
       faviconCacheState.loaded = true;
     }
 
+    /**
+     * Persists the current in-memory favicon map back to `chrome.storage.local`.
+     * @returns {Promise<void>}
+     */
     async function persistFaviconCache() {
       await chrome.storage.local.set({
         [FAVICON_CACHE_KEY]: faviconCacheState.map,
       });
     }
 
+    /**
+     * Returns the cached favicon data URL for a bookmark node if it exists and
+     * is still valid (i.e. its stored URL matches the node's current URL).
+     * @param {chrome.bookmarks.BookmarkTreeNode} node
+     * @returns {string|null} A data URL string, or `null` if no valid entry exists.
+     */
     function getCachedFaviconForBookmark(node) {
       const cached = faviconCacheState.map?.[node.id];
       if (!cached || !cached.dataUrl || cached.url !== node.url) {
@@ -44,6 +77,11 @@
       return cached.dataUrl;
     }
 
+    /**
+     * Recursively collects all bookmark (non-folder) nodes within `node`.
+     * @param {chrome.bookmarks.BookmarkTreeNode} node - A folder node to walk.
+     * @returns {chrome.bookmarks.BookmarkTreeNode[]}
+     */
     function getBookmarkNodesInFolder(node) {
       const bookmarks = [];
       const walk = (cur) => {
@@ -59,6 +97,12 @@
       return bookmarks;
     }
 
+    /**
+     * Walks the full bookmark tree and collects every bookmark node's ID.
+     * Used to identify which favicon cache entries are still referenced.
+     * @param {chrome.bookmarks.BookmarkTreeNode[]} tree - Root array from `chrome.bookmarks.getTree()`.
+     * @returns {Set<string>}
+     */
     function collectBookmarkIds(tree) {
       const ids = new Set();
       const walk = (nodes) => {
@@ -74,6 +118,12 @@
       return ids;
     }
 
+    /**
+     * Removes favicon cache entries for bookmarks that no longer exist in the tree.
+     * Persists the updated cache only if at least one entry was removed.
+     * @param {chrome.bookmarks.BookmarkTreeNode[]} tree - Result of `chrome.bookmarks.getTree()`.
+     * @returns {Promise<void>}
+     */
     async function pruneFaviconCacheForTree(tree) {
       await ensureFaviconCacheLoaded();
       const cache = faviconCacheState.map || {};
@@ -138,6 +188,13 @@
       });
     }
 
+    /**
+     * Validates and normalises a raw URL string.
+     * Throws a translated error if the value is empty, malformed, or non-HTTP(S).
+     * @param {string} rawUrl
+     * @returns {string} The normalised absolute URL.
+     * @throws {Error}
+     */
     function ensureValidUrl(rawUrl) {
       const value = (rawUrl || "").trim();
       if (!value) {
@@ -155,6 +212,16 @@
       return parsed.toString();
     }
 
+    /**
+     * Attempts to fetch a favicon for `node.url` from a prioritised list of sources:
+     *   1. `chrome://favicon2` (highest quality via browser cache)
+     *   2. `chrome://favicon` legacy API
+     *   3. Google S2 favicon service (public fallback)
+     * Returns the first successfully loaded image as a data URL.
+     * @param {chrome.bookmarks.BookmarkTreeNode} node
+     * @returns {Promise<string>} Resolves with a data URL.
+     * @throws {Error} If all sources fail.
+     */
     async function fetchFaviconDataUrlForBookmark(node) {
       const url = ensureValidUrl(node.url);
       const sources = [
@@ -177,6 +244,14 @@
       throw new Error(t("faviconFetchFailed"));
     }
 
+    /**
+     * Fetches and caches a fresh favicon for a single bookmark.
+     * Skips if another favicon update is already in flight.
+     * @param {chrome.bookmarks.BookmarkTreeNode} node - The bookmark to update.
+     * @param {{ silent?: boolean }} [options]
+     * @param {boolean} [options.silent=false] - When true, suppresses the status message and re-render.
+     * @returns {Promise<void>}
+     */
     async function refreshBookmarkFavicon(node, { silent = false } = {}) {
       if (faviconUpdateInFlight) {
         setStatus(t("faviconUpdateInProgress"), "");
@@ -204,6 +279,12 @@
       }
     }
 
+    /**
+     * Fetches and caches favicons for every bookmark in a folder, showing a
+     * determinate progress bar. Reports per-item success/failure counts.
+     * @param {chrome.bookmarks.BookmarkTreeNode} folderNode
+     * @returns {Promise<void>}
+     */
     async function refreshFolderFavicons(folderNode) {
       if (faviconUpdateInFlight) {
         setStatus(t("faviconUpdateInProgress"), "");
@@ -261,6 +342,12 @@
       }
     }
 
+    /**
+     * Removes favicon cache entries for the given bookmark IDs and persists
+     * the cache if any entries were actually deleted.
+     * @param {string[]} ids - Chrome bookmark node IDs whose cache entries should be removed.
+     * @returns {Promise<void>}
+     */
     async function removeFaviconsByBookmarkIds(ids) {
       await ensureFaviconCacheLoaded();
       let changed = false;

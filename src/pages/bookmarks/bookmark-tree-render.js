@@ -1,4 +1,16 @@
+/**
+ * @file bookmark-tree-render.js
+ * DOM rendering for the bookmark tree: builds `<div>` rows for bookmarks and
+ * `<details>` nodes for folders, wires all event listeners, and manages the
+ * full render cycle (favicon cache load, tree fetch, fragment swap).
+ * Exposed as `window.YABMBookmarkTreeRenderModule`.
+ */
 (function () {
+  /**
+   * Factory that creates the bookmark tree render module.
+   * @param {object} deps - All dependency functions injected by the orchestrator.
+   * @returns {{ renderBookmarks: Function }}
+   */
   function createBookmarkTreeRenderModule(deps) {
     const {
       t,
@@ -37,6 +49,12 @@
       sortFolderAndRerender,
     } = deps;
 
+    /**
+     * Creates the DOM row for a single bookmark link, including its favicon,
+     * title, URL text, action buttons, drag handles, and right-click menu.
+     * @param {chrome.bookmarks.BookmarkTreeNode} node - A bookmark node (has `url`).
+     * @returns {HTMLDivElement}
+     */
     function createBookmarkLink(node) {
       const row = document.createElement("div");
       row.className = "bookmark-row";
@@ -161,6 +179,13 @@
       return row;
     }
 
+    /**
+     * Creates the collapsible `<details>` DOM node for a folder, recursively
+     * rendering all child bookmarks and sub-folders.
+     * @param {chrome.bookmarks.BookmarkTreeNode} node - A folder node (has `children`).
+     * @param {number} [level=0] - Nesting depth, controls the `--level` CSS variable.
+     * @returns {HTMLDetailsElement}
+     */
     function createFolderNode(node, level = 0) {
       const details = document.createElement("details");
       details.className = "folder";
@@ -362,6 +387,12 @@
       return details;
     }
 
+    /**
+     * Fetches the full Chrome bookmark tree, prunes the favicon cache, renders
+     * all top-level folders into the list container, and restores open folder state.
+     * @param {Set<string>|null} openFolderIds - IDs of folders to keep open after render.
+     * @returns {Promise<void>}
+     */
     async function renderBookmarksWithOpenState(openFolderIds) {
       closeEditContextMenu();
       closeTreeContextMenu();
@@ -390,6 +421,12 @@
       updateMainLayoutMetrics();
     }
 
+    /**
+     * Public entry point for triggering a tree re-render, optionally with a
+     * specific set of open folder IDs. Defaults to whatever is currently open.
+     * @param {Set<string>|null} [openFolderIds=null]
+     * @returns {Promise<void>}
+     */
     async function renderBookmarks(openFolderIds = null) {
       const targetOpenIds = openFolderIds ?? getOpenFolderIds();
       return renderBookmarksWithOpenState(targetOpenIds);

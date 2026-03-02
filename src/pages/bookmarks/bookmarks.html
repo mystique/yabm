@@ -1,18 +1,39 @@
+<!--
+  bookmarks.html
+  Main UI page for Yet Another Bookmark Manager (YABM).
+
+  This page is opened by the service worker when the extension toolbar icon
+  is clicked, and is also used as the options_page entry point (opened with
+  ?openConfig=1 to pre-open the configuration modal).
+
+  Script load order matters — shared libraries must be loaded before the
+  feature modules that depend on them:
+    1. i18n.js      → window.YABMI18n  (locale, translation)
+    2. sync-utils.js → window.YABMSync  (WebDAV, import/export)
+    3. Feature modules (notifications, scrollbar, favicon, modals, tree, …)
+    4. bookmarks.js  (orchestrator — wires everything together)
+-->
 <!doctype html>
 <html lang="en">
+    <!-- ═══════════════════════ HEAD ═══════════════════════ -->
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title data-i18n="bookmarksPageTitle">Yet Another Bookmark Manager</title>
         <link rel="stylesheet" href="bookmarks.css" />
     </head>
+    <!-- ═══════════════════════ BODY ═══════════════════════ -->
     <body>
+        <!-- ── Notification toast: slides in from the top, role=status for SR ── -->
         <div id="top-toast" class="top-toast hidden" role="status" aria-live="polite"></div>
+        <!-- ── Indeterminate / determinate progress bar along the top edge ── -->
         <div id="top-progress" class="top-progress hidden" aria-hidden="true">
             <span class="top-progress-bar"></span>
         </div>
 
+        <!-- ══════════════════════ MAIN PANEL ══════════════════════ -->
         <main class="container">
+            <!-- ── App header: title, WebDAV actions, sync status ── -->
             <header>
                 <div class="header-top">
                     <h1 class="title">
@@ -25,6 +46,7 @@
                         />
                         Yet Another Bookmark Manager
                     </h1>
+                    <!-- Version badge; text is injected by bookmarks.js -->
                     <span
                         id="app-version"
                         class="app-version"
@@ -32,7 +54,9 @@
                         data-tooltip="Extension version"
                     >v-</span>
                 </div>
+                <!-- Toolbar: WebDAV status, upload/download, config, language -->
                 <div class="tree-actions" data-i18n-aria-label="treeActionsAria" aria-label="Bookmark tree actions">
+                    <!-- WebDAV connection state icon (checking/ready/error/not-configured) -->
                     <span
                         id="webdav-status-indicator"
                         class="webdav-status-indicator"
@@ -47,6 +71,7 @@
                             alt=""
                         />
                     </span>
+                    <!-- WebDAV upload / download buttons -->
                     <button
                         id="upload-bookmarks"
                         class="tree-btn"
@@ -63,6 +88,7 @@
                         <span class="icon-font" aria-hidden="true">download</span>
                         <span data-i18n="btnDownload">Download</span>
                     </button>
+                    <!-- Icon-only buttons: configuration modal trigger, language switcher -->
                     <button
                         id="open-config"
                         class="tree-btn tree-btn-soft tree-btn-icon-only"
@@ -84,14 +110,20 @@
                         <span class="icon-font" aria-hidden="true">translate</span>
                     </button>
                 </div>
+                <!-- Inline status message below toolbar (e.g., last sync time) -->
                 <p id="sync-status" class="sync-status is-hidden" aria-live="polite"></p>
             </header>
+
+            <!-- ══════════════════ BOOKMARK PANEL ══════════════════ -->
             <section class="bookmark-panel" data-i18n-aria-label="bookmarkPanelAria" aria-label="Bookmarks">
+                <!-- Panel toolbar: folder/bookmark counts, expand/collapse all -->
                 <div class="bookmark-panel-head">
+                    <!-- Live-updated folder and bookmark counters -->
                     <div class="bookmark-summary" aria-live="polite">
                         <span id="tree-folder-count" class="summary-pill" data-i18n="summaryFoldersInitial">Folders: -</span>
                         <span id="tree-bookmark-count" class="summary-pill" data-i18n="summaryBookmarksInitial">Bookmarks: -</span>
                     </div>
+                    <!-- Expand-all / collapse-all tree controls -->
                     <div class="bookmark-panel-actions">
                         <button
                             id="expand-all"
@@ -117,6 +149,7 @@
                         </button>
                     </div>
                 </div>
+            <!-- Bookmark tree root — populated dynamically by bookmark-tree-render.js -->
             <section
                 id="bookmark-list"
                 class="bookmark-list"
@@ -124,12 +157,22 @@
             ></section>
             </section>
         </main>
+        <!-- ══════════════════ CUSTOM SCROLLBAR ══════════════════ -->
+        <!-- Positioned via JS (custom-scrollbar.js); hidden from assistive tech -->
         <div id="bookmark-scrollbar" class="bookmark-scrollbar hidden" aria-hidden="true">
             <span id="bookmark-scrollbar-thumb" class="bookmark-scrollbar-thumb"></span>
         </div>
+        <!-- Arrow buttons for keyboard / click-based scrolling -->
         <button id="bookmark-scroll-up" class="bookmark-scroll-arrow bookmark-scroll-arrow-up hidden" type="button" aria-label="Scroll up"></button>
         <button id="bookmark-scroll-down" class="bookmark-scroll-arrow bookmark-scroll-arrow-down hidden" type="button" aria-label="Scroll down"></button>
 
+        <!-- ═════════════════════ MODALS ═════════════════════ -->
+
+        <!--
+          Config modal — WebDAV configuration.
+          Opened when the user clicks the settings button or when the page is
+          loaded with ?openConfig=1 (extensions options shortcut).
+        -->
         <div
             id="config-modal"
             class="modal hidden"
@@ -153,6 +196,7 @@
                 </header>
 
                 <div class="modal-body">
+                    <!-- WebDAV directory URL — must be HTTPS; validated before save -->
                     <label class="field">
                         <span data-i18n="webdavUrlLabel">WebDAV URL (directory, HTTPS only)</span>
                         <input
@@ -163,6 +207,7 @@
                         />
                     </label>
 
+                    <!-- Optional Basic Auth credentials (stored in chrome.storage.local) -->
                     <div class="field-row">
                         <label class="field">
                             <span data-i18n="usernameOptional">Username (optional)</span>
@@ -188,6 +233,7 @@
                         </button>
                     </div>
 
+                    <!-- File list section — revealed after a successful connection test -->
                     <section id="cfg-file-section" class="collapsed">
                         <h3 class="section-title" data-i18n="filesInDirectory">Files in directory</h3>
                         <div id="cfg-files" class="files"></div>
@@ -201,6 +247,7 @@
                         </label>
                     </section>
 
+                    <!-- Inline status for connection test result / save feedback -->
                     <p
                         id="cfg-status"
                         class="sync-status is-hidden"
@@ -230,6 +277,10 @@
             </section>
         </div>
 
+        <!--
+          Prompt modal — generic confirmation dialog.
+          Message and confirm-button label are set dynamically by modals.js.
+        -->
         <div
             id="prompt-modal"
             class="modal hidden"
@@ -256,6 +307,10 @@
             </section>
         </div>
 
+        <!--
+          Editor modal — inline edit for bookmark name/URL or folder name.
+          The URL field is shown only when editing a bookmark (hidden for folders).
+        -->
         <div
             id="editor-modal"
             class="modal hidden"
@@ -295,6 +350,9 @@
             </section>
         </div>
 
+        <!-- ═════════════════ CONTEXTUAL MENUS ═════════════════ -->
+
+        <!-- Folder sort menu: ascending / descending by name -->
         <div id="folder-sort-menu" class="sort-menu hidden" role="menu" data-i18n-aria-label="sortFolder" aria-label="Sort folder">
             <button id="sort-asc" class="sort-menu-item" type="button" role="menuitem">
                 <span class="sort-menu-icon" aria-hidden="true">
@@ -310,6 +368,7 @@
             </button>
         </div>
 
+        <!-- Right-click context menu for bookmark items (open, edit, delete, …) -->
         <div
             id="tree-context-menu"
             class="tree-context-menu hidden"
@@ -318,6 +377,7 @@
             aria-label="Bookmark actions"
         ></div>
 
+        <!-- Right-click context menu for editable text nodes (rename, cut, …) -->
         <div
             id="edit-context-menu"
             class="tree-context-menu hidden"
@@ -325,9 +385,17 @@
             data-i18n-aria-label="editActionsAria"
             aria-label="Edit actions"
         ></div>
+        <!-- Language switcher dropdown; items injected by bookmarks.js -->
         <div id="language-menu" class="sort-menu hidden" role="menu" aria-label="Language"></div>
+
+        <!-- Global tooltip — repositioned near the hovered element by bookmarks.js -->
         <div id="app-tooltip" class="app-tooltip hidden" role="tooltip"></div>
 
+        <!-- ════════════════════ BOTTOM STATUS BAR ════════════════════ -->
+        <!--
+          Persistent footer strip showing the configured WebDAV URL and
+          entry-count comparison between the WebDAV file and the browser.
+        -->
         <footer class="bottom-status" aria-live="polite">
             <div class="bottom-status-main">
                 <span class="bottom-status-label" data-i18n="webdavLabel">WebDAV</span>
@@ -340,8 +408,16 @@
             </button>
         </footer>
 
+        <!-- ════════════════════════ SCRIPTS ════════════════════════ -->
+        <!--
+          Load order is significant:
+            Shared libs first, then feature modules, then the orchestrator.
+            Do NOT switch to ES modules without updating the entire project.
+        -->
+        <!-- Shared libraries (expose window.YABMI18n and window.YABMSync) -->
         <script src="../../lib/i18n.js"></script>
         <script src="../../lib/sync-utils.js"></script>
+        <!-- Feature modules (depend on the libs above) -->
         <script src="notifications.js"></script>
         <script src="custom-scrollbar.js"></script>
         <script src="favicon-cache.js"></script>
@@ -353,6 +429,7 @@
         <script src="bookmark-tree-menu.js"></script>
         <script src="bookmark-tree-render.js"></script>
         <script src="bookmark-tree.js"></script>
+        <!-- Orchestrator — initialises and wires all modules together -->
         <script src="bookmarks.js"></script>
     </body>
 </html>
