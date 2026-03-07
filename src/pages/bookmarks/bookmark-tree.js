@@ -12,7 +12,7 @@
    * (observers, mutations) can reference it before the render module is created.
    *
    * @param {{ t: Function, getCachedFaviconForBookmark: Function, getBookmarkNodesInFolder: Function, copyBookmarkUrl: Function, refreshBookmarkFavicon: Function, refreshFolderFavicons: Function, removeFaviconsByBookmarkIds: Function, ensureValidUrl: Function, ensureFaviconCacheLoaded: Function, pruneFaviconCacheForTree: Function, setStatus: Function, openPromptModal: Function, openEditorModal: Function, closeEditContextMenu: Function, updateMainLayoutMetrics: Function, updateBookmarkListScrollbar: Function, refreshWebdavStatusBar: Function }} deps
-   * @returns {{ bindBookmarkTreeObservers: Function, closeTreeContextMenu: Function, closeSortMenu: Function, handleBookmarkListDragOver: Function, handleSortMenuApply: Function, isTreeContextMenuOpen: Function, renderBookmarks: Function, rerenderAfterTreeChange: Function, setAllFoldersOpen: Function }}
+   * @returns {{ bindBookmarkTreeObservers: Function, closeTreeContextMenu: Function, closeSortMenu: Function, createContainerDragHandlers: Function, handleSortMenuApply: Function, isTreeContextMenuOpen: Function, renderBookmarks: Function, rerenderAfterTreeChange: Function, setAllFoldersOpen: Function }}
    */
   function createBookmarkTreeModule(deps) {
     const {
@@ -75,11 +75,7 @@
       rerenderAfterTreeChange,
     });
     const {
-      handleBookmarkListDragOver,
-      handleFolderDragEnter,
-      handleFolderDragLeave,
-      handleFolderDragOver,
-      handleFolderDrop,
+      createContainerDragHandlers,
       handleNodeDragEnd,
       handleNodeDragStart,
     } = dndModule;
@@ -146,10 +142,6 @@
         openSortMenu,
         handleNodeDragStart,
         handleNodeDragEnd,
-        handleFolderDragEnter,
-        handleFolderDragOver,
-        handleFolderDragLeave,
-        handleFolderDrop,
         toggleFolder,
         setFolderOpen,
         updateTreeSummaryStats,
@@ -172,7 +164,7 @@
       bindBookmarkTreeObservers,
       closeTreeContextMenu,
       closeSortMenu,
-      handleBookmarkListDragOver,
+      createContainerDragHandlers,
       handleSortMenuApply,
       isTreeContextMenuOpen,
       renderBookmarks,

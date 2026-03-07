@@ -344,7 +344,7 @@ const treeModule = window.YABMBookmarkTreeModule.createBookmarkTreeModule({
 let bindBookmarkTreeObservers;
 let closeSortMenu;
 let closeTreeContextMenu;
-let handleBookmarkListDragOver;
+let createContainerDragHandlers;
 let handleSortMenuApply;
 let isTreeContextMenuOpen;
 let renderBookmarks;
@@ -354,7 +354,7 @@ let setAllFoldersOpen;
   bindBookmarkTreeObservers,
   closeSortMenu,
   closeTreeContextMenu,
-  handleBookmarkListDragOver,
+  createContainerDragHandlers,
   handleSortMenuApply,
   isTreeContextMenuOpen,
   renderBookmarks,
@@ -1110,7 +1110,11 @@ function bindTreeActions() {
   bookmarkListEl?.addEventListener("scroll", updateBookmarkListScrollbar, {
     passive: true,
   });
-  bookmarkListEl?.addEventListener("dragover", handleBookmarkListDragOver);
+  // Attach container-level drag handlers for bookmark/folder drag-and-drop
+  if (bookmarkListEl && createContainerDragHandlers) {
+    const containerHandlers = createContainerDragHandlers(bookmarkListEl);
+    containerHandlers.attach();
+  }
   if (!isGlobalEventsBound()) {
     setGlobalEventsBound(true);
     document.addEventListener("pointermove", handleBookmarkThumbPointerMove);

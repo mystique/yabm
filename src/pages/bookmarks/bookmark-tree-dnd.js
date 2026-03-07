@@ -1,22 +1,24 @@
 /**
  * @file bookmark-tree-dnd.js
  * Drag-and-drop handlers for moving bookmarks and folders within the tree.
+ * Uses event delegation at the container level to eliminate flickering.
  * Exposed as `window.YABMBookmarkTreeDndModule`.
  */
 (function () {
   /**
    * Factory that creates the drag-and-drop module.
    * @param {{ t: Function, setStatus: Function, rerenderAfterTreeChange: Function }} deps
-   * @returns {{ handleBookmarkListDragOver: Function, handleFolderDragEnter: Function, handleFolderDragLeave: Function, handleFolderDragOver: Function, handleFolderDrop: Function, handleNodeDragEnd: Function, handleNodeDragStart: Function }}
+   * @returns {{ createContainerDragHandlers: Function, handleNodeDragStart: Function, handleNodeDragEnd: Function, handleFolderDrop: Function }}
    */
   function createBookmarkTreeDndModule(deps) {
     const { t, setStatus, rerenderAfterTreeChange } = deps;
 
     // Tracks the node currently being dragged so drop handlers can validate targets.
     const dragState = {
-      nodeId: null,     // Chrome bookmark ID of the dragged node.
-      nodeType: null,   // 'bookmark' or 'folder'.
-      parentId: null,   // Original parent folder ID (used to skip no-op drops).
+      nodeId: null,                  // Chrome bookmark ID of the dragged node.
+      nodeType: null,                // 'bookmark' or 'folder'.
+      parentId: null,                // Original parent folder ID (used to skip no-op drops).
+      currentDragOverFolderId: null, // Currently highlighted drop target folder ID.
     };
     // Cloned ghost element appended off-screen to serve as the drag image.
     let dragGhostEl = null;
@@ -29,18 +31,6 @@
         dragGhostEl.parentNode.removeChild(dragGhostEl);
       }
       dragGhostEl = null;
-    }
-
-    /**
-     * Removes the `drag-over` highlight class from every folder in the list.
-     * Called whenever the drag ends or a new folder takes over as the drop target.
-     */
-    function clearFolderDragOverStyles() {
-      for (const folder of document.querySelectorAll(
-        "#bookmark-list .folder.drag-over",
-      )) {
-        folder.classList.remove("drag-over");
-      }
     }
 
     /**
@@ -86,53 +76,16 @@
     /**
      * Cleans up drag state and visual artefacts when a drag operation ends.
      * @param {DragEvent} event - The native dragend event.
+     * @param {{ clearCurrentHighlight?: Function }} [containerHandlers] - Optional handlers for cleanup.
      */
-    function handleNodeDragEnd(event) {
+    function handleNodeDragEnd(event, containerHandlers) {
       dragState.nodeId = null;
       dragState.nodeType = null;
+      dragState.parentId = null;
+      dragState.currentDragOverFolderId = null;
       event.currentTarget?.classList.remove("drag-source");
-      clearFolderDragOverStyles();
+      containerHandlers?.clearCurrentHighlight?.();
       removeDragGhost();
-    }
-
-    /**
-     * Highlights a folder as the active drop target when the cursor enters it.
-     * Clears any previously highlighted folder first to keep only one active.
-     * @param {DragEvent} event
-     * @param {HTMLDetailsElement} details - The folder `<details>` element.
-     */
-    function handleFolderDragEnter(event, details) {
-      if (!dragState.nodeId) {
-        return;
-      }
-      event.preventDefault();
-      clearFolderDragOverStyles();
-      details.classList.add("drag-over");
-    }
-
-    /**
-     * Allows the drag to proceed over a folder target and sets the drop effect.
-     * @param {DragEvent} event
-     */
-    function handleFolderDragOver(event) {
-      if (!dragState.nodeId) {
-        return;
-      }
-      event.preventDefault();
-      event.dataTransfer.dropEffect = "move";
-    }
-
-    /**
-     * Removes the drop-target highlight when the drag leaves a folder.
-     * Ignores events where the cursor moves to a child element of the same folder.
-     * @param {DragEvent} event
-     * @param {HTMLDetailsElement} details - The folder `<details>` element.
-     */
-    function handleFolderDragLeave(event, details) {
-      if (event.relatedTarget && details.contains(event.relatedTarget)) {
-        return;
-      }
-      details.classList.remove("drag-over");
     }
 
     /**
@@ -193,12 +146,16 @@
       }
       event.preventDefault();
       event.stopPropagation();
-      clearFolderDragOverStyles();
 
       const dragNodeId = dragState.nodeId;
       const dragNodeType = dragState.nodeType;
       dragState.nodeId = null;
       dragState.nodeType = null;
+      dragState.currentDragOverFolderId = null;
+
+      // Clear visual highlight
+      const folder = event.target?.closest?.(".folder");
+      folder?.classList.remove("drag-over");
 
       try {
         const canDrop = await canDropNodeInFolder(
@@ -234,43 +191,129 @@
     }
 
     /**
-     * Handles `dragover` on the bookmark list container.
-     * Highlights the folder under the cursor as a potential drop target,
-     * but ignores the node's current parent folder (no-op move).
-     * @param {DragEvent} event
+     * Creates container-level drag event handlers using event delegation.
+     * This approach eliminates flickering by tracking the current drag-over folder
+     * and only updating highlights when the target actually changes.
+     * @param {HTMLElement} container - The #bookmark-list container element.
+     * @returns {{ attach: Function, detach: Function, clearCurrentHighlight: Function }}
      */
-    function handleBookmarkListDragOver(event) {
-      if (!dragState.nodeId) {
-        return;
+    function createContainerDragHandlers(container) {
+      /**
+       * Clears the highlight from the currently highlighted folder, if any.
+       */
+      function clearCurrentHighlight() {
+        if (dragState.currentDragOverFolderId) {
+          const folder = document.querySelector(
+            `[data-folder-id="${dragState.currentDragOverFolderId}"]`,
+          );
+          folder?.classList.remove("drag-over");
+          dragState.currentDragOverFolderId = null;
+        }
       }
-      const folder = event.target?.closest?.(".folder");
-      if (!folder) {
-        return;
+
+      /**
+       * Handles dragover events at the container level.
+       * Highlights the folder under the cursor as a potential drop target.
+       * @param {DragEvent} event
+       */
+      function handleDragOver(event) {
+        if (!dragState.nodeId) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+
+        // Find the target folder under the cursor
+        const folder = event.target?.closest?.(".folder");
+        if (!folder) {
+          // Not over any folder, clear highlight
+          clearCurrentHighlight();
+          return;
+        }
+
+        const folderId = folder.dataset.folderId;
+
+        // Skip the source node's parent folder (no-op move)
+        if (folderId === dragState.parentId) {
+          clearCurrentHighlight();
+          return;
+        }
+
+        // Skip dropping a folder into its own subtree
+        if (
+          dragState.nodeType === "folder" &&
+          folder.contains(document.querySelector(`[data-folder-id="${dragState.nodeId}"]`))
+        ) {
+          clearCurrentHighlight();
+          return;
+        }
+
+        // Only update highlight if the target folder changed
+        if (dragState.currentDragOverFolderId !== folderId) {
+          clearCurrentHighlight();
+          folder.classList.add("drag-over");
+          dragState.currentDragOverFolderId = folderId;
+        }
       }
-      const folderId = folder.dataset.folderId;
-      if (String(folderId) === String(dragState.parentId)) {
-        return;
+
+      /**
+       * Handles drop events at the container level.
+       * Finds the target folder and delegates to handleFolderDrop.
+       * @param {DragEvent} event
+       */
+      function handleDrop(event) {
+        if (!dragState.nodeId) return;
+
+        const folder = event.target?.closest?.(".folder");
+        if (!folder) return;
+
+        const folderId = folder.dataset.folderId;
+
+        // Fetch the folder node and call the drop handler
+        chrome.bookmarks.get(folderId).then(([targetFolderNode]) => {
+          if (targetFolderNode) {
+            handleFolderDrop(event, targetFolderNode);
+          }
+        });
       }
-      if (
-        dragState.nodeType === "folder" &&
-        folder.contains(document.querySelector(`[data-folder-id="${dragState.nodeId}"]`))
-      ) {
-        return;
+
+      /**
+       * Handles dragleave events at the container level.
+       * Clears highlight when the drag leaves the container entirely.
+       * @param {DragEvent} event
+       */
+      function handleDragLeave(event) {
+        // Check if we truly left the container
+        if (event.relatedTarget && container.contains(event.relatedTarget)) {
+          return;
+        }
+        clearCurrentHighlight();
       }
-      if (!folder.classList.contains("drag-over")) {
-        clearFolderDragOverStyles();
-        folder.classList.add("drag-over");
+
+      /**
+       * Attaches all event listeners to the container.
+       */
+      function attach() {
+        container.addEventListener("dragover", handleDragOver);
+        container.addEventListener("drop", handleDrop);
+        container.addEventListener("dragleave", handleDragLeave);
       }
+
+      /**
+       * Removes all event listeners from the container.
+       */
+      function detach() {
+        container.removeEventListener("dragover", handleDragOver);
+        container.removeEventListener("drop", handleDrop);
+        container.removeEventListener("dragleave", handleDragLeave);
+      }
+
+      return { attach, detach, clearCurrentHighlight };
     }
 
     return {
-      handleBookmarkListDragOver,
-      handleFolderDragEnter,
-      handleFolderDragLeave,
-      handleFolderDragOver,
-      handleFolderDrop,
-      handleNodeDragEnd,
+      createContainerDragHandlers,
       handleNodeDragStart,
+      handleNodeDragEnd,
+      handleFolderDrop,
     };
   }
 

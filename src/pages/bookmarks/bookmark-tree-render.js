@@ -29,9 +29,6 @@
       openSortMenu,
       handleNodeDragStart,
       handleNodeDragEnd,
-      handleFolderDragEnter,
-      handleFolderDragOver,
-      handleFolderDragLeave,
       handleFolderDrop,
       toggleFolder,
       setFolderOpen,
@@ -207,16 +204,6 @@
         handleNodeDragStart(event, node, "folder"),
       );
       summary.addEventListener("dragend", handleNodeDragEnd);
-      summary.addEventListener("dragenter", (event) =>
-        handleFolderDragEnter(event, details),
-      );
-      summary.addEventListener("dragover", (event) =>
-        handleFolderDragOver(event, details),
-      );
-      summary.addEventListener("dragleave", (event) =>
-        handleFolderDragLeave(event, details),
-      );
-      summary.addEventListener("drop", (event) => handleFolderDrop(event, node));
       summary.addEventListener("contextmenu", (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -354,16 +341,6 @@
 
       const content = document.createElement("div");
       content.className = "folder-content";
-      content.addEventListener("dragenter", (event) =>
-        handleFolderDragEnter(event, details),
-      );
-      content.addEventListener("dragover", (event) =>
-        handleFolderDragOver(event, details),
-      );
-      content.addEventListener("dragleave", (event) =>
-        handleFolderDragLeave(event, details),
-      );
-      content.addEventListener("drop", (event) => handleFolderDrop(event, node));
 
       for (const child of node.children || []) {
         if (child.url) {
