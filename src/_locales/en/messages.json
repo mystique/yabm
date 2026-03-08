@@ -347,6 +347,24 @@
   "languageCurrentTooltip": {
     "message": "Language: $1"
   },
+  "themeButton": {
+    "message": "Theme"
+  },
+  "themeCurrentTooltip": {
+    "message": "Theme: $1"
+  },
+  "themeDark": {
+    "message": "Dark"
+  },
+  "themeLight": {
+    "message": "Light"
+  },
+  "themeMenuAria": {
+    "message": "Theme"
+  },
+  "themeSystem": {
+    "message": "System"
+  },
   "loadBookmarksFailed": {
     "message": "Failed to load bookmarks: $1"
   },

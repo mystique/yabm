@@ -347,6 +347,24 @@
   "languageCurrentTooltip": {
     "message": "Язык: $1"
   },
+  "themeButton": {
+    "message": "Тема"
+  },
+  "themeCurrentTooltip": {
+    "message": "Тема: $1"
+  },
+  "themeDark": {
+    "message": "Темная"
+  },
+  "themeLight": {
+    "message": "Светлая"
+  },
+  "themeMenuAria": {
+    "message": "Тема"
+  },
+  "themeSystem": {
+    "message": "Системная"
+  },
   "loadBookmarksFailed": {
     "message": "Ошибка при загрузке закладок: $1"
   },

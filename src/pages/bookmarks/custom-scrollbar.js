@@ -375,14 +375,22 @@
         track.classList.add("hidden");
         upArrow.classList.add("hidden");
         downArrow.classList.add("hidden");
+        upArrow.classList.remove("at-boundary");
+        downArrow.classList.remove("at-boundary");
         thumb.style.height = "";
         thumb.style.transform = "";
         return;
       }
 
+      // Detect scroll boundaries for arrow visual feedback
+      const isAtTop = list.scrollTop <= 0;
+      const isAtBottom = list.scrollTop >= maxScroll - 1; // -1 for rounding tolerance
+
       track.classList.remove("hidden");
       upArrow.classList.remove("hidden");
       downArrow.classList.remove("hidden");
+      upArrow.classList.toggle("at-boundary", isAtTop);
+      downArrow.classList.toggle("at-boundary", isAtBottom);
       const trackVisualWidth = track.offsetWidth || trackWidth;
       const maxTrackLeft = window.innerWidth - trackVisualWidth - 4;
       const trackLeft = Math.min(rawTrackLeft, maxTrackLeft);

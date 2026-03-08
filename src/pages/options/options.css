@@ -1,14 +1,42 @@
 :root {
-  /* Color Palette and Variables */
-  color-scheme: light;
   --bg: #eef4f2;
+  --bg-accent: #dbf2e8;
   --text: #162620;
   --muted: #526861;
   --line: #d3e1da;
   --card: #ffffff;
-  --accent: #0f766e;
+  --card-shadow: 0 8px 20px rgba(17, 47, 35, 0.07);
+  --accent: #14857a;
+  --accent-line: #148276;
   --accent-soft: #e8f5f1;
+  --accent-focus: rgba(15, 118, 110, 0.12);
+  --focus-line: #8cbcad;
+  --input-bg: #ffffff;
+  --file-bg: #fbfefd;
+  --success: #087443;
+  --error: #b42318;
+  color-scheme: light;
   font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f1716;
+  --bg-accent: rgba(34, 110, 96, 0.28);
+  --text: #edf7f4;
+  --muted: #aac0b8;
+  --line: #28423c;
+  --card: #16211f;
+  --card-shadow: 0 16px 34px rgba(0, 0, 0, 0.32);
+  --accent: #2eaa9c;
+  --accent-line: #2b9b8f;
+  --accent-soft: #173630;
+  --accent-focus: rgba(46, 170, 156, 0.18);
+  --focus-line: #48b8ab;
+  --input-bg: #101918;
+  --file-bg: #111b19;
+  --success: #6fdbab;
+  --error: #ff8f87;
+  color-scheme: dark;
 }
 
 /* Base Layout */
@@ -19,7 +47,7 @@
 body {
   margin: 0;
   color: var(--text);
-  background: radial-gradient(circle at 0 0, #dbf2e8, transparent 40%), var(--bg);
+  background: radial-gradient(circle at 0 0, var(--bg-accent), transparent 40%), var(--bg);
 }
 
 .container {
@@ -51,7 +79,7 @@ h2 {
   border-radius: 14px;
   padding: 16px;
   margin-bottom: 14px;
-  box-shadow: 0 8px 20px rgba(17, 47, 35, 0.07);
+  box-shadow: var(--card-shadow);
 }
 
 .hidden {
@@ -86,11 +114,13 @@ input[type="password"] {
   padding: 10px 12px;
   font-size: 14px;
   outline: none;
+  color: var(--text);
+  background: var(--input-bg);
 }
 
 input:focus {
-  border-color: #8cbcad;
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+  border-color: var(--focus-line);
+  box-shadow: 0 0 0 3px var(--accent-focus);
 }
 
 /* Action group: Buttons */
@@ -100,8 +130,8 @@ input:focus {
 }
 
 .btn {
-  border: 1px solid #148276;
-  background: #14857a;
+  border: 1px solid var(--accent-line);
+  background: var(--accent);
   color: #fff;
   font-weight: 700;
   border-radius: 999px;
@@ -133,7 +163,7 @@ input:focus {
   padding: 8px 10px;
   border: 1px solid var(--line);
   border-radius: 10px;
-  background: #fbfefd;
+  background: var(--file-bg);
 }
 
 .file-item label {
@@ -208,11 +238,11 @@ input:focus {
 }
 
 .status.error {
-  color: #b42318;
+  color: var(--error);
 }
 
 .status.success {
-  color: #087443;
+  color: var(--success);
 }
 
 @media (max-width: 700px) {

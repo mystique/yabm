@@ -36,10 +36,19 @@ const LANGUAGE_OPTIONS = [
   { value: "ru", label: "Русский", flag: "🇷🇺" },
 ];
 
+/** Available UI theme options shown in the theme picker menu. */
+const THEME_OPTIONS = [
+  { value: window.YABMTheme.LIGHT_THEME, labelKey: "themeLight", iconFile: "light_mode" },
+  { value: window.YABMTheme.DARK_THEME, labelKey: "themeDark", iconFile: "dark_mode" },
+  { value: window.YABMTheme.SYSTEM_THEME, labelKey: "themeSystem", iconFile: "desktop_windows" },
+];
+
 /** LRU-style cache mapping flag emoji strings to their resolved Twemoji asset URLs. */
 const flagIconCache = new Map();
 /** Base path for Twemoji SVG assets relative to the extension root. */
 const TWEMOJI_BASE_PATH = "assets/twemoji";
+/** Base path for individually downloaded Material Symbols SVG assets. */
+const MATERIAL_SYMBOLS_BASE_PATH = "assets/material-symbols";
 /**
  * Maps logical WebDAV status keys to their CSS class, Twemoji codepoint, and text fallback.
  * The fallback text is shown when the icon image fails to load.
@@ -98,6 +107,15 @@ function getTwemojiIconSrcByCodepoint(codepoint) {
 }
 
 /**
+ * Returns the chrome-extension URL for a locally stored Material Symbols SVG.
+ * @param {string} iconName
+ * @returns {string}
+ */
+function getMaterialSymbolIconSrc(iconName) {
+  return chrome.runtime.getURL(`${MATERIAL_SYMBOLS_BASE_PATH}/${iconName}.svg`);
+}
+
+/**
  * Returns the human-readable label for a language option value.
  * Falls back to `"Auto (Browser)"` when the value is not found.
  * @param {string} value - Locale value, e.g. `"en"` or `"auto"`.
@@ -106,6 +124,17 @@ function getTwemojiIconSrcByCodepoint(codepoint) {
 function getLanguageOptionLabel(value) {
   const option = LANGUAGE_OPTIONS.find((item) => item.value === value);
   return option ? option.label : "Auto (Browser)";
+}
+
+/**
+ * Returns the localised label for a theme option value.
+ * Falls back to the system theme label when the value is not found.
+ * @param {string} value
+ * @returns {string}
+ */
+function getThemeOptionLabel(value) {
+  const option = THEME_OPTIONS.find((item) => item.value === value);
+  return option ? t(option.labelKey) : t("themeSystem");
 }
 
 /**
@@ -848,7 +877,9 @@ function bindTreeActions() {
   const collapseAllBtn = document.getElementById("collapse-all");
   const openConfigBtn = document.getElementById("open-config");
   const openLanguageMenuBtn = document.getElementById("open-language-menu");
+  const openThemeMenuBtn = document.getElementById("open-theme-menu");
   const languageMenu = document.getElementById("language-menu");
+  const themeMenu = document.getElementById("theme-menu");
   const closeConfigBtn = document.getElementById("close-config");
   const cancelConfigBtn = document.getElementById("cfg-cancel");
   const configTestBtn = document.getElementById("cfg-test");
@@ -872,6 +903,7 @@ function bindTreeActions() {
   const sortDescBtn = document.getElementById("sort-desc");
   let tooltipTarget = null;
   let languageMenuOpen = false;
+  let themeMenuOpen = false;
 
   webdavStatusIcon?.addEventListener("error", () => {
     const indicator = document.getElementById("webdav-status-indicator");
@@ -889,19 +921,35 @@ function bindTreeActions() {
     languageMenuOpen = false;
   };
 
-  const positionLanguageMenu = () => {
-    if (!languageMenu || !openLanguageMenuBtn) {
+  const closeThemeMenu = () => {
+    if (!themeMenu) {
       return;
     }
-    const rect = openLanguageMenuBtn.getBoundingClientRect();
-    const width = languageMenu.offsetWidth || 220;
+    themeMenu.classList.add("hidden");
+    themeMenuOpen = false;
+  };
+
+  const positionMenu = (menuEl, anchorEl) => {
+    if (!menuEl || !anchorEl) {
+      return;
+    }
+    const rect = anchorEl.getBoundingClientRect();
+    const width = menuEl.offsetWidth || 220;
     const left = Math.min(
       window.innerWidth - width - 10,
       Math.max(10, rect.right - width),
     );
     const top = Math.min(window.innerHeight - 10, rect.bottom + 8);
-    languageMenu.style.left = `${left}px`;
-    languageMenu.style.top = `${top}px`;
+    menuEl.style.left = `${left}px`;
+    menuEl.style.top = `${top}px`;
+  };
+
+  const positionLanguageMenu = () => {
+    positionMenu(languageMenu, openLanguageMenuBtn);
+  };
+
+  const positionThemeMenu = () => {
+    positionMenu(themeMenu, openThemeMenuBtn);
   };
 
   const updateLanguageButtonTooltip = () => {
@@ -914,10 +962,20 @@ function bindTreeActions() {
     ]);
   };
 
+  const updateThemeButtonTooltip = () => {
+    if (!openThemeMenuBtn) {
+      return;
+    }
+    openThemeMenuBtn.dataset.tooltip = t("themeCurrentTooltip", [
+      getThemeOptionLabel(window.YABMTheme.getThemePreference()),
+    ]);
+  };
+
   const updatePageLanguage = async (language) => {
     await window.YABMI18n.setLanguagePreference(language);
     window.YABMI18n.apply();
     renderLanguageMenu();
+    renderThemeMenu();
     setAppVersion();
     await rerenderAfterTreeChange();
   };
@@ -973,14 +1031,69 @@ function bindTreeActions() {
     updateLanguageButtonTooltip();
   };
 
+  const updatePageTheme = async (theme) => {
+    await window.YABMTheme.setThemePreference(theme);
+    window.YABMTheme.apply();
+    renderThemeMenu();
+  };
+
+  const renderThemeMenu = () => {
+    if (!themeMenu) {
+      return;
+    }
+    const preferred = window.YABMTheme.getThemePreference();
+    themeMenu.innerHTML = "";
+    for (const option of THEME_OPTIONS) {
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "sort-menu-item";
+      item.setAttribute("role", "menuitemradio");
+      item.setAttribute(
+        "aria-checked",
+        preferred === option.value ? "true" : "false",
+      );
+      if (preferred === option.value) {
+        item.classList.add("theme-menu-item-active");
+      }
+      item.innerHTML =
+        `<span class="sort-menu-icon theme-menu-icon" aria-hidden="true"><span class="theme-symbol-icon" style="--theme-symbol-icon: url('${getMaterialSymbolIconSrc(option.iconFile)}');"></span></span>` +
+        `<span>${t(option.labelKey)}</span>` +
+        (preferred === option.value
+          ? '<span class="language-item-check icon-font" aria-hidden="true">check</span>'
+          : "");
+      item.addEventListener("click", async () => {
+        closeThemeMenu();
+        try {
+          await updatePageTheme(option.value);
+        } catch (error) {
+          setStatus(t("initializationFailed", [error.message]), "error");
+        }
+      });
+      themeMenu.appendChild(item);
+    }
+    updateThemeButtonTooltip();
+  };
+
   const openLanguageMenu = () => {
     if (!languageMenu) {
       return;
     }
+    closeThemeMenu();
     renderLanguageMenu();
     languageMenu.classList.remove("hidden");
     languageMenuOpen = true;
     positionLanguageMenu();
+  };
+
+  const openThemeMenu = () => {
+    if (!themeMenu) {
+      return;
+    }
+    closeLanguageMenu();
+    renderThemeMenu();
+    themeMenu.classList.remove("hidden");
+    themeMenuOpen = true;
+    positionThemeMenu();
   };
 
   const hideAppTooltip = () => {
@@ -1036,6 +1149,14 @@ function bindTreeActions() {
       closeLanguageMenu();
     } else {
       openLanguageMenu();
+    }
+  });
+  openThemeMenuBtn?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (themeMenuOpen) {
+      closeThemeMenu();
+    } else {
+      openThemeMenu();
     }
   });
   closeConfigBtn?.addEventListener("click", closeConfigModal);
@@ -1173,6 +1294,16 @@ function bindTreeActions() {
       }
     }
 
+    if (themeMenuOpen) {
+      const inThemeMenu = Boolean(
+        (themeMenu && themeMenu.contains(event.target)) ||
+          (openThemeMenuBtn && openThemeMenuBtn.contains(event.target)),
+      );
+      if (!inThemeMenu) {
+        closeThemeMenu();
+      }
+    }
+
     if (!sortMenu || sortMenu.classList.contains("hidden")) {
       return;
     }
@@ -1188,12 +1319,14 @@ function bindTreeActions() {
       closeTreeContextMenu();
       closeSortMenu();
       closeLanguageMenu();
+      closeThemeMenu();
       hideAppTooltip();
     }
   });
   window.addEventListener("resize", () => {
     closeEditContextMenu();
     closeLanguageMenu();
+    closeThemeMenu();
     hideAppTooltip();
     updateMainLayoutMetrics();
   });
@@ -1204,6 +1337,7 @@ function bindTreeActions() {
     () => {
       closeTreeContextMenu();
       closeLanguageMenu();
+      closeThemeMenu();
       hideAppTooltip();
     },
     true,
@@ -1291,6 +1425,7 @@ function bindTreeActions() {
       getLanguageOptionLabel(preferred),
     ]);
   }
+  updateThemeButtonTooltip();
 }
 
 /**
@@ -1301,6 +1436,8 @@ function bindTreeActions() {
  * @returns {Promise<void>}
  */
 async function initPage() {
+  await window.YABMTheme.init();
+  window.YABMTheme.apply();
   await window.YABMI18n.init();
   window.YABMI18n.apply();
   bindTreeActions();

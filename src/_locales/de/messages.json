@@ -347,6 +347,24 @@
   "languageCurrentTooltip": {
     "message": "Sprache: $1"
   },
+  "themeButton": {
+    "message": "Thema"
+  },
+  "themeCurrentTooltip": {
+    "message": "Thema: $1"
+  },
+  "themeDark": {
+    "message": "Dunkel"
+  },
+  "themeLight": {
+    "message": "Hell"
+  },
+  "themeMenuAria": {
+    "message": "Thema"
+  },
+  "themeSystem": {
+    "message": "System"
+  },
   "loadBookmarksFailed": {
     "message": "Fehler beim Laden der Lesezeichen: $1"
   },

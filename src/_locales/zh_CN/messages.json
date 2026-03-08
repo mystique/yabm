@@ -347,6 +347,24 @@
   "languageCurrentTooltip": {
     "message": "语言：$1"
   },
+  "themeButton": {
+    "message": "主题"
+  },
+  "themeCurrentTooltip": {
+    "message": "主题：$1"
+  },
+  "themeDark": {
+    "message": "深色"
+  },
+  "themeLight": {
+    "message": "浅色"
+  },
+  "themeMenuAria": {
+    "message": "主题"
+  },
+  "themeSystem": {
+    "message": "跟随系统"
+  },
   "loadBookmarksFailed": {
     "message": "加载书签失败：$1"
   },

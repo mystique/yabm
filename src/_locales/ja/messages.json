@@ -347,6 +347,24 @@
   "languageCurrentTooltip": {
     "message": "言語: $1"
   },
+  "themeButton": {
+    "message": "テーマ"
+  },
+  "themeCurrentTooltip": {
+    "message": "テーマ: $1"
+  },
+  "themeDark": {
+    "message": "ダーク"
+  },
+  "themeLight": {
+    "message": "ライト"
+  },
+  "themeMenuAria": {
+    "message": "テーマ"
+  },
+  "themeSystem": {
+    "message": "システム"
+  },
   "loadBookmarksFailed": {
     "message": "ブックマークの読み込みに失敗しました: $1"
   },

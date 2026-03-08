@@ -347,6 +347,24 @@
   "languageCurrentTooltip": {
     "message": "언어: $1"
   },
+  "themeButton": {
+    "message": "테마"
+  },
+  "themeCurrentTooltip": {
+    "message": "테마: $1"
+  },
+  "themeDark": {
+    "message": "다크"
+  },
+  "themeLight": {
+    "message": "라이트"
+  },
+  "themeMenuAria": {
+    "message": "테마"
+  },
+  "themeSystem": {
+    "message": "시스템"
+  },
   "loadBookmarksFailed": {
     "message": "북마크 로드 실패: $1"
   },

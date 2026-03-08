@@ -347,6 +347,24 @@
   "languageCurrentTooltip": {
     "message": "語言：$1"
   },
+  "themeButton": {
+    "message": "主題"
+  },
+  "themeCurrentTooltip": {
+    "message": "主題：$1"
+  },
+  "themeDark": {
+    "message": "深色"
+  },
+  "themeLight": {
+    "message": "淺色"
+  },
+  "themeMenuAria": {
+    "message": "主題"
+  },
+  "themeSystem": {
+    "message": "跟隨系統"
+  },
   "loadBookmarksFailed": {
     "message": "載入書籤失敗：$1"
   },

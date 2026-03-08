@@ -336,6 +336,8 @@ function bindEvents() {
  * Initialize the page: load i18n, bind events, restore saved config
  */
 async function init() {
+  await window.YABMTheme.init();
+  window.YABMTheme.apply();
   await window.YABMI18n.init();
   window.YABMI18n.apply();
   bindEvents();

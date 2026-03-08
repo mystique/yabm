@@ -109,6 +109,20 @@
                     >
                         <span class="icon-font" aria-hidden="true">translate</span>
                     </button>
+                    <button
+                        id="open-theme-menu"
+                        class="tree-btn tree-btn-soft tree-btn-icon-only"
+                        type="button"
+                        data-i18n-aria-label="themeButton"
+                        aria-label="Theme"
+                        data-tooltip="Theme"
+                    >
+                        <span
+                            class="theme-symbol-icon"
+                            aria-hidden="true"
+                            style="--theme-symbol-icon: url('../../assets/material-symbols/contrast.svg');"
+                        ></span>
+                    </button>
                 </div>
                 <!-- Inline status message below toolbar (e.g., last sync time) -->
                 <p id="sync-status" class="sync-status is-hidden" aria-live="polite"></p>
@@ -387,6 +401,14 @@
         ></div>
         <!-- Language switcher dropdown; items injected by bookmarks.js -->
         <div id="language-menu" class="sort-menu hidden" role="menu" aria-label="Language"></div>
+        <!-- Theme switcher dropdown; items injected by bookmarks.js -->
+        <div
+            id="theme-menu"
+            class="sort-menu hidden"
+            role="menu"
+            data-i18n-aria-label="themeMenuAria"
+            aria-label="Theme"
+        ></div>
 
         <!-- Global tooltip — repositioned near the hovered element by bookmarks.js -->
         <div id="app-tooltip" class="app-tooltip hidden" role="tooltip"></div>
@@ -416,6 +438,7 @@
         -->
         <!-- Shared libraries (expose window.YABMI18n and window.YABMSync) -->
         <script src="../../lib/i18n.js"></script>
+        <script src="../../lib/theme.js"></script>
         <script src="../../lib/sync-utils.js"></script>
         <!-- Feature modules (depend on the libs above) -->
         <script src="notifications.js"></script>

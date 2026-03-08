@@ -347,6 +347,24 @@
   "languageCurrentTooltip": {
     "message": "Idioma: $1"
   },
+  "themeButton": {
+    "message": "Tema"
+  },
+  "themeCurrentTooltip": {
+    "message": "Tema: $1"
+  },
+  "themeDark": {
+    "message": "Oscuro"
+  },
+  "themeLight": {
+    "message": "Claro"
+  },
+  "themeMenuAria": {
+    "message": "Tema"
+  },
+  "themeSystem": {
+    "message": "Sistema"
+  },
   "loadBookmarksFailed": {
     "message": "Error al cargar marcadores: $1"
   },
