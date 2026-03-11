@@ -38,17 +38,16 @@ const LANGUAGE_OPTIONS = [
 
 /** Available UI theme options shown in the theme picker menu. */
 const THEME_OPTIONS = [
-  { value: window.YABMTheme.LIGHT_THEME, labelKey: "themeLight", iconFile: "light_mode" },
-  { value: window.YABMTheme.DARK_THEME, labelKey: "themeDark", iconFile: "dark_mode" },
-  { value: window.YABMTheme.SYSTEM_THEME, labelKey: "themeSystem", iconFile: "desktop_windows" },
+  { value: window.YABMTheme.LIGHT_THEME, labelKey: "themeLight", iconLigature: "light_mode" },
+  { value: window.YABMTheme.DARK_THEME, labelKey: "themeDark", iconLigature: "dark_mode" },
+  { value: window.YABMTheme.SYSTEM_THEME, labelKey: "themeSystem", iconLigature: "desktop_windows" },
 ];
 
 /** LRU-style cache mapping flag emoji strings to their resolved Twemoji asset URLs. */
 const flagIconCache = new Map();
-/** Base path for Twemoji SVG assets relative to the extension root. */
-const TWEMOJI_BASE_PATH = "assets/twemoji";
-/** Base path for individually downloaded Material Symbols SVG assets. */
-const MATERIAL_SYMBOLS_BASE_PATH = "assets/material-symbols";
+/** Base URL for Twemoji SVG assets on jsDelivr CDN. */
+const TWEMOJI_CDN_BASE = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg";
+
 /**
  * Maps logical WebDAV status keys to their CSS class, Twemoji codepoint, and text fallback.
  * The fallback text is shown when the icon image fails to load.
@@ -81,7 +80,7 @@ function emojiToCodepoints(emoji) {
 }
 
 /**
- * Returns the chrome-extension URL for a flag emoji's Twemoji SVG asset,
+ * Returns the CDN URL for a flag emoji's Twemoji SVG asset,
  * caching the result to avoid repeated codepoint conversions.
  * @param {string} flagEmoji
  * @returns {string}
@@ -91,28 +90,19 @@ function getFlagIconSrc(flagEmoji) {
     return flagIconCache.get(flagEmoji);
   }
   const code = emojiToCodepoints(flagEmoji || "🌐");
-  const url = chrome.runtime.getURL(`${TWEMOJI_BASE_PATH}/${code}.svg`);
+  const url = `${TWEMOJI_CDN_BASE}/${code}.svg`;
   flagIconCache.set(flagEmoji, url);
   return url;
 }
 
 /**
- * Returns the chrome-extension URL for a Twemoji SVG identified by its
+ * Returns the CDN URL for a Twemoji SVG identified by its
  * raw Unicode codepoint string (e.g. `"1f7e2"` for 🟢).
  * @param {string} codepoint
  * @returns {string}
  */
 function getTwemojiIconSrcByCodepoint(codepoint) {
-  return chrome.runtime.getURL(`${TWEMOJI_BASE_PATH}/${codepoint}.svg`);
-}
-
-/**
- * Returns the chrome-extension URL for a locally stored Material Symbols SVG.
- * @param {string} iconName
- * @returns {string}
- */
-function getMaterialSymbolIconSrc(iconName) {
-  return chrome.runtime.getURL(`${MATERIAL_SYMBOLS_BASE_PATH}/${iconName}.svg`);
+  return `${TWEMOJI_CDN_BASE}/${codepoint}.svg`;
 }
 
 /**
@@ -1056,7 +1046,7 @@ function bindTreeActions() {
         item.classList.add("theme-menu-item-active");
       }
       item.innerHTML =
-        `<span class="sort-menu-icon theme-menu-icon" aria-hidden="true"><span class="theme-symbol-icon" style="--theme-symbol-icon: url('${getMaterialSymbolIconSrc(option.iconFile)}');"></span></span>` +
+        `<span class="sort-menu-icon theme-menu-icon" aria-hidden="true"><span class="theme-symbol-icon">${option.iconLigature}</span></span>` +
         `<span>${t(option.labelKey)}</span>` +
         (preferred === option.value
           ? '<span class="language-item-check icon-font" aria-hidden="true">check</span>'

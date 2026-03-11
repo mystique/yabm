@@ -28,37 +28,11 @@
 
 /* ============================================================
  * 1. CUSTOM FONTS
+ * Fonts are loaded from Google Fonts CDN via <link> tags in HTML.
  * Space Grotesk is used for all UI text.
  * Material Symbols Outlined is used for icon ligatures via
  * the .icon-font utility class.
- * font-display:block prevents invisible text flash for icons.
  * ============================================================ */
-
-@font-face {
-    font-family: "Space Grotesk";
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url("../../assets/fonts/space-grotesk-400.woff2") format("woff2");
-}
-
-@font-face {
-    font-family: "Space Grotesk";
-    font-style: normal;
-    font-weight: 700;
-    font-display: swap;
-    src: url("../../assets/fonts/space-grotesk-700.woff2") format("woff2");
-}
-
-/* Material Symbols Outlined — icon font loaded locally to avoid network requests */
-@font-face {
-    font-family: "Material Symbols Outlined";
-    font-style: normal;
-    font-weight: 400;
-    font-display: block;
-    src: url("../../assets/fonts/material-symbols-outlined-400.woff2")
-        format("woff2");
-}
 
 /* ============================================================
  * 2. DESIGN TOKENS
@@ -383,6 +357,9 @@
     /* Language item colors */
     --language-item-check-text: #8fc1ff;
     --language-flag-bg: #15202f;
+
+    /* Material Symbols font settings */
+    --material-symbols-variation: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 18;
 
     color-scheme: dark;
 }
@@ -1309,8 +1286,8 @@ h1 {
 
 /*
  * Material Symbols icon utility class.
- * font-feature-settings:"liga" enables ligature-based icon rendering
- * (each icon keyword is a ligature in the font file).
+ * Uses Google Material Symbols Outlined loaded from CDN.
+ * font-variation-settings controls the optical size to match the 18px design.
  */
 .icon-font {
     font-family: "Material Symbols Outlined";
@@ -1326,7 +1303,7 @@ h1 {
     direction: ltr;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    font-feature-settings: "liga";
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 18;
 }
 
 .action-btn:hover {
@@ -1960,20 +1937,18 @@ h1 {
     padding: 0;
 }
 
+/* Theme menu icon - uses font icon (ligature) */
 .theme-symbol-icon {
-    width: 18px;
-    height: 18px;
+    font-family: "Material Symbols Outlined";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 18px;
+    line-height: 1;
     display: inline-block;
     flex: 0 0 auto;
-    background-color: currentColor;
-    -webkit-mask-image: var(--theme-symbol-icon);
-    mask-image: var(--theme-symbol-icon);
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    mask-position: center;
-    -webkit-mask-size: contain;
-    mask-size: contain;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 18;
 }
 
 /* Override sort-menu-icon appearance for flag thumbnails */
@@ -2006,19 +1981,25 @@ h1 {
     width: 28px;
     height: 18px;
     border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.language-flag-img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: contain;
+/* Emoji flag icons - use system emoji rendering */
+.language-flag-emoji {
+    font-size: 16px;
+    line-height: 1;
 }
 
-.language-item-flag-auto .language-flag-img {
-    width: 16px;
-    height: 16px;
-    margin: 0 auto;
+.language-item-flag-auto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.language-item-flag-auto .language-flag-emoji {
+    font-size: 16px;
 }
 
 :root[data-theme="dark"] .top-toast {
