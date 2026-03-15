@@ -1,0 +1,21 @@
+{
+  "name": "yabm-classic",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tooling for Yet Another Bookmark Manager Chrome extension.",
+  "scripts": {
+    "build": "node tools/build.cjs",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json",
+    "check": "npm run lint && npm run typecheck && npm run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.23.0",
+    "@types/chrome": "^0.0.321",
+    "@types/node": "^22.13.10",
+    "esbuild": "^0.25.1",
+    "eslint": "^9.23.0",
+    "globals": "^16.0.0",
+    "typescript": "^5.8.2"
+  }
+}

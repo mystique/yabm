@@ -17,26 +17,32 @@ Key paths:
 - `src/assets/` - icons/twemoji/static assets.
 ## 2) Build / Lint / Test Commands
 Reality in this repo:
-- Build: none.
-- Lint: none configured.
-- Typecheck: none configured (plain JS).
+- Build: `npm run build` (copies `src/` to `dist/` and transpiles JS with esbuild, no runtime architecture change).
+- Lint: `npm run lint`.
+- Typecheck: `npm run typecheck` (TypeScript `checkJs` for shared libs, background scripts, and tooling).
 - Unit/integration test runner: none configured.
 Local development flow:
 1. Open `chrome://extensions/`.
 2. Enable Developer mode.
-3. Click Load unpacked.
-4. Select `src/` (folder containing `manifest.json`).
+3. Run `npm install` once.
+4. Click Load unpacked.
+5. Select `src/` for direct source loading, or `dist/` after `npm run build` when validating the build artifact.
 Syntax validation (run from repo root):
 ```powershell
+npm run lint
+npm run typecheck
+npm run build
 node --check src/pages/bookmarks/bookmarks.js
 node --check src/pages/options/options.js
 node --check src/lib/sync-utils.js
 node --check src/lib/i18n.js
+node --check src/background/service-worker.js
 ```
 Single-test execution guidance:
 - Not available because no automated tests exist.
 - "Run one test" equivalent is `node --check <modified-file.js>` for the specific file.
 When changing JS, run `node --check` on each modified JS file.
+When changing shared libraries, background scripts, or tooling files, also run `npm run typecheck`.
 When changing UI behavior, also manually verify in Chrome.
 ## 3) Architecture and Runtime Contracts
 Manifest/runtime:

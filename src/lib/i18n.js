@@ -160,7 +160,7 @@
    *  3. The raw `key` itself as a last resort.
    *
    * @param {string} key - Message key as defined in `messages.json`.
-   * @param {string|string[]|undefined} substitutions - Substitution values.
+  * @param {string|string[]|undefined} [substitutions] - Substitution values.
    * @returns {string} Translated message, or `key` if no translation exists.
    */
   function t(key, substitutions) {
@@ -243,19 +243,24 @@
    */
   function applyI18n(root = document) {
     for (const el of root.querySelectorAll("[data-i18n]")) {
-      el.textContent = t(el.dataset.i18n);
+      const element = /** @type {HTMLElement} */ (el);
+      element.textContent = t(element.dataset.i18n);
     }
     for (const el of root.querySelectorAll("[data-i18n-placeholder]")) {
-      el.setAttribute("placeholder", t(el.dataset.i18nPlaceholder));
+      const element = /** @type {HTMLElement} */ (el);
+      element.setAttribute("placeholder", t(element.dataset.i18nPlaceholder));
     }
     for (const el of root.querySelectorAll("[data-i18n-title]")) {
-      el.setAttribute("title", t(el.dataset.i18nTitle));
+      const element = /** @type {HTMLElement} */ (el);
+      element.setAttribute("title", t(element.dataset.i18nTitle));
     }
     for (const el of root.querySelectorAll("[data-i18n-aria-label]")) {
-      el.setAttribute("aria-label", t(el.dataset.i18nAriaLabel));
+      const element = /** @type {HTMLElement} */ (el);
+      element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
     }
     for (const el of root.querySelectorAll("[data-i18n-tooltip]")) {
-      el.dataset.tooltip = t(el.dataset.i18nTooltip);
+      const element = /** @type {HTMLElement} */ (el);
+      element.dataset.tooltip = t(element.dataset.i18nTooltip);
     }
   }
 

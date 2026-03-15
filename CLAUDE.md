@@ -4,11 +4,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Yet Another Bookmark Manager — a Chrome Extension (Manifest V3) for visual bookmark management with optional WebDAV sync. No build step, no package manager, no bundler: plain JS/CSS/HTML loaded directly by Chrome.
+Yet Another Bookmark Manager — a Chrome Extension (Manifest V3) for visual bookmark management with optional WebDAV sync. Runtime architecture remains plain JS/CSS/HTML loaded by Chrome, and the repository now also includes a lightweight Node-based tooling layer for build, lint, and JSDoc type checking.
 
 **For detailed coding conventions, see [AGENTS.md](./AGENTS.md).**
 
 ## Development Commands
+
+Tooling commands:
+
+```powershell
+npm install
+npm run build
+npm run lint
+npm run typecheck
+npm run check
+```
+
+- `npm run build` copies `src/` to `dist/` and transpiles JavaScript with esbuild without changing the runtime architecture.
+- `npm run lint` runs ESLint across the repository JavaScript.
+- `npm run typecheck` runs TypeScript `checkJs` for shared libraries, background scripts, and tooling files.
+- `npm run check` runs lint, typecheck, and build together.
 
 **Syntax check** (run from repo root):
 

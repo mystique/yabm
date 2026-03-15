@@ -500,13 +500,22 @@
   }
 
   /**
+   * @typedef {{
+   *   title: string,
+   *   url?: string,
+   *   children?: BookmarkNodeSnapshot[],
+   *   target?: "toolbar"|"other"|"mobile"
+   * }} BookmarkNodeSnapshot
+   */
+
+  /**
    * Recursively parses a `<DL>` element from a Netscape bookmarks HTML
    * document into an array of plain bookmark-node objects. Handles both
    * inline `<DL>` children and sibling `<DL>` elements (different exporters
    * produce different DOM structures).
    *
    * @param {Element} dlEl - The `<DL>` element to parse.
-   * @returns {{ title: string, url?: string, children?: Array, target?: string }[]}
+   * @returns {BookmarkNodeSnapshot[]}
    */
   function parseDlElement(dlEl) {
     const items = [];
@@ -566,7 +575,7 @@
    * walking it with {@link parseDlElement}.
    *
    * @param {string} htmlText - Raw Netscape bookmarks HTML content.
-   * @returns {{ title: string, url?: string, children?: Array }[]}
+  * @returns {BookmarkNodeSnapshot[]}
    * @throws {Error} If the document contains no root `<DL>` element.
    */
   function parseBookmarksHtml(htmlText) {
@@ -669,7 +678,7 @@
    * Used to snapshot the tree before a destructive import operation.
    *
    * @param {chrome.bookmarks.BookmarkTreeNode[]} nodes
-   * @returns {{ title: string, url?: string, children?: Array }[]}
+  * @returns {BookmarkNodeSnapshot[]}
    */
   function cloneBookmarkNodes(nodes) {
     return (nodes || []).map((node) => {
@@ -694,10 +703,11 @@
    *
    * @param {chrome.bookmarks.BookmarkTreeNode[]} rootChildren
    *     Direct children of the synthetic Chrome bookmark root.
-   * @returns {Promise<Object.<string, Array>>}
+   * @returns {Promise<Object.<string, BookmarkNodeSnapshot[]>>}
    *     Map of folder ID → cloned children array.
    */
   async function snapshotRootChildren(rootChildren) {
+    /** @type {Object.<string, BookmarkNodeSnapshot[]>} */
     const snapshot = {};
     for (const folder of rootChildren) {
       const subtree = await chrome.bookmarks.getSubTree(folder.id);
@@ -712,7 +722,7 @@
    * the bookmark tree after a failed import.
    *
    * @param {chrome.bookmarks.BookmarkTreeNode[]} rootChildren
-   * @param {Object.<string, Array>} snapshot - Map from {@link snapshotRootChildren}.
+  * @param {Object.<string, BookmarkNodeSnapshot[]>} snapshot - Map from {@link snapshotRootChildren}.
    * @returns {Promise<void>}
    */
   async function restoreRootChildren(rootChildren, snapshot) {

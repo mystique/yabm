@@ -145,12 +145,41 @@ See [PRIVACY.md](./PRIVACY.md) for details.
 
 ## Development
 
-This is a **plain JavaScript project** with no build step, bundler, or transpiler.
+This is a **plain JavaScript project** at runtime. The extension still uses
+script-tag loading and global namespaces, but the repository now includes a
+lightweight tooling layer for build, lint, and JSDoc type checking.
+
+Modernization planning and progress tracking live in:
+
+- [docs/modernization/ROADMAP.md](docs/modernization/ROADMAP.md)
+- [docs/modernization/STATUS.md](docs/modernization/STATUS.md)
 
 - Manifest V3 extension
 - Scripts load via `<script>` tags (no ESM imports)
 - Global namespaces: `window.YABMI18n`, `window.YABMSync`
 - Module pattern via factory functions (e.g., `createBookmarkTreeModule`)
+
+### Tooling Setup
+
+```powershell
+npm install
+```
+
+Available commands:
+
+```powershell
+npm run build
+npm run lint
+npm run typecheck
+npm run check
+```
+
+- `npm run build` copies the extension into `dist/` and transpiles JavaScript with esbuild without changing the current runtime architecture.
+- `npm run lint` runs ESLint across the repository JavaScript.
+- `npm run typecheck` runs TypeScript in `checkJs` mode for the shared libraries, background scripts, and tooling layer.
+- `npm run check` runs lint, typecheck, and build in sequence.
+
+Load `src/` in Chrome for the legacy direct-edit flow, or load `dist/` when you want to verify the tooling build output.
 
 ### Quick Syntax Check
 
@@ -159,6 +188,7 @@ node --check src/pages/bookmarks/bookmarks.js
 node --check src/pages/options/options.js
 node --check src/lib/sync-utils.js
 node --check src/lib/i18n.js
+node --check src/background/service-worker.js
 ```
 
 ### Manual Testing
