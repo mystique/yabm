@@ -16,7 +16,6 @@
       t,
       setStatus,
       showTopToast,
-      setWebdavStatusIndicator,
       refreshWebdavStatusBar,
     } = deps;
 

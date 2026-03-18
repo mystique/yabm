@@ -29,7 +29,6 @@
       openSortMenu,
       handleNodeDragStart,
       handleNodeDragEnd,
-      handleFolderDrop,
       toggleFolder,
       setFolderOpen,
       updateTreeSummaryStats,

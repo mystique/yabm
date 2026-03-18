@@ -382,7 +382,6 @@ let setAllFoldersOpen;
 } = treeModule);
 
 let editContextMenuOpen = false;
-let editContextTarget = null;
 
 /**
  * Returns `true` if `target` is an editable text field (input, textarea, or
@@ -421,7 +420,6 @@ function closeEditContextMenu() {
   menu.classList.add("hidden");
   menu.innerHTML = "";
   editContextMenuOpen = false;
-  editContextTarget = null;
 }
 
 /**
@@ -498,8 +496,6 @@ function openEditContextMenu(target, x, y) {
   closeTreeContextMenu();
   closeSortMenu();
   menu.innerHTML = "";
-
-  editContextTarget = target;
   editContextMenuOpen = true;
 
   const selectedText = getSelectionTextFromEditable(target);

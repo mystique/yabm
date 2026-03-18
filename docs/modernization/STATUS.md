@@ -23,12 +23,20 @@ When continuing the modernization work in a new task:
 
 ## Current State
 
-- Current phase: Phase 1 complete, Phase 2 not started
-- Overall status: Safe tooling baseline established
-- Last updated: 2026-03-15
-- Recommended next task: clean page-layer lint warnings and start bringing `pages/options` into typecheck scope
+- Current phase: Phase 1 complete, Phase 2 in progress
+- Overall status: Page-layer lint warnings resolved
+- Last updated: 2026-03-18
+- Recommended next task: bring `pages/options` into typecheck scope
 
 ## Completed Work
+
+### 2026-03-18
+
+- Fixed 3 page-layer ESLint warnings:
+  - `bookmark-tree-render.js`: removed unused `handleFolderDrop` dependency
+  - `modals.js`: removed unused `setWebdavStatusIndicator` dependency
+  - `bookmarks.js`: removed unread `editContextTarget` variable
+- `npm run lint` now passes with zero warnings
 
 ### 2026-03-15
 
@@ -41,6 +49,11 @@ When continuing the modernization work in a new task:
 - Tightened JSDoc in [src/lib/i18n.js](src/lib/i18n.js) and [src/lib/sync-utils.js](src/lib/sync-utils.js) so the shared-library typecheck baseline passes.
 
 ## Verification Log
+
+### 2026-03-18
+
+- Ran `npm run lint` — passes with zero warnings
+- Ran `npm run check` — all checks pass
 
 ### 2026-03-15
 
@@ -88,19 +101,13 @@ Current `checkJs` scope does not yet include:
 
 ### Lint Baseline
 
-`npm run lint` currently passes with warnings only.
-
-Open warnings:
-
-- [src/pages/bookmarks/bookmark-tree-render.js](src/pages/bookmarks/bookmark-tree-render.js) has an unused `handleFolderDrop` binding.
-- [src/pages/bookmarks/bookmarks.js](src/pages/bookmarks/bookmarks.js) has an unused `editContextTarget` binding.
-- [src/pages/bookmarks/modals.js](src/pages/bookmarks/modals.js) has an unused `setWebdavStatusIndicator` binding.
+`npm run lint` passes with zero warnings.
 
 ## Next Work Queue
 
 ### Phase 2 Entry Tasks
 
-- [ ] Remove the 3 existing page-layer ESLint warnings.
+- [x] Remove the 3 existing page-layer ESLint warnings.
 - [ ] Add DOM narrowing helpers or local casting patterns for `src/pages/options/options.js`.
 - [ ] Expand `tsconfig.json` include scope to add `src/pages/options/**/*.js` once it passes.
 - [ ] Verify options page load, config save, and connection test after typecheck expansion.
