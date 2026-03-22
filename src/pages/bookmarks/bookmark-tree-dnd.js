@@ -138,17 +138,22 @@
      * Chrome bookmarks API, and triggers a re-render.
      * @param {DragEvent} event
      * @param {chrome.bookmarks.BookmarkTreeNode} targetFolderNode - Destination folder.
+     * @param {Object} [capturedDragState] - Drag state captured before async operation.
+     * @param {string} [capturedDragState.nodeId] - ID of dragged node.
+     * @param {'bookmark'|'folder'} [capturedDragState.nodeType] - Type of dragged node.
+     * @param {string} [capturedDragState.parentId] - Original parent folder ID.
      * @returns {Promise<void>}
      */
-    async function handleFolderDrop(event, targetFolderNode) {
-      if (!dragState.nodeId) {
+    async function handleFolderDrop(event, targetFolderNode, capturedDragState) {
+      const dragNodeId = capturedDragState?.nodeId ?? dragState.nodeId;
+      const dragNodeType = capturedDragState?.nodeType ?? dragState.nodeType;
+
+      if (!dragNodeId) {
         return;
       }
       event.preventDefault();
       event.stopPropagation();
 
-      const dragNodeId = dragState.nodeId;
-      const dragNodeType = dragState.nodeType;
       dragState.nodeId = null;
       dragState.nodeType = null;
       dragState.currentDragOverFolderId = null;
@@ -184,7 +189,7 @@
         });
 
         setStatus(t("movedSuccessfully"), "success");
-        await rerenderAfterTreeChange([targetFolderNode.id]);
+        await rerenderAfterTreeChange();
       } catch (error) {
         setStatus(t("moveFailed", [error.message]), "error");
       }
@@ -257,6 +262,7 @@
       /**
        * Handles drop events at the container level.
        * Finds the target folder and delegates to handleFolderDrop.
+       * Captures drag state before async operation to avoid race condition with dragend.
        * @param {DragEvent} event
        */
       function handleDrop(event) {
@@ -267,10 +273,17 @@
 
         const folderId = folder.dataset.folderId;
 
+        // Capture drag state before async operation to prevent race with dragend
+        const capturedDragState = {
+          nodeId: dragState.nodeId,
+          nodeType: dragState.nodeType,
+          parentId: dragState.parentId,
+        };
+
         // Fetch the folder node and call the drop handler
         chrome.bookmarks.get(folderId).then(([targetFolderNode]) => {
           if (targetFolderNode) {
-            handleFolderDrop(event, targetFolderNode);
+            handleFolderDrop(event, targetFolderNode, capturedDragState);
           }
         });
       }
