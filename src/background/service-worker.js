@@ -49,7 +49,7 @@ async function findBookmarksTabFromContexts() {
   if (typeof chrome.runtime.getContexts !== "function") return null;
 
   const contexts = await chrome.runtime.getContexts({
-    contextTypes: ["TAB"],
+    contextTypes: /** @type {chrome.runtime.ContextType[]} */ (["TAB"]),
     documentUrls: [BOOKMARKS_PAGE_URL_PATTERN],
   });
 

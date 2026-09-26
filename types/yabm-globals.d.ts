@@ -16,18 +16,6 @@ declare global {
     YABMBookmarkTreeModule: any;
   }
 
-  namespace chrome.runtime {
-    interface ExtensionContext {
-      contextType?: string;
-      documentUrl?: string;
-      tabId?: number;
-    }
-
-    function getContexts(filter: {
-      contextTypes?: string[];
-      documentUrls?: string[];
-    }): Promise<ExtensionContext[]>;
-  }
 }
 
 export {};
