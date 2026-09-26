@@ -153,4 +153,19 @@ When guidance conflicts, prioritize in this order:
 1. Direct code behavior in `src/`.
 2. `manifest.json` runtime constraints.
 3. This file (`AGENTS.md`).
+
 4. Generic tooling assumptions.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs live as local Markdown files under `.scratch/<feature-slug>/`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the five canonical labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, and `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This is a single-context repository using root `CONTEXT.md` and `docs/adr/` when those documents exist. See `docs/agents/domain.md`.
