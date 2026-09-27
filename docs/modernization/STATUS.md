@@ -131,7 +131,7 @@ Current `checkJs` scope does not yet include:
 
 ### Phase 2 Boundary and Acceptance Tasks
 
-- [ ] Audit global reads and keep runtime-global access concentrated in page bootstrap code.
+- [x] Audit global reads and keep runtime-global access concentrated in page bootstrap code (see Page Global Boundaries; manual Chrome verification pending).
 - [ ] Run the complete Phase 2 acceptance checks and record the evidence.
 - [ ] Record that runtime ESM remains deferred during this phase.
 
@@ -140,6 +140,22 @@ Current `checkJs` scope does not yet include:
 - [ ] Map shared logic candidates between bookmarks and options pages.
 - [ ] Identify files that should move into `core/` or `shared/` later.
 - [ ] Confirm a target directory structure before moving files.
+
+## Page Global Boundaries
+
+Audited 2026-09-27 (ticket 09). Runtime-global service reads (`window.YABM*` library services) live in the page bootstraps: `src/pages/bookmarks/bookmarks.js` (`YABMI18n`, `YABMTheme`, `YABMSync`, feature-module factories) and `src/pages/options/options.js` (`YABMI18n`, `YABMTheme`, `YABMSync`).
+
+Changed:
+
+- `modals.js` now receives the sync service as `deps.sync` (passed `window.YABMSync` from `bookmarks.js`) instead of reading `window.YABMSync` directly (4 reads removed).
+
+Deliberate remaining global access in feature modules:
+
+- `bookmark-tree.js` reads the six `window.YABMBookmarkTree*Module` factories. It is the tree composition root; moving factory acquisition into `bookmarks.js` would restructure the wiring, not a local change.
+- `chrome.bookmarks.*` in `bookmark-tree-dnd.js`, `bookmark-tree-menu.js`, `bookmark-tree-mutations.js`, `bookmark-tree-observers.js`, and `bookmark-tree-render.js`. This is the Chrome platform API these modules exist to wrap, not an app-service global; injecting it adds indirection without a boundary benefit.
+- `chrome.storage.local` in `favicon-cache.js`. The module owns the favicon cache key and its persistence, so it keeps the platform storage API.
+- Each feature module assigns its own `window.YABM*Module` export; that is the script-tag module pattern, not a read.
+- DOM/browser globals (`document`, `window.setTimeout`, `window.innerWidth`, `window.open`, `navigator`) are platform APIs and out of scope.
 
 ## Notes For Future Tasks
 
