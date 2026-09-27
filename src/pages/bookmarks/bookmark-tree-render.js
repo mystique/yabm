@@ -10,7 +10,7 @@
    * @typedef {Object} RenderModuleDeps
    * @property {(key: string, substitutions?: string[]) => string} t
    * @property {(openFolderIds: Set<string> | null) => void} applyOpenFolderIds
-   * @property {(options: { ariaLabel: string, icon: string, onClick: (event?: Event) => void, danger?: boolean }) => HTMLButtonElement} createActionButton
+   * @property {(options: { ariaLabel: string, icon: string, onClick: (event: MouseEvent) => Promise<void> | void, danger?: boolean }) => HTMLButtonElement} createActionButton
    * @property {(node: chrome.bookmarks.BookmarkTreeNode) => string | null} getCachedFaviconForBookmark
    * @property {(node: chrome.bookmarks.BookmarkTreeNode) => { bookmarkCount: number, folderCount: number }} getFolderStats
    * @property {() => Set<string>} getOpenFolderIds
@@ -22,10 +22,10 @@
    * @property {() => void} closeSortMenu
    * @property {(options: { x: number, y: number, items: Array<{ label?: string, icon?: string, danger?: boolean, type?: string, onClick?: () => void | Promise<void> }> }) => void} openTreeContextMenu
    * @property {(folderNode: chrome.bookmarks.BookmarkTreeNode, anchorEl: HTMLElement) => void} openSortMenu
-   * @property {(event: DragEvent, node: chrome.bookmarks.BookmarkTreeNode, type: string) => void} handleNodeDragStart
+   * @property {(event: DragEvent, node: chrome.bookmarks.BookmarkTreeNode, nodeType: 'bookmark' | 'folder') => void} handleNodeDragStart
    * @property {(event: DragEvent) => void} handleNodeDragEnd
    * @property {(details: HTMLDetailsElement) => void} toggleFolder
-   * @property {(details: HTMLDetailsElement, open: boolean, saveState: boolean) => void} setFolderOpen
+   * @property {(details: HTMLDetailsElement, open: boolean, animate?: boolean) => void} setFolderOpen
    * @property {(folders: chrome.bookmarks.BookmarkTreeNode[]) => void} updateTreeSummaryStats
    * @property {() => void} updateMainLayoutMetrics
    * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} copyBookmarkUrl
@@ -342,9 +342,9 @@
         createActionButton({
           ariaLabel: t("sortFolder"),
           icon: "sort",
-          onClick: (/** @type {Event} */ event) => {
-            const target = /** @type {HTMLElement} */ (event.currentTarget);
-            openSortMenu(node, target);
+          onClick: (event) => {
+            const anchorEl = /** @type {HTMLElement} */ (event.currentTarget);
+            openSortMenu(node, anchorEl);
           },
         }),
         createActionButton({

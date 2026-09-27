@@ -8,8 +8,8 @@
   /**
    * @typedef {Object} MenuModuleDeps
    * @property {(key: string, substitutions?: string[]) => string} t
-   * @property {(mutation: () => Promise<void>, options: { successKey: string, errorKey: string, afterSuccess: () => void }) => Promise<void>} runBookmarkMutation
-   * @property {(folderIds: string[]) => Promise<void>} rerenderAfterTreeChange
+   * @property {(run: () => Promise<any>, options?: { successKey?: string, errorKey?: string, afterSuccess?: () => Promise<void> | void }) => Promise<void>} runBookmarkMutation
+   * @property {(extraOpenFolderIds?: string[]) => Promise<void>} rerenderAfterTreeChange
    */
 
   /**

@@ -4,10 +4,10 @@
 
 **Blocked by:** 04: Typecheck foundational bookmarks modules.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Make rendered element types explicit before accessing style, dataset, or details-specific state.
-- [ ] Make menu item callbacks and dependency contracts explicit.
-- [ ] Preserve folder rendering, context-menu positioning, and sorting behavior.
-- [ ] Preserve the current factory boundaries and script-tag runtime model.
-- [ ] Verify the affected modules pass lint and page-layer typecheck.
+- [x] Make rendered element types explicit before accessing style, dataset, or details-specific state.
+- [x] Make menu item callbacks and dependency contracts explicit.
+- [x] Preserve folder rendering, context-menu positioning, and sorting behavior.
+- [x] Preserve the current factory boundaries and script-tag runtime model.
+- [x] Verify the affected modules pass lint and page-layer typecheck.
