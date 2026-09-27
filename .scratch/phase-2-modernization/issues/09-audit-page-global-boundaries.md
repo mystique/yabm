@@ -4,11 +4,11 @@
 
 **Blocked by:** 03: Verify options configuration flows; 08: Typecheck bookmarks orchestrators.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Inventory direct runtime-global reads in the page layer.
-- [ ] Keep intentional service acquisition in page bootstrap code.
-- [ ] Replace brittle feature-module global reads with existing dependency injection boundaries where the change is local and behavior-preserving.
-- [ ] Do not introduce new global namespace reads in feature modules.
-- [ ] Record any deliberate remaining global access and why it remains.
-- [ ] Verify lint, typecheck, build, and affected Chrome flows.
+- [x] Inventory direct runtime-global reads in the page layer.
+- [x] Keep intentional service acquisition in page bootstrap code.
+- [x] Replace brittle feature-module global reads with existing dependency injection boundaries where the change is local and behavior-preserving.
+- [x] Do not introduce new global namespace reads in feature modules.
+- [x] Record any deliberate remaining global access and why it remains.
+- [ ] Verify lint, typecheck, build, and affected Chrome flows. Lint, typecheck, and build pass; pending manual Chrome verification: reload the extension, open the bookmarks page, open the WebDAV config modal (saved config pre-fills), run Test connection, Save, and Clear, and confirm the status bar refreshes.
