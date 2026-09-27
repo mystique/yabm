@@ -4,12 +4,10 @@
 
 **Blocked by:** 04: Typecheck foundational bookmarks modules.
 
-**Status:** ready-for-human
-
-Code is done; only the manual Chrome check remains.
+**Status:** done
 
 - [x] Narrow drag and pointer event targets before using element APIs.
 - [x] Make folder highlighting and drop-target validation types explicit.
 - [x] Preserve event delegation and current drag lifecycle behavior.
 - [x] Verify the module passes lint and page-layer typecheck.
-- [ ] Verify drag-and-drop behavior in Chrome. (Pending manual check: agent could not drive the Chrome UI.)
+- [x] Verify drag-and-drop behavior in Chrome. (Passed in the maintainer's Phase 2 smoke test, 2026-09-27.)

@@ -23,11 +23,10 @@ When continuing the modernization work in a new task:
 
 ## Current State
 
-- Current phase: Phase 1 complete, Phase 2 in progress (awaiting manual Chrome acceptance)
-- Overall status: all Phase 2 code and automated checks are done; tickets 03, 07, 08, 09, and 10 are `ready-for-human`
+- Current phase: Phase 1 complete, Phase 2 complete
+- Overall status: all Phase 2 tickets (01-10) are done; automated checks and the manual Chrome smoke checklist passed
 - Last updated: 2026-09-27
-- Recommended next task: run the Phase 2 Manual Chrome Smoke Checklist below, record the result in the Verification Log, then mark Phase 2 complete
-- Phase 2 is not complete: manual Chrome verification has not been performed for any ticket.
+- Recommended next task: start the Phase 3 Preparation Tasks below
 
 ### 2026-09-27
 
@@ -87,22 +86,22 @@ Runtime-model checks:
 - `git diff 83b8e45 -- src/manifest.json src/pages/bookmarks/bookmarks.html src/pages/options/options.html` is empty, so the manifest entry points and script tags are unchanged.
 - `dist/manifest.json` and both `dist/` HTML files match `src/`.
 
-Manual Chrome verification: NOT performed. Phase 2 acceptance waits on the checklist below.
+Manual Chrome verification: performed by the maintainer after the review fixes and ticket 10 (`9bba1e5`); every checklist item passed with no issues reported.
 
-### Phase 2 Manual Chrome Smoke Checklist (pending)
+### Phase 2 Manual Chrome Smoke Checklist (passed 2026-09-27)
 
 Reload the extension at `chrome://extensions/` (from `src/`, or `dist/` after `npm run build`), then check:
 
-- [ ] Bookmarks page starts with no console errors.
-- [ ] Bookmark and folder create, edit, and delete work and show status toasts.
-- [ ] Expand all, collapse all, and single-folder toggle work.
-- [ ] Context menu and sort menu open and apply their actions.
-- [ ] Drag-and-drop moves items, refuses a drop into a folder's own descendant, and clears the drop highlight.
-- [ ] Edit menu and tooltips work.
-- [ ] Language and theme switching work.
-- [ ] Options page loads, tests the connection, lists remote files, saves, and shows an error status on failure (invalid URL or credentials, save before test).
-- [ ] Bookmarks-page config modal pre-fills saved config, saves, and clears, and the status bar refreshes.
-- [ ] WebDAV upload and download work from the bookmarks page.
+- [x] Bookmarks page starts with no console errors.
+- [x] Bookmark and folder create, edit, and delete work and show status toasts.
+- [x] Expand all, collapse all, and single-folder toggle work.
+- [x] Context menu and sort menu open and apply their actions.
+- [x] Drag-and-drop moves items, refuses a drop into a folder's own descendant, and clears the drop highlight.
+- [x] Edit menu and tooltips work.
+- [x] Language and theme switching work.
+- [x] Options page loads, tests the connection, lists remote files, saves, and shows an error status on failure (invalid URL or credentials, save before test).
+- [x] Bookmarks-page config modal pre-fills saved config, saves, and clears, and the status bar refreshes.
+- [x] WebDAV upload and download work from the bookmarks page.
 
 ### 2026-03-18
 
@@ -165,18 +164,18 @@ The whole page layer is in scope. New bookmarks modules must be added to `tsconf
 - [x] Remove redundant Chrome runtime declarations.
 - [x] Add local DOM narrowing and data-shape contracts for the options page.
 - [x] Expand `tsconfig.json` to include the options page.
-- [ ] Verify options startup, configuration save/clear, and WebDAV connection test (code analysis done; manual Chrome check pending).
+- [x] Verify options startup, configuration save/clear, and WebDAV connection test.
 - [x] Add bookmarks foundational modules to `checkJs` in small batches.
 - [x] Add bookmarks rendering/menu modules to `checkJs`.
 - [x] Add bookmarks mutations/observers modules to `checkJs`.
-- [x] Add bookmarks drag-and-drop module to `checkJs` (manual Chrome check pending).
-- [x] Add bookmarks tree and page orchestrators to `checkJs` (manual Chrome check pending).
+- [x] Add bookmarks drag-and-drop module to `checkJs`.
+- [x] Add bookmarks tree and page orchestrators to `checkJs`.
 
 ### Phase 2 Boundary and Acceptance Tasks
 
-- [x] Audit global reads and keep runtime-global access concentrated in page bootstrap code (see Page Global Boundaries; manual Chrome verification pending).
+- [x] Audit global reads and keep runtime-global access concentrated in page bootstrap code (see Page Global Boundaries).
 - [x] Run the automated Phase 2 acceptance checks and record the evidence (see Verification Log).
-- [ ] Run the Phase 2 Manual Chrome Smoke Checklist (pending).
+- [x] Run the Phase 2 Manual Chrome Smoke Checklist (passed).
 - [x] Record that runtime ESM remains deferred (see ESM Deferral).
 
 ### Phase 3 Preparation Tasks
