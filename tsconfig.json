@@ -28,6 +28,8 @@
     "src/pages/bookmarks/bookmarks.js",
     "src/pages/bookmarks/custom-scrollbar.js",
     "src/pages/bookmarks/notifications.js",
+    "src/pages/bookmarks/modals.js",
+    "src/pages/bookmarks/favicon-cache.js",
     "tools/**/*.cjs",
     "types/**/*.d.ts"
   ],

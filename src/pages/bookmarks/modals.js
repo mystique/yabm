@@ -5,13 +5,84 @@
  * Each modal uses a CSS open/close animation; a WeakMap tracks pending close timers.
  * Exposed as `window.YABMModalsModule`.
  */
+
+/**
+ * Stored WebDAV configuration, as persisted by `YABMSync.saveConfig`.
+ * @typedef {Object} WebdavConfig
+ * @property {string} directoryUrl
+ * @property {string} fileName
+ * @property {string} username
+ * @property {string} password
+ */
+
+/**
+ * File entry returned by a WebDAV directory listing.
+ * @typedef {Object} WebdavFileMetadata
+ * @property {string} name
+ * @property {number|string} [size]
+ * @property {string} [lastModified]
+ */
+
+/**
+ * Subset of the `window.YABMSync` service used by the modals.
+ * @typedef {Object} ModalsSyncService
+ * @property {() => Promise<WebdavConfig | null>} getConfig
+ * @property {(config: WebdavConfig) => Promise<void>} saveConfig
+ * @property {() => Promise<void>} clearConfig
+ * @property {(input: { directoryUrl: string, username?: string, password?: string }) => Promise<{ directoryUrl: string, files: WebdavFileMetadata[] }>} listDirectoryFiles
+ */
+
+/**
+ * Dependencies injected by the bookmarks page bootstrap (bookmarks.js).
+ * @typedef {Object} ModalsModuleDeps
+ * @property {(key: string, substitutions?: string[]) => string} t
+ * @property {(message: string, type: 'success'|'error'|'') => void} setStatus
+ * @property {(message: string, type?: 'success'|'error'|'') => void} showTopToast
+ * @property {(stateKey: 'notConfigured'|'checking'|'ready'|'error', tooltipText: string) => void} setWebdavStatusIndicator
+ * @property {(options?: { interactive?: boolean }) => Promise<void>} refreshWebdavStatusBar
+ * @property {ModalsSyncService} sync
+ */
+
+/**
+ * @typedef {Object} PromptModalOptions
+ * @property {string} [title]
+ * @property {string} [message]
+ * @property {string} [confirmLabel]
+ * @property {string} [cancelLabel]
+ */
+
+/**
+ * @typedef {Object} EditorModalOptions
+ * @property {string} [title]
+ * @property {string} [nameLabel]
+ * @property {string} [nameValue]
+ * @property {string} [urlValue]
+ * @property {boolean} [urlVisible]
+ * @property {string} [saveLabel]
+ */
+
+/**
+ * Public API returned by `createModalsModule`.
+ * @typedef {Object} ModalsModule
+ * @property {(modal: HTMLElement | null) => void} openModal
+ * @property {(modal: HTMLElement | null) => void} closeModal
+ * @property {() => Promise<void>} openConfigModal
+ * @property {() => void} closeConfigModal
+ * @property {(options: PromptModalOptions) => Promise<boolean>} openPromptModal
+ * @property {(options: EditorModalOptions) => Promise<{ name: string, url: string } | null>} openEditorModal
+ * @property {() => Promise<void>} testConfigConnection
+ * @property {() => Promise<void>} saveConfigFromModal
+ * @property {() => Promise<void>} clearConfigFromModal
+ * @property {() => void} invalidateConfigTest
+ */
+
 (function () {
   /**
    * Factory that creates the modals module.
    * `sync` is the page's `window.YABMSync` service, injected by bookmarks.js so this
    * module does not read the shared-library global directly.
-   * @param {{ t: Function, setStatus: Function, showTopToast: Function, setWebdavStatusIndicator: Function, refreshWebdavStatusBar: Function, sync: { getConfig: Function, saveConfig: Function, clearConfig: Function, listDirectoryFiles: Function } }} deps
-   * @returns {{ openModal: Function, closeModal: Function, openConfigModal: Function, closeConfigModal: Function, openPromptModal: Function, openEditorModal: Function, testConfigConnection: Function, saveConfigFromModal: Function, clearConfigFromModal: Function, invalidateConfigTest: Function }}
+   * @param {ModalsModuleDeps} deps
+   * @returns {ModalsModule}
    */
   function createModalsModule(deps) {
     const {
@@ -28,10 +99,49 @@
     const modalCloseTimers = new WeakMap();
 
     /**
+     * Returns the element with `id`, throwing if it is missing.
+     * @param {string} id
+     * @returns {HTMLElement}
+     */
+    function requireElement(id) {
+      const el = document.getElementById(id);
+      if (!el) {
+        throw new Error(`Missing element #${id}`);
+      }
+      return el;
+    }
+
+    /**
+     * Returns the input element with `id`, throwing if it is missing or not an input.
+     * @param {string} id
+     * @returns {HTMLInputElement}
+     */
+    function requireInput(id) {
+      const el = requireElement(id);
+      if (!(el instanceof HTMLInputElement)) {
+        throw new Error(`Element #${id} is not an input`);
+      }
+      return el;
+    }
+
+    /**
+     * Returns the button element with `id`, throwing if it is missing or not a button.
+     * @param {string} id
+     * @returns {HTMLButtonElement}
+     */
+    function requireButton(id) {
+      const el = requireElement(id);
+      if (!(el instanceof HTMLButtonElement)) {
+        throw new Error(`Element #${id} is not a button`);
+      }
+      return el;
+    }
+
+    /**
      * Transient state for the WebDAV config wizard.
      * `tested` must be true before the user can save; it is reset whenever
      * any credential field changes in a way that invalidates the connection test.
-     * @type {{ tested: boolean, directoryUrl: string, files: Array<{name: string, size?: number, lastModified?: string}> }}
+     * @type {{ tested: boolean, directoryUrl: string, files: WebdavFileMetadata[] }}
      */
     const configState = {
       tested: false,
@@ -162,7 +272,7 @@
      * @returns {string}
      */
     function formatFileSize(sizeValue) {
-      const bytes = Number.parseInt(sizeValue, 10);
+      const bytes = Number.parseInt(String(sizeValue), 10);
       if (!Number.isFinite(bytes) || bytes < 0) {
         return "-";
       }
@@ -203,7 +313,7 @@
 
     /**
      * Builds the inner HTML string for a file-list item's metadata section.
-     * @param {{ size?: number, lastModified?: string }} file
+     * @param {WebdavFileMetadata} file
      * @returns {string}
      */
     function buildFileMetaHtml(file) {
@@ -215,11 +325,11 @@
     /**
      * Populates the config modal's file selection list with existing WebDAV files
      * plus a "Create new file" option, pre-selecting `selectedName` when possible.
-     * @param {Array<{name: string, size?: number, lastModified?: string}>} files
+     * @param {WebdavFileMetadata[]} files
      * @param {string} selectedName - File name to pre-select.
      */
     function renderConfigFileList(files, selectedName) {
-      const container = document.getElementById("cfg-files");
+      const container = requireElement("cfg-files");
       container.innerHTML = "";
 
       const createOption = document.createElement("div");
@@ -257,6 +367,9 @@
       let matched = false;
 
       for (const radio of radios) {
+        if (!(radio instanceof HTMLInputElement)) {
+          continue;
+        }
         if (radio.value === target) {
           radio.checked = true;
           matched = true;
@@ -266,7 +379,7 @@
 
       if (!matched) {
         const newRadio = container.querySelector('input[value="__new__"]');
-        if (newRadio) {
+        if (newRadio instanceof HTMLInputElement) {
           newRadio.checked = true;
         }
       }
@@ -281,14 +394,12 @@
       const checked = document.querySelector(
         'input[name="cfg-file-select"]:checked',
       );
-      if (!checked) {
+      if (!(checked instanceof HTMLInputElement)) {
         return "";
       }
 
       if (checked.value === "__new__") {
-        return normalizeFileName(
-          document.getElementById("cfg-new-file-name").value,
-        );
+        return normalizeFileName(requireInput("cfg-new-file-name").value);
       }
 
       return checked.value;
@@ -303,7 +414,7 @@
       configState.tested = false;
       configState.directoryUrl = "";
       configState.files = [];
-      const section = document.getElementById("cfg-file-section");
+      const section = requireElement("cfg-file-section");
       section.classList.remove("is-open");
     }
 
@@ -320,11 +431,10 @@
         return;
       }
 
-      document.getElementById("cfg-directory-url").value =
-        config.directoryUrl || "";
-      document.getElementById("cfg-username").value = config.username || "";
-      document.getElementById("cfg-password").value = config.password || "";
-      document.getElementById("cfg-new-file-name").value =
+      requireInput("cfg-directory-url").value = config.directoryUrl || "";
+      requireInput("cfg-username").value = config.username || "";
+      requireInput("cfg-password").value = config.password || "";
+      requireInput("cfg-new-file-name").value =
         config.fileName || "bookmarks.html";
 
       setConfigStatus("", "");
@@ -346,16 +456,14 @@
      * @returns {Promise<void>}
      */
     async function testConfigConnection() {
-      const testBtn = document.getElementById("cfg-test");
+      const testBtn = requireButton("cfg-test");
       testBtn.disabled = true;
       setConfigStatus(t("testingWebdavConnection"), "");
 
       try {
-        const directoryUrl = document
-          .getElementById("cfg-directory-url")
-          .value.trim();
-        const username = document.getElementById("cfg-username").value.trim();
-        const password = document.getElementById("cfg-password").value;
+        const directoryUrl = requireInput("cfg-directory-url").value.trim();
+        const username = requireInput("cfg-username").value.trim();
+        const password = requireInput("cfg-password").value;
 
         const result = await sync.listDirectoryFiles({
           directoryUrl,
@@ -367,10 +475,10 @@
         configState.directoryUrl = result.directoryUrl;
         configState.files = result.files;
 
-        document.getElementById("cfg-file-section").classList.add("is-open");
+        requireElement("cfg-file-section").classList.add("is-open");
         renderConfigFileList(
           result.files,
-          normalizeFileName(document.getElementById("cfg-new-file-name").value),
+          normalizeFileName(requireInput("cfg-new-file-name").value),
         );
 
         if (!result.files.length) {
@@ -408,8 +516,8 @@
 
       const payload = {
         directoryUrl: configState.directoryUrl,
-        username: document.getElementById("cfg-username").value.trim(),
-        password: document.getElementById("cfg-password").value,
+        username: requireInput("cfg-username").value.trim(),
+        password: requireInput("cfg-password").value,
         fileName,
       };
 
@@ -442,10 +550,10 @@
 
       try {
         await sync.clearConfig();
-        document.getElementById("cfg-directory-url").value = "";
-        document.getElementById("cfg-username").value = "";
-        document.getElementById("cfg-password").value = "";
-        document.getElementById("cfg-new-file-name").value = "bookmarks.html";
+        requireInput("cfg-directory-url").value = "";
+        requireInput("cfg-username").value = "";
+        requireInput("cfg-password").value = "";
+        requireInput("cfg-new-file-name").value = "bookmarks.html";
         invalidateConfigTest();
         setConfigStatus(t("configurationCleared"), "success");
         setStatus(t("configurationCleared"), "success");
@@ -459,7 +567,7 @@
      * Shows a confirmation-style prompt modal and returns a Promise that resolves
      * to `true` (confirmed) or `false` (cancelled/dismissed).
      * One-shot: event listeners are cleaned up after the user responds.
-     * @param {{ title?: string, message?: string, confirmLabel?: string, cancelLabel?: string }} options
+     * @param {PromptModalOptions} options
      * @returns {Promise<boolean>}
      */
     function openPromptModal({
@@ -469,10 +577,10 @@
       cancelLabel = t("cancel"),
     }) {
       const modal = document.getElementById("prompt-modal");
-      const titleEl = document.getElementById("prompt-title");
-      const messageEl = document.getElementById("prompt-message");
-      const confirmBtn = document.getElementById("prompt-confirm");
-      const cancelBtn = document.getElementById("prompt-cancel");
+      const titleEl = requireElement("prompt-title");
+      const messageEl = requireElement("prompt-message");
+      const confirmBtn = requireElement("prompt-confirm");
+      const cancelBtn = requireElement("prompt-cancel");
 
       titleEl.textContent = title || t("promptNotice");
       messageEl.textContent = message || "";
@@ -507,7 +615,7 @@
      * Shows the bookmark/folder editor modal pre-filled with the given values.
      * Returns a Promise that resolves to `{ name, url }` when saved, or `null` when cancelled.
      * Keyboard shortcuts: Enter submits the form, Escape cancels.
-     * @param {{ title?: string, nameLabel?: string, nameValue?: string, urlValue?: string, urlVisible?: boolean, saveLabel?: string }} options
+     * @param {EditorModalOptions} options
      * @returns {Promise<{name: string, url: string}|null>}
      */
     function openEditorModal({
@@ -519,13 +627,13 @@
       saveLabel = t("save"),
     }) {
       const modal = document.getElementById("editor-modal");
-      const titleEl = document.getElementById("editor-title");
-      const nameLabelEl = document.getElementById("editor-name-label");
-      const nameInput = document.getElementById("editor-name");
-      const urlField = document.getElementById("editor-url-field");
-      const urlInput = document.getElementById("editor-url");
-      const saveBtn = document.getElementById("editor-save");
-      const cancelBtn = document.getElementById("editor-cancel");
+      const titleEl = requireElement("editor-title");
+      const nameLabelEl = requireElement("editor-name-label");
+      const nameInput = requireInput("editor-name");
+      const urlField = requireElement("editor-url-field");
+      const urlInput = requireInput("editor-url");
+      const saveBtn = requireElement("editor-save");
+      const cancelBtn = requireElement("editor-cancel");
 
       titleEl.textContent = title || t("editorEdit");
       nameLabelEl.textContent = nameLabel || t("editorName");

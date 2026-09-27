@@ -248,8 +248,7 @@
      * Fetches and caches a fresh favicon for a single bookmark.
      * Skips if another favicon update is already in flight.
      * @param {chrome.bookmarks.BookmarkTreeNode} node - The bookmark to update.
-     * @param {{ silent?: boolean }} [options]
-     * @param {boolean} [options.silent=false] - When true, suppresses the status message and re-render.
+     * @param {{ silent?: boolean }} [options] - `silent` (default false) suppresses the status message and re-render.
      * @returns {Promise<void>}
      */
     async function refreshBookmarkFavicon(node, { silent = false } = {}) {
