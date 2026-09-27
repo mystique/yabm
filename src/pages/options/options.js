@@ -33,12 +33,71 @@ const t = (key, substitutions) => window.YABMI18n.t(key, substitutions);
 
 /**
  * Get a DOM element by ID
- * @template {HTMLElement} T
  * @param {string} id - Element ID
- * @returns {T|null}
+ * @returns {HTMLElement|null}
  */
 function $(id) {
-  return /** @type {T|null} */ (document.getElementById(id));
+  return document.getElementById(id);
+}
+
+/**
+ * Get a DOM element by ID, throwing if it is missing
+ * @param {string} id - Element ID
+ * @returns {HTMLElement}
+ */
+function requireElement(id) {
+  const el = $(id);
+  if (!el) {
+    throw new Error(`Missing element #${id}`);
+  }
+  return el;
+}
+
+/**
+ * Get an input element by ID, throwing if it is missing or not an input
+ * @param {string} id - Element ID
+ * @returns {HTMLInputElement}
+ */
+function requireInput(id) {
+  const el = requireElement(id);
+  if (!(el instanceof HTMLInputElement)) {
+    throw new Error(`Element #${id} is not an input`);
+  }
+  return el;
+}
+
+/**
+ * Get a button element by ID, throwing if it is missing or not a button
+ * @param {string} id - Element ID
+ * @returns {HTMLButtonElement}
+ */
+function requireButton(id) {
+  const el = requireElement(id);
+  if (!(el instanceof HTMLButtonElement)) {
+    throw new Error(`Element #${id} is not a button`);
+  }
+  return el;
+}
+
+/**
+ * @typedef {object} FormElements
+ * @property {HTMLInputElement} directoryUrl - WebDAV directory URL input
+ * @property {HTMLInputElement} username - Username input
+ * @property {HTMLInputElement} password - Password input
+ * @property {HTMLInputElement} newFileName - New file name input
+ */
+
+/**
+ * Get the WebDAV form inputs, throwing if any is missing
+ * @returns {FormElements}
+ */
+function getFormElements() {
+  return {
+    directoryUrl: requireInput("directory-url"),
+    username: requireInput("username"),
+    password: requireInput("password"),
+    newFileName: requireInput("new-file-name"),
+  };
 }
 
 /**
@@ -138,8 +197,7 @@ function buildFileMetaHtml(file) {
  * @param {string} [selectedName] - File name to pre-select (if present)
  */
 function renderFileList(files, selectedName) {
-  const container = $("files-container");
-  if (!container) return;
+  const container = requireElement("files-container");
   container.innerHTML = "";
 
   // Create a new file entry
@@ -183,9 +241,11 @@ function renderFileList(files, selectedName) {
 
   // Try to find the exact file name
   for (const radio of radios) {
-    const input = /** @type {HTMLInputElement} */ (radio);
-    if (input.value === target) {
-      input.checked = true;
+    if (!(radio instanceof HTMLInputElement)) {
+      continue;
+    }
+    if (radio.value === target) {
+      radio.checked = true;
       selected = true;
       break;
     }
@@ -193,8 +253,8 @@ function renderFileList(files, selectedName) {
 
   // Fallback to "Create New" option if target file is not found
   if (!selected) {
-    const newRadio = /** @type {HTMLInputElement|null} */ (container.querySelector('input[value="__new__"]'));
-    if (newRadio) {
+    const newRadio = container.querySelector('input[value="__new__"]');
+    if (newRadio instanceof HTMLInputElement) {
       newRadio.checked = true;
     }
   }
@@ -205,14 +265,13 @@ function renderFileList(files, selectedName) {
  * @returns {string} - Selected file name (normalized if creating new)
  */
 function getSelectedFileName() {
-  const checked = /** @type {HTMLInputElement|null} */ (document.querySelector('input[name="file-select"]:checked'));
-  if (!checked) {
+  const checked = document.querySelector('input[name="file-select"]:checked');
+  if (!(checked instanceof HTMLInputElement)) {
     return "";
   }
 
   if (checked.value === "__new__") {
-    const input = /** @type {HTMLInputElement|null} */ ($("new-file-name"));
-    return normalizeFileName(input ? input.value : "");
+    return normalizeFileName(requireInput("new-file-name").value);
   }
 
   return checked.value;
@@ -227,39 +286,33 @@ async function loadSavedConfig() {
     return;
   }
 
-  const directoryUrl = /** @type {HTMLInputElement|null} */ ($("directory-url"));
-  const username = /** @type {HTMLInputElement|null} */ ($("username"));
-  const password = /** @type {HTMLInputElement|null} */ ($("password"));
-  const newFileName = /** @type {HTMLInputElement|null} */ ($("new-file-name"));
-
-  if (directoryUrl) directoryUrl.value = config.directoryUrl || "";
-  if (username) username.value = config.username || "";
-  if (password) password.value = config.password || "";
-  if (newFileName) newFileName.value = config.fileName || "bookmarks.html";
+  const form = getFormElements();
+  form.directoryUrl.value = config.directoryUrl || "";
+  form.username.value = config.username || "";
+  form.password.value = config.password || "";
+  form.newFileName.value = config.fileName || "bookmarks.html";
 }
 
 /**
  * Test WebDAV connection and list available files
  */
 async function testConnection() {
-  const testBtn = /** @type {HTMLButtonElement|null} */ ($("test-connection"));
-  const directoryUrlInput = /** @type {HTMLInputElement|null} */ ($("directory-url"));
-  const usernameInput = /** @type {HTMLInputElement|null} */ ($("username"));
-  const passwordInput = /** @type {HTMLInputElement|null} */ ($("password"));
-  const fileSection = $("file-section");
-  const newFileNameInput = /** @type {HTMLInputElement|null} */ ($("new-file-name"));
-
-  if (!testBtn || !directoryUrlInput || !usernameInput || !passwordInput || !fileSection || !newFileNameInput) {
-    return;
-  }
-
-  testBtn.disabled = true;
-  setStatus(t("testingConnection"), "");
+  /** @type {HTMLButtonElement|null} */
+  let testBtn = null;
+  /** @type {HTMLElement|null} */
+  let fileSection = null;
 
   try {
-    const directoryUrl = directoryUrlInput.value.trim();
-    const username = usernameInput.value.trim();
-    const password = passwordInput.value;
+    // Lookups stay inside the try so a missing element surfaces in the status
+    testBtn = requireButton("test-connection");
+    testBtn.disabled = true;
+    setStatus(t("testingConnection"), "");
+
+    fileSection = requireElement("file-section");
+    const form = getFormElements();
+    const directoryUrl = form.directoryUrl.value.trim();
+    const username = form.username.value.trim();
+    const password = form.password.value;
 
     const result = await window.YABMSync.listDirectoryFiles({
       directoryUrl,
@@ -272,7 +325,7 @@ async function testConnection() {
     state.files = result.files;
 
     fileSection.classList.remove("hidden");
-    renderFileList(result.files, normalizeFileName(newFileNameInput.value));
+    renderFileList(result.files, normalizeFileName(form.newFileName.value));
 
     if (!result.files.length) {
       setStatus(t("connSuccessNoFiles"), "success");
@@ -283,10 +336,14 @@ async function testConnection() {
     state.tested = false;
     state.directoryUrl = "";
     state.files = [];
-    fileSection.classList.add("hidden");
+    if (fileSection) {
+      fileSection.classList.add("hidden");
+    }
     setStatus(t("connectionFailed", [error.message]), "error");
   } finally {
-    testBtn.disabled = false;
+    if (testBtn) {
+      testBtn.disabled = false;
+    }
   }
 }
 
@@ -300,27 +357,22 @@ async function saveConfig() {
     return;
   }
 
-  const fileName = getSelectedFileName();
-  if (!fileName) {
-    setStatus(t("selectOrEnterFile"), "error");
-    return;
-  }
-
-  const usernameInput = /** @type {HTMLInputElement|null} */ ($("username"));
-  const passwordInput = /** @type {HTMLInputElement|null} */ ($("password"));
-
-  if (!usernameInput || !passwordInput) {
-    return;
-  }
-
-  const payload = {
-    directoryUrl: state.directoryUrl,
-    username: usernameInput.value.trim(),
-    password: passwordInput.value,
-    fileName
-  };
-
   try {
+    // Lookups stay inside the try so a missing element surfaces in the status
+    const fileName = getSelectedFileName();
+    if (!fileName) {
+      setStatus(t("selectOrEnterFile"), "error");
+      return;
+    }
+
+    const form = getFormElements();
+    const payload = {
+      directoryUrl: state.directoryUrl,
+      username: form.username.value.trim(),
+      password: form.password.value,
+      fileName
+    };
+
     await window.YABMSync.saveConfig(payload);
     setStatus(t("configurationSaved"), "success");
   } catch (error) {
@@ -332,25 +384,16 @@ async function saveConfig() {
  * Attach event listeners to form controls for interactivity
  */
 function bindEvents() {
-  const testBtn = $("test-connection");
-  const saveBtn = $("save-config");
-  const newFileNameInput = /** @type {HTMLInputElement|null} */ ($("new-file-name"));
-  const directoryUrlInput = $("directory-url");
-  const usernameInput = $("username");
-  const passwordInput = $("password");
-  const fileSection = $("file-section");
+  const form = getFormElements();
+  const fileSection = requireElement("file-section");
 
-  if (!testBtn || !saveBtn || !newFileNameInput || !directoryUrlInput || !usernameInput || !passwordInput || !fileSection) {
-    return;
-  }
-
-  testBtn.addEventListener("click", testConnection);
-  saveBtn.addEventListener("click", saveConfig);
+  requireElement("test-connection").addEventListener("click", testConnection);
+  requireElement("save-config").addEventListener("click", saveConfig);
 
   // Auto-switch radio when typing in new file name input
-  newFileNameInput.addEventListener("input", () => {
-    const newRadio = /** @type {HTMLInputElement|null} */ (document.querySelector('input[value="__new__"]'));
-    if (newRadio) {
+  form.newFileName.addEventListener("input", () => {
+    const newRadio = document.querySelector('input[value="__new__"]');
+    if (newRadio instanceof HTMLInputElement) {
       newRadio.checked = true;
     }
   });
@@ -366,9 +409,9 @@ function bindEvents() {
     fileSection.classList.add("hidden");
   };
 
-  directoryUrlInput.addEventListener("input", invalidate);
-  usernameInput.addEventListener("input", invalidate);
-  passwordInput.addEventListener("input", invalidate);
+  form.directoryUrl.addEventListener("input", invalidate);
+  form.username.addEventListener("input", invalidate);
+  form.password.addEventListener("input", invalidate);
 }
 
 /**

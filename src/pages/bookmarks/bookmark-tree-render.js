@@ -415,7 +415,7 @@
       await ensureFaviconCacheLoaded();
       const container = document.getElementById("bookmark-list");
       if (!container) {
-        return;
+        throw new Error("Missing element #bookmark-list");
       }
       const tree = await chrome.bookmarks.getTree();
       await pruneFaviconCacheForTree(tree);
