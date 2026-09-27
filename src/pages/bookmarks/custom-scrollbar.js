@@ -9,7 +9,6 @@
 (function () {
   /**
    * Factory that creates the scrollbar module.
-   * @returns {{ updateBookmarkListScrollbar: Function, startBookmarkScrollHold: Function, stopBookmarkScrollHold: Function, startBookmarkTrackPressScroll: Function, handleBookmarkThumbPointerDown: Function, handleBookmarkThumbPointerMove: Function, stopBookmarkThumbDrag: Function, isGlobalEventsBound: Function, setGlobalEventsBound: Function }}
    */
   function createScrollbarModule() {
     /**
@@ -26,7 +25,7 @@
 
     /**
      * Mutable state for the scrollbar's hold and drag interactions.
-     * @type {{ holdTimeoutId: number|null, holdIntervalId: number|null, holdDirection: number, holdTickFn: Function|null, dragPointerId: number|null, dragStartY: number, dragStartScrollTop: number, globalEventsBound: boolean }}
+     * @type {{ holdTimeoutId: number | null, holdIntervalId: number | null, holdDirection: number, holdTickFn: (() => boolean) | null, dragPointerId: number | null, dragStartY: number, dragStartScrollTop: number, globalEventsBound: boolean }}
      */
     const bookmarkScrollbarState = {
       holdTimeoutId: null,       // setTimeout handle for the initial hold delay.
@@ -105,11 +104,12 @@
         }
         return;
       }
-      if (!bookmarkScrollbarState.holdDirection) {
+      const direction = bookmarkScrollbarState.holdDirection;
+      if (!direction) {
         stopBookmarkScrollHold();
         return;
       }
-      scrollBookmarkListByStep(bookmarkScrollbarState.holdDirection, {
+      scrollBookmarkListByStep(/** @type {1 | -1} */ (direction), {
         behavior: "auto",
       });
     }
@@ -118,8 +118,7 @@
      * Begins a click-and-hold scroll sequence: fires one immediate tick then
      * starts a repeating interval after `holdInitialDelayMs`.
      * @param {1|-1} direction - Initial scroll direction.
-     * @param {{ tickFn?: (() => boolean)|null }} [options]
-     * @param {Function|null} [options.tickFn] - Custom tick function; return `false` to stop early.
+     * @param {{ tickFn?: (() => boolean) | null }} [options]
      */
     function startBookmarkScrollHold(direction, { tickFn = null } = {}) {
       stopBookmarkScrollHold();

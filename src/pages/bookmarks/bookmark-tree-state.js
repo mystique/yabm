@@ -7,8 +7,7 @@
 (function () {
   /**
    * Factory that creates the bookmark tree state module.
-   * @param {{ t: Function, updateBookmarkListScrollbar: Function }} deps
-   * @returns {{ applyOpenFolderIds: Function, createActionButton: Function, getFolderStats: Function, getNameForNode: Function, getOpenFolderIds: Function, getTopLevelFolders: Function, setAllFoldersOpen: Function, setFolderOpen: Function, toggleFolder: Function, updateTreeSummaryStats: Function }}
+   * @param {{ t: (key: string, substitutions?: string[]) => string, updateBookmarkListScrollbar: () => void }} deps
    */
   function createBookmarkTreeStateModule(deps) {
     const { t, updateBookmarkListScrollbar } = deps;
@@ -135,7 +134,7 @@
 
     /**
      * Creates a styled icon button for the folder/bookmark action bar.
-     * @param {{ ariaLabel: string, icon: string, onClick: (event: MouseEvent) => Promise<void>, danger?: boolean }} options
+     * @param {{ ariaLabel: string, icon: string, onClick: (event: MouseEvent) => Promise<void> | void, danger?: boolean }} options
      * @returns {HTMLButtonElement}
      */
     function createActionButton({ ariaLabel, icon, onClick, danger = false }) {
@@ -169,7 +168,7 @@
      */
     function setFolderOpen(details, open, animate = true) {
       const content = details.querySelector(":scope > .folder-content");
-      if (!content) {
+      if (!(content instanceof HTMLElement)) {
         details.open = open;
         return;
       }
@@ -182,7 +181,7 @@
         details.open = open;
         requestAnimationFrame(() => {
           updateBookmarkListScrollbar();
-          window.setTimeout(updateBookmarkListScrollbar, 30);
+          window.setTimeout(() => updateBookmarkListScrollbar(), 30);
         });
         return;
       }
@@ -205,7 +204,7 @@
         }, FOLDER_TOGGLE_ANIM_MS);
         requestAnimationFrame(() => {
           updateBookmarkListScrollbar();
-          window.setTimeout(updateBookmarkListScrollbar, FOLDER_TOGGLE_ANIM_MS + 20);
+          window.setTimeout(() => updateBookmarkListScrollbar(), FOLDER_TOGGLE_ANIM_MS + 20);
         });
         return;
       }
@@ -227,7 +226,7 @@
       }, FOLDER_TOGGLE_ANIM_MS);
       requestAnimationFrame(() => {
         updateBookmarkListScrollbar();
-        window.setTimeout(updateBookmarkListScrollbar, FOLDER_TOGGLE_ANIM_MS + 20);
+        window.setTimeout(() => updateBookmarkListScrollbar(), FOLDER_TOGGLE_ANIM_MS + 20);
       });
     }
 
@@ -246,11 +245,13 @@
     function setAllFoldersOpen(open) {
       const folders = document.querySelectorAll("#bookmark-list details.folder");
       for (const folder of folders) {
-        setFolderOpen(folder, open, true);
+        if (folder instanceof HTMLDetailsElement) {
+          setFolderOpen(folder, open, true);
+        }
       }
       requestAnimationFrame(() => {
         updateBookmarkListScrollbar();
-        window.setTimeout(updateBookmarkListScrollbar, FOLDER_TOGGLE_ANIM_MS + 20);
+        window.setTimeout(() => updateBookmarkListScrollbar(), FOLDER_TOGGLE_ANIM_MS + 20);
       });
     }
 
@@ -262,7 +263,7 @@
     function getOpenFolderIds() {
       return new Set(
         Array.from(document.querySelectorAll("#bookmark-list details.folder[open]"))
-          .map((el) => el.dataset.folderId)
+          .map((el) => (el instanceof HTMLElement ? el.dataset.folderId : undefined))
           .filter(Boolean),
       );
     }
@@ -279,7 +280,7 @@
 
       const folders = document.querySelectorAll("#bookmark-list details.folder");
       for (const folder of folders) {
-        if (openFolderIds.has(folder.dataset.folderId)) {
+        if (folder instanceof HTMLDetailsElement && folder.dataset.folderId && openFolderIds.has(folder.dataset.folderId)) {
           setFolderOpen(folder, true, false);
         }
       }

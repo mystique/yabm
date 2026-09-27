@@ -24,9 +24,19 @@ When continuing the modernization work in a new task:
 ## Current State
 
 - Current phase: Phase 1 complete, Phase 2 in progress
-- Overall status: Page-layer lint warnings resolved
-- Last updated: 2026-03-18
-- Recommended next task: bring `pages/options` into typecheck scope
+- Overall status: Phase 2 plan approved; documentation and ticket publication started
+- Last updated: 2026-09-27
+- Recommended next task: remove redundant Chrome runtime declarations, then bring `pages/options` into typecheck scope
+
+### 2026-09-27
+
+- Confirmed the Phase 2 strategy:
+  - strengthen script-tag factory modules instead of migrating to ESM;
+  - type-check the page layer incrementally;
+  - keep DOM helpers page-local until reuse is demonstrated;
+  - do not introduce a test framework or Phase 3 directory reorganization.
+- Synchronized the Phase 2 status and roadmap.
+- Published the Phase 2 specification at `.scratch/phase-2-modernization/spec.md` with `ready-for-agent` status.
 
 ## Completed Work
 
@@ -45,7 +55,7 @@ When continuing the modernization work in a new task:
 - Added TypeScript `checkJs` config in [tsconfig.json](tsconfig.json).
 - Added build pipeline in [tools/build.cjs](tools/build.cjs).
 - Added ambient globals in [types/yabm-globals.d.ts](types/yabm-globals.d.ts).
-- Updated [README.md](README.md), [AGENTS.md](AGENTS.md), and [CLAUDE.md](CLAUDE.md) to reflect the new workflow.
+- Updated [README.md](README.md) and [AGENTS.md](AGENTS.md) to reflect the tooling flow.
 - Tightened JSDoc in [src/lib/i18n.js](src/lib/i18n.js) and [src/lib/sync-utils.js](src/lib/sync-utils.js) so the shared-library typecheck baseline passes.
 
 ## Verification Log
@@ -107,17 +117,23 @@ Current `checkJs` scope does not yet include:
 
 ### Phase 2 Entry Tasks
 
-- [x] Remove the 3 existing page-layer ESLint warnings.
-- [ ] Add DOM narrowing helpers or local casting patterns for `src/pages/options/options.js`.
-- [ ] Expand `tsconfig.json` include scope to add `src/pages/options/**/*.js` once it passes.
-- [ ] Verify options page load, config save, and connection test after typecheck expansion.
-- [ ] Repeat the same process for bookmarks page modules in small batches instead of all at once.
+- [x] Synchronize the roadmap and operational status with the approved Phase 2 plan.
+- [x] Publish the Phase 2 tracer-bullet tickets under `.scratch/phase-2-modernization/issues/`.
+- [ ] Remove redundant Chrome runtime declarations.
+- [ ] Add local DOM narrowing and data-shape contracts for the options page.
+- [ ] Expand `tsconfig.json` to include the options page.
+- [ ] Verify options startup, configuration save/clear, and WebDAV connection test.
+- [ ] Add bookmarks foundational modules to `checkJs` in small batches.
+- [ ] Add bookmarks rendering/menu modules to `checkJs`.
+- [ ] Add bookmarks mutations/observers modules to `checkJs`.
+- [ ] Add bookmarks drag-and-drop module to `checkJs`.
+- [ ] Add bookmarks tree and page orchestrators to `checkJs`.
 
-### Phase 2 Follow-Up Tasks
+### Phase 2 Boundary and Acceptance Tasks
 
-- [ ] Identify the highest-risk `window.YABM*` access points and replace them with narrower dependencies.
-- [ ] Decide whether runtime ESM migration is still desired after page-level type safety improves.
-- [ ] If runtime ESM remains desired, document the exact migration path before changing HTML script loading.
+- [ ] Audit global reads and keep runtime-global access concentrated in page bootstrap code.
+- [ ] Run the complete Phase 2 acceptance checks and record the evidence.
+- [ ] Record that runtime ESM remains deferred during this phase.
 
 ### Phase 3 Preparation Tasks
 

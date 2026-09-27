@@ -6,27 +6,28 @@
 (function () {
   /**
    * Factory that creates an isolated notifications module instance.
-   * @returns {{ showTopToast: Function, hideTopToast: Function, showTopProgress: Function, hideTopProgress: Function, updateTopProgress: Function }}
    */
   function createNotificationsModule() {
-    // Pending auto-dismiss timer for the toast; cleared on early hide or re-show.
+    /** @type {number | null} */
     let topToastTimer = null;
-    // Pending CSS-transition cleanup timer that resets toast DOM after it fades out.
+    /** @type {number | null} */
     let topToastHideTimer = null;
-    // Reference count of concurrent callers that have requested the progress bar.
-    // The bar stays visible until every caller invokes hideTopProgress().
+    /** @type {number} */
     let topProgressActiveCount = 0;
-    // Timer used to fully hide and reset the progress bar after its CSS fade-out.
+    /** @type {number | null} */
     let topProgressHideTimer = null;
 
     /**
      * Returns the top progress bar container and its inner bar element.
-     * @returns {{ progress: HTMLElement|null, bar: HTMLElement|null }}
+     * @returns {{ progress: HTMLElement | null, bar: HTMLElement | null }}
      */
     function getTopProgressElements() {
       const progress = document.getElementById("top-progress");
-      const bar = progress?.querySelector(".top-progress-bar") || null;
-      return { progress, bar };
+      const bar = progress?.querySelector(".top-progress-bar");
+      return {
+        progress,
+        bar: bar instanceof HTMLElement ? bar : null
+      };
     }
 
     /**

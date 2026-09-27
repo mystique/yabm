@@ -28,7 +28,7 @@ Do not use this document as a daily progress log. Update [docs/modernization/STA
 | Phase | Name | Status | Outcome |
 | --- | --- | --- | --- |
 | 1 | Tooling Baseline | Completed | Build, lint, and JSDoc type checking exist and are documented |
-| 2 | Module Boundary Modernization | Not started | Reduce global coupling and make page code safer to evolve |
+| 2 | Module Boundary Modernization | In progress | Bring page code into the checkable dependency model while preserving script-tag runtime loading |
 | 3 | Directory and Feature Architecture | Not started | Reorganize the repo into a more modern app/core/shared/features structure |
 
 ## Phase 1: Tooling Baseline
@@ -52,7 +52,7 @@ Introduce modern engineering guardrails without changing runtime behavior.
 - added [tsconfig.json](tsconfig.json) for JSDoc-based type checking
 - added [tools/build.cjs](tools/build.cjs) to copy `src/` to `dist/` and transpile JavaScript with esbuild
 - added [types/yabm-globals.d.ts](types/yabm-globals.d.ts) for current global namespace declarations
-- updated [README.md](README.md), [AGENTS.md](AGENTS.md), and [CLAUDE.md](CLAUDE.md) to describe the tooling flow
+- updated [README.md](../../README.md) and [AGENTS.md](../../AGENTS.md) to describe the tooling flow
 
 ### Acceptance Criteria
 
@@ -69,8 +69,8 @@ Completed.
 
 ### Known Residual Items
 
-- ESLint still reports 3 existing warnings in page scripts
-- page scripts are not yet included in `checkJs` scope
+- Page scripts still need to enter the formal `checkJs` scope.
+- Runtime globals remain a deliberate compatibility boundary until page-layer type safety is stable.
 
 ## Phase 2: Module Boundary Modernization
 
@@ -87,20 +87,22 @@ Make the page code less fragile by reducing manual global coupling and improving
 
 ### Recommended Task Order
 
-1. Clean the current lint baseline in page scripts.
-2. Add JSDoc narrowing and helper utilities so `pages/options` can enter `typecheck` scope.
-3. Add JSDoc narrowing and helper utilities so `pages/bookmarks` modules can enter `typecheck` scope incrementally.
-4. Replace the most brittle implicit globals with narrower dependency injection boundaries.
-5. Decide whether to stop at stronger script-tag modules or to migrate build output to ESM entry points.
-6. If migrating to ESM output, keep behavior parity and script ordering guarantees explicitly tested.
+1. Synchronize the roadmap and operational status with the agreed Phase 2 plan.
+2. Remove the redundant Chrome runtime declarations and keep the existing page namespace declarations as a temporary boundary.
+3. Add local DOM narrowing and data-shape contracts to the options page, then include it in `checkJs`.
+4. Verify options startup, configuration, and WebDAV test flows in Chrome.
+5. Add bookmarks foundational modules to `checkJs` in small dependency-ordered batches.
+6. Add bookmarks rendering/menu, mutation/observer, drag-and-drop, and orchestrator modules in sequence.
+7. Audit global reads and keep runtime-global access concentrated in page bootstrap code.
+8. Run the Phase 2 acceptance checks and record that ESM remains deferred.
 
 ### Suggested Deliverables
 
 - zero or near-zero lint warnings in `src/pages/`
-- `pages/options` included in `typecheck`
-- `pages/bookmarks` included in `typecheck`
+- `pages/options` included in `checkJs`
+- `pages/bookmarks` included in `checkJs`
 - fewer direct cross-file global reads in large page entry files
-- a written migration note describing whether runtime ESM is now approved
+- a written decision that runtime ESM remains deferred during this phase
 
 ### Acceptance Criteria
 
@@ -109,6 +111,16 @@ Make the page code less fragile by reducing manual global coupling and improving
 - no regressions in bookmarks page startup
 - no regressions in configuration modal and options page flows
 - no regressions in WebDAV upload/download/test flows
+- the existing script-tag runtime model remains intact
+- the final verification evidence is recorded in `STATUS.md`
+
+### Phase 2 Decisions
+
+- The phase will strengthen script-tag modules and factory boundaries; it will not migrate runtime loading to ESM.
+- The options page remains a bootstrap script rather than gaining a new factory layer.
+- DOM helpers remain page-local until reuse across pages is demonstrated.
+- No new test framework or top-level directory reorganization is included.
+- The implementation plan and tracer-bullet tickets are published in `.scratch/phase-2-modernization/`.
 
 ### Risks
 

@@ -18,6 +18,9 @@
     "src/background/**/*.js",
     "src/lib/**/*.js",
     "src/pages/options/**/*.js",
+    "src/pages/bookmarks/bookmark-tree-state.js",
+    "src/pages/bookmarks/custom-scrollbar.js",
+    "src/pages/bookmarks/notifications.js",
     "tools/**/*.cjs",
     "types/**/*.d.ts"
   ],
