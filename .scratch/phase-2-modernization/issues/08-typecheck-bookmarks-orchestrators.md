@@ -4,7 +4,9 @@
 
 **Blocked by:** 05: Typecheck bookmarks render and menu modules; 06: Typecheck bookmark mutations and observers; 07: Typecheck bookmark drag-and-drop.
 
-**Status:** done
+**Status:** ready-for-human
+
+Code is done; only the manual Chrome check remains.
 
 - [x] Make the orchestrator dependency object and returned module API explicit enough for page-layer typechecking.
 - [x] Correct DOM, event, callback, and spread-argument contracts in the page bootstrap.

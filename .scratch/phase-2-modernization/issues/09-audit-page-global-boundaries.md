@@ -4,7 +4,9 @@
 
 **Blocked by:** 03: Verify options configuration flows; 08: Typecheck bookmarks orchestrators.
 
-**Status:** done
+**Status:** ready-for-human
+
+Code is done; only the manual Chrome check remains.
 
 - [x] Inventory direct runtime-global reads in the page layer.
 - [x] Keep intentional service acquisition in page bootstrap code.

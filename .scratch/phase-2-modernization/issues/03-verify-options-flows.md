@@ -4,14 +4,16 @@
 
 **Blocked by:** 02: Bring the options page into typecheck.
 
-**Status:** done
+**Status:** ready-for-human
 
-- [x] Verify options page startup in Chrome.
-- [x] Verify saved configuration loading and form population.
-- [x] Verify WebDAV connection testing and remote file listing.
-- [x] Verify configuration save and clear flows.
-- [x] Verify user-visible error status for failed operations.
-- [x] Record the verification commands and Chrome smoke-test result.
+Automated checks and code analysis are done; the manual Chrome smoke test below is still pending.
+
+- [ ] Verify options page startup in Chrome.
+- [ ] Verify saved configuration loading and form population.
+- [ ] Verify WebDAV connection testing and remote file listing.
+- [ ] Verify configuration save and clear flows.
+- [ ] Verify user-visible error status for failed operations.
+- [ ] Record the verification commands and Chrome smoke-test result. (Commands recorded; Chrome smoke-test result pending.)
 
 ## Verification Results
 

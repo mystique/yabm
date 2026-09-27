@@ -7,7 +7,7 @@
 **Status:** done
 
 - [x] Add page-local DOM narrowing for form controls, status elements, and file-list elements.
-- [x] Narrow event targets before reading form values or control state.
+- [x] Narrow event targets before reading form values or control state. (No options handler reads `event.target`, so the only narrowing needed was for elements.)
 - [x] Represent file metadata and byte-size values accurately at the page boundary.
 - [x] Include the options page in the formal JSDoc typecheck scope.
 - [x] Make `npm run lint` and `npm run typecheck` pass.
