@@ -4,10 +4,10 @@
 
 **Blocked by:** 05: Typecheck bookmarks render and menu modules; 06: Typecheck bookmark mutations and observers; 07: Typecheck bookmark drag-and-drop.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Make the orchestrator dependency object and returned module API explicit enough for page-layer typechecking.
-- [ ] Correct DOM, event, callback, and spread-argument contracts in the page bootstrap.
-- [ ] Keep runtime-global reads intentional at the bootstrap boundary.
-- [ ] Preserve module load order and bookmarks page startup behavior.
-- [ ] Verify bookmark CRUD, folder interactions, menus, drag-and-drop, and status updates in Chrome.
+- [x] Make the orchestrator dependency object and returned module API explicit enough for page-layer typechecking.
+- [x] Correct DOM, event, callback, and spread-argument contracts in the page bootstrap.
+- [x] Keep runtime-global reads intentional at the bootstrap boundary.
+- [x] Preserve module load order and bookmarks page startup behavior.
+- [ ] Verify bookmark CRUD, folder interactions, menus, drag-and-drop, and status updates in Chrome. (Pending manual Chrome verification: agent could not drive the Chrome UI.)
