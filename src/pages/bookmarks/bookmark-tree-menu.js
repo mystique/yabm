@@ -11,11 +11,33 @@
  * @property {(extraOpenFolderIds?: string[]) => Promise<void>} rerenderAfterTreeChange
  */
 
+/**
+ * A single entry in the tree context menu; `type: "divider"` renders a separator.
+ * @typedef {Object} TreeContextMenuItem
+ * @property {string} [label]
+ * @property {string} [icon]
+ * @property {boolean} [danger]
+ * @property {string} [type]
+ * @property {() => void | Promise<void>} [onClick]
+ */
+
+/**
+ * Public API returned by `createBookmarkTreeMenuModule`.
+ * @typedef {Object} MenuModule
+ * @property {() => void} closeSortMenu
+ * @property {() => void} closeTreeContextMenu
+ * @property {(descending: boolean) => Promise<void>} handleSortMenuApply
+ * @property {() => boolean} isTreeContextMenuOpen
+ * @property {(folderNode: chrome.bookmarks.BookmarkTreeNode, anchorEl: HTMLElement) => void} openSortMenu
+ * @property {(options: { x: number, y: number, items: TreeContextMenuItem[] }) => void} openTreeContextMenu
+ * @property {(folderId: string, descending: boolean) => Promise<void>} sortFolderAndRerender
+ */
+
 (function () {
   /**
    * Factory that creates the bookmark tree menu module.
    * @param {MenuModuleDeps} deps
-   * @returns {{ closeSortMenu: () => void, closeTreeContextMenu: () => void, handleSortMenuApply: (descending: boolean) => Promise<void>, isTreeContextMenuOpen: () => boolean, openSortMenu: (folderNode: chrome.bookmarks.BookmarkTreeNode, anchorEl: HTMLElement) => void, openTreeContextMenu: (options: { x: number, y: number, items: Array<{label?: string, icon?: string, danger?: boolean, type?: string, onClick?: () => void | Promise<void>}> }) => void, sortFolderAndRerender: (folderId: string, descending: boolean) => Promise<void> }}
+   * @returns {MenuModule}
    */
   function createBookmarkTreeMenuModule(deps) {
     const { t, runBookmarkMutation, rerenderAfterTreeChange } = deps;

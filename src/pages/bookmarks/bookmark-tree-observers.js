@@ -88,14 +88,7 @@
      * Each event triggers a debounced refresh so the UI reflects external changes
      * (e.g. changes made in the Chrome bookmark manager or another extension).
      * No-ops if the bookmarks API is unavailable (e.g. in non-extension contexts).
-     *
-     * Chrome bookmark event signatures:
-     * - onCreated: (id: string, bookmark: chrome.bookmarks.BookmarkTreeNode) => void
-     * - onRemoved: (id: string, removeInfo: {parentId: string, index: number, node: chrome.bookmarks.BookmarkTreeNode}) => void
-     * - onChanged: (id: string, changeInfo: {title: string, url?: string}) => void
-     * - onMoved: (id: string, moveInfo: {parentId: string, index: number, oldParentId: string, oldIndex: number}) => void
-     * - onChildrenReordered: (id: string, reorderInfo: {childIds: string[]}) => void
-     * - onImportEnded: () => void
+     * Event payloads are ignored; every event only schedules a refresh.
      *
      * @returns {void}
      */
