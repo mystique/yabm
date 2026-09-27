@@ -8,7 +8,9 @@
 (function () {
   /**
    * Factory that creates the modals module.
-   * @param {{ t: Function, setStatus: Function, showTopToast: Function, setWebdavStatusIndicator: Function, refreshWebdavStatusBar: Function }} deps
+   * `sync` is the page's `window.YABMSync` service, injected by bookmarks.js so this
+   * module does not read the shared-library global directly.
+   * @param {{ t: Function, setStatus: Function, showTopToast: Function, setWebdavStatusIndicator: Function, refreshWebdavStatusBar: Function, sync: { getConfig: Function, saveConfig: Function, clearConfig: Function, listDirectoryFiles: Function } }} deps
    * @returns {{ openModal: Function, closeModal: Function, openConfigModal: Function, closeConfigModal: Function, openPromptModal: Function, openEditorModal: Function, testConfigConnection: Function, saveConfigFromModal: Function, clearConfigFromModal: Function, invalidateConfigTest: Function }}
    */
   function createModalsModule(deps) {
@@ -17,6 +19,7 @@
       setStatus,
       showTopToast,
       refreshWebdavStatusBar,
+      sync,
     } = deps;
 
     /** CSS transition duration for modal open/close animations (ms). */
@@ -312,7 +315,7 @@
       const modal = document.getElementById("config-modal");
       openModal(modal);
 
-      const config = await window.YABMSync.getConfig();
+      const config = await sync.getConfig();
       if (!config) {
         return;
       }
@@ -354,7 +357,7 @@
         const username = document.getElementById("cfg-username").value.trim();
         const password = document.getElementById("cfg-password").value;
 
-        const result = await window.YABMSync.listDirectoryFiles({
+        const result = await sync.listDirectoryFiles({
           directoryUrl,
           username,
           password,
@@ -411,7 +414,7 @@
       };
 
       try {
-        await window.YABMSync.saveConfig(payload);
+        await sync.saveConfig(payload);
         setConfigStatus(t("configurationSaved"), "success");
         setStatus(t("configurationSaved"), "success");
         closeConfigModal();
@@ -438,7 +441,7 @@
       }
 
       try {
-        await window.YABMSync.clearConfig();
+        await sync.clearConfig();
         document.getElementById("cfg-directory-url").value = "";
         document.getElementById("cfg-username").value = "";
         document.getElementById("cfg-password").value = "";

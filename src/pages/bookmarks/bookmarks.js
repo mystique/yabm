@@ -322,6 +322,7 @@ const modalsModule = window.YABMModalsModule.createModalsModule({
   refreshWebdavStatusBar: (
     /** @type {Parameters<BookmarkTreeModuleDeps["refreshWebdavStatusBar"]>} */ ...args
   ) => refreshWebdavStatusBar(...args),
+  sync: window.YABMSync,
 });
 
 const {
