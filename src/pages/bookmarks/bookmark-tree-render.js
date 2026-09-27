@@ -5,41 +5,41 @@
  * full render cycle (favicon cache load, tree fetch, fragment swap).
  * Exposed as `window.YABMBookmarkTreeRenderModule`.
  */
-(function () {
-  /**
-   * @typedef {Object} RenderModuleDeps
-   * @property {(key: string, substitutions?: string[]) => string} t
-   * @property {(openFolderIds: Set<string> | null) => void} applyOpenFolderIds
-   * @property {(options: { ariaLabel: string, icon: string, onClick: (event: MouseEvent) => Promise<void> | void, danger?: boolean }) => HTMLButtonElement} createActionButton
-   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => string | null} getCachedFaviconForBookmark
-   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => { bookmarkCount: number, folderCount: number }} getFolderStats
-   * @property {() => Set<string>} getOpenFolderIds
-   * @property {(tree: chrome.bookmarks.BookmarkTreeNode[]) => chrome.bookmarks.BookmarkTreeNode[]} getTopLevelFolders
-   * @property {() => Promise<void>} ensureFaviconCacheLoaded
-   * @property {(tree: chrome.bookmarks.BookmarkTreeNode[]) => Promise<void>} pruneFaviconCacheForTree
-   * @property {() => void} closeEditContextMenu
-   * @property {() => void} closeTreeContextMenu
-   * @property {() => void} closeSortMenu
-   * @property {(options: { x: number, y: number, items: Array<{ label?: string, icon?: string, danger?: boolean, type?: string, onClick?: () => void | Promise<void> }> }) => void} openTreeContextMenu
-   * @property {(folderNode: chrome.bookmarks.BookmarkTreeNode, anchorEl: HTMLElement) => void} openSortMenu
-   * @property {(event: DragEvent, node: chrome.bookmarks.BookmarkTreeNode, nodeType: 'bookmark' | 'folder') => void} handleNodeDragStart
-   * @property {(event: DragEvent) => void} handleNodeDragEnd
-   * @property {(details: HTMLDetailsElement) => void} toggleFolder
-   * @property {(details: HTMLDetailsElement, open: boolean, animate?: boolean) => void} setFolderOpen
-   * @property {(folders: chrome.bookmarks.BookmarkTreeNode[]) => void} updateTreeSummaryStats
-   * @property {() => void} updateMainLayoutMetrics
-   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} copyBookmarkUrl
-   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} refreshBookmarkFaviconWithStatus
-   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} refreshFolderFavicons
-   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} deleteBookmarkNode
-   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} deleteFolderNode
-   * @property {(parentNode: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} addFolderNode
-   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} editFolderNode
-   * @property {(parentNode: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} addBookmarkNode
-   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} editBookmarkNode
-   * @property {(folderId: string, descending: boolean) => Promise<void>} sortFolderAndRerender
-   */
+/**
+ * @typedef {Object} RenderModuleDeps
+ * @property {(key: string, substitutions?: string[]) => string} t
+ * @property {(openFolderIds: Set<string> | null) => void} applyOpenFolderIds
+ * @property {(options: { ariaLabel: string, icon: string, onClick: (event: MouseEvent) => Promise<void> | void, danger?: boolean }) => HTMLButtonElement} createActionButton
+ * @property {(node: chrome.bookmarks.BookmarkTreeNode) => string | null} getCachedFaviconForBookmark
+ * @property {(node: chrome.bookmarks.BookmarkTreeNode) => { bookmarkCount: number, folderCount: number }} getFolderStats
+ * @property {() => Set<string>} getOpenFolderIds
+ * @property {(tree: chrome.bookmarks.BookmarkTreeNode[]) => chrome.bookmarks.BookmarkTreeNode[]} getTopLevelFolders
+ * @property {() => Promise<void>} ensureFaviconCacheLoaded
+ * @property {(tree: chrome.bookmarks.BookmarkTreeNode[]) => Promise<void>} pruneFaviconCacheForTree
+ * @property {() => void} closeEditContextMenu
+ * @property {() => void} closeTreeContextMenu
+ * @property {() => void} closeSortMenu
+ * @property {(options: { x: number, y: number, items: Array<{ label?: string, icon?: string, danger?: boolean, type?: string, onClick?: () => void | Promise<void> }> }) => void} openTreeContextMenu
+ * @property {(folderNode: chrome.bookmarks.BookmarkTreeNode, anchorEl: HTMLElement) => void} openSortMenu
+ * @property {(event: DragEvent, node: chrome.bookmarks.BookmarkTreeNode, nodeType: 'bookmark' | 'folder') => void} handleNodeDragStart
+ * @property {(event: DragEvent) => void} handleNodeDragEnd
+ * @property {(details: HTMLDetailsElement) => void} toggleFolder
+ * @property {(details: HTMLDetailsElement, open: boolean, animate?: boolean) => void} setFolderOpen
+ * @property {(folders: chrome.bookmarks.BookmarkTreeNode[]) => void} updateTreeSummaryStats
+ * @property {() => void} updateMainLayoutMetrics
+ * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} copyBookmarkUrl
+ * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} refreshBookmarkFaviconWithStatus
+ * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} refreshFolderFavicons
+ * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} deleteBookmarkNode
+ * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} deleteFolderNode
+ * @property {(parentNode: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} addFolderNode
+ * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} editFolderNode
+ * @property {(parentNode: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} addBookmarkNode
+ * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} editBookmarkNode
+ * @property {(folderId: string, descending: boolean) => Promise<void>} sortFolderAndRerender
+ */
 
+(function () {
   /**
    * Factory that creates the bookmark tree render module.
    * @param {RenderModuleDeps} deps - All dependency functions injected by the orchestrator.

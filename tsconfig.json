@@ -24,6 +24,8 @@
     "src/pages/bookmarks/bookmark-tree-mutations.js",
     "src/pages/bookmarks/bookmark-tree-observers.js",
     "src/pages/bookmarks/bookmark-tree-dnd.js",
+    "src/pages/bookmarks/bookmark-tree.js",
+    "src/pages/bookmarks/bookmarks.js",
     "src/pages/bookmarks/custom-scrollbar.js",
     "src/pages/bookmarks/notifications.js",
     "tools/**/*.cjs",

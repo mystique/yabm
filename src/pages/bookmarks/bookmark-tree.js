@@ -5,14 +5,56 @@
  * Provides a single entry point (`createBookmarkTreeModule`) consumed by bookmarks.js.
  * Exposed as `window.YABMBookmarkTreeModule`.
  */
+
+/**
+ * @typedef {import("./bookmark-tree-render.js").RenderModuleDeps} RenderModuleDeps
+ * @typedef {import("./bookmark-tree-menu.js").MenuModuleDeps} MenuModuleDeps
+ */
+
+/**
+ * Dependencies injected by the bookmarks page bootstrap (bookmarks.js).
+ * @typedef {Object} BookmarkTreeModuleDeps
+ * @property {RenderModuleDeps["t"]} t
+ * @property {RenderModuleDeps["getCachedFaviconForBookmark"]} getCachedFaviconForBookmark
+ * @property {(node: chrome.bookmarks.BookmarkTreeNode) => chrome.bookmarks.BookmarkTreeNode[]} getBookmarkNodesInFolder
+ * @property {RenderModuleDeps["copyBookmarkUrl"]} copyBookmarkUrl
+ * @property {(node: chrome.bookmarks.BookmarkTreeNode, options?: { silent?: boolean }) => Promise<void>} refreshBookmarkFavicon
+ * @property {RenderModuleDeps["refreshFolderFavicons"]} refreshFolderFavicons
+ * @property {(ids: string[]) => Promise<void>} removeFaviconsByBookmarkIds
+ * @property {(rawUrl: string) => string} ensureValidUrl
+ * @property {RenderModuleDeps["ensureFaviconCacheLoaded"]} ensureFaviconCacheLoaded
+ * @property {RenderModuleDeps["pruneFaviconCacheForTree"]} pruneFaviconCacheForTree
+ * @property {(message: string, type: 'success'|'error'|'') => void} setStatus
+ * @property {(options: { title?: string, message?: string, confirmLabel?: string, cancelLabel?: string }) => Promise<boolean>} openPromptModal
+ * @property {(options: { title?: string, nameLabel?: string, nameValue?: string, urlValue?: string, urlVisible?: boolean, saveLabel?: string }) => Promise<{ name: string, url: string } | null>} openEditorModal
+ * @property {RenderModuleDeps["closeEditContextMenu"]} closeEditContextMenu
+ * @property {RenderModuleDeps["updateMainLayoutMetrics"]} updateMainLayoutMetrics
+ * @property {() => void} updateBookmarkListScrollbar
+ * @property {(options?: { interactive?: boolean }) => Promise<void>} refreshWebdavStatusBar
+ */
+
+/**
+ * Public API returned by `createBookmarkTreeModule`.
+ * @typedef {Object} BookmarkTreeModule
+ * @property {() => void} bindBookmarkTreeObservers
+ * @property {RenderModuleDeps["closeTreeContextMenu"]} closeTreeContextMenu
+ * @property {RenderModuleDeps["closeSortMenu"]} closeSortMenu
+ * @property {(container: HTMLElement) => { attach: Function, detach: Function, clearCurrentHighlight: Function }} createContainerDragHandlers
+ * @property {(descending: boolean) => Promise<void>} handleSortMenuApply
+ * @property {() => boolean} isTreeContextMenuOpen
+ * @property {(openFolderIds?: Set<string> | null) => Promise<void>} renderBookmarks
+ * @property {MenuModuleDeps["rerenderAfterTreeChange"]} rerenderAfterTreeChange
+ * @property {(open: boolean) => void} setAllFoldersOpen
+ */
+
 (function () {
   /**
    * Factory that instantiates and composes all bookmark tree sub-modules.
    * The `renderBookmarks` function is late-bound via a proxy so that sub-modules
    * (observers, mutations) can reference it before the render module is created.
    *
-   * @param {{ t: Function, getCachedFaviconForBookmark: Function, getBookmarkNodesInFolder: Function, copyBookmarkUrl: Function, refreshBookmarkFavicon: Function, refreshFolderFavicons: Function, removeFaviconsByBookmarkIds: Function, ensureValidUrl: Function, ensureFaviconCacheLoaded: Function, pruneFaviconCacheForTree: Function, setStatus: Function, openPromptModal: Function, openEditorModal: Function, closeEditContextMenu: Function, updateMainLayoutMetrics: Function, updateBookmarkListScrollbar: Function, refreshWebdavStatusBar: Function }} deps
-   * @returns {{ bindBookmarkTreeObservers: Function, closeTreeContextMenu: Function, closeSortMenu: Function, createContainerDragHandlers: Function, handleSortMenuApply: Function, isTreeContextMenuOpen: Function, renderBookmarks: Function, rerenderAfterTreeChange: Function, setAllFoldersOpen: Function }}
+   * @param {BookmarkTreeModuleDeps} deps
+   * @returns {BookmarkTreeModule}
    */
   function createBookmarkTreeModule(deps) {
     const {
@@ -57,6 +99,7 @@
     // Placeholder replaced after the render module is created.
     // Using an indirect reference like this avoids circular initialisation
     // when observers and mutations need to trigger re-renders.
+    /** @type {BookmarkTreeModule["renderBookmarks"]} */
     let renderBookmarks = async () => {};
 
     const observersModule =
@@ -64,7 +107,9 @@
         t,
         setStatus,
         getOpenFolderIds,
-        renderBookmarks: (...args) => renderBookmarks(...args),
+        renderBookmarks: (
+          /** @type {Parameters<BookmarkTreeModule["renderBookmarks"]>} */ ...args
+        ) => renderBookmarks(...args),
         refreshWebdavStatusBar,
       });
     const { bindBookmarkTreeObservers, rerenderAfterTreeChange } = observersModule;
@@ -94,7 +139,9 @@
         openPromptModal,
         openEditorModal,
         rerenderAfterTreeChange,
-        renderBookmarks: (...args) => renderBookmarks(...args),
+        renderBookmarks: (
+          /** @type {Parameters<BookmarkTreeModule["renderBookmarks"]>} */ ...args
+        ) => renderBookmarks(...args),
       });
     const {
       addBookmarkNode,

@@ -4,14 +4,14 @@
  * Handles rendering, positioning, open/close lifecycle, and sort operations.
  * Exposed as `window.YABMBookmarkTreeMenuModule`.
  */
-(function () {
-  /**
-   * @typedef {Object} MenuModuleDeps
-   * @property {(key: string, substitutions?: string[]) => string} t
-   * @property {(run: () => Promise<any>, options?: { successKey?: string, errorKey?: string, afterSuccess?: () => Promise<void> | void }) => Promise<void>} runBookmarkMutation
-   * @property {(extraOpenFolderIds?: string[]) => Promise<void>} rerenderAfterTreeChange
-   */
+/**
+ * @typedef {Object} MenuModuleDeps
+ * @property {(key: string, substitutions?: string[]) => string} t
+ * @property {(run: () => Promise<any>, options?: { successKey?: string, errorKey?: string, afterSuccess?: () => Promise<void> | void }) => Promise<void>} runBookmarkMutation
+ * @property {(extraOpenFolderIds?: string[]) => Promise<void>} rerenderAfterTreeChange
+ */
 
+(function () {
   /**
    * Factory that creates the bookmark tree menu module.
    * @param {MenuModuleDeps} deps

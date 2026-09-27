@@ -14,6 +14,11 @@
  *   - window.YABMBookmarkTreeModule
  */
 
+/**
+ * @typedef {import("./bookmark-tree.js").BookmarkTreeModule} BookmarkTreeModule
+ * @typedef {import("./bookmark-tree.js").BookmarkTreeModuleDeps} BookmarkTreeModuleDeps
+ */
+
 /** Shorthand wrapper around the active i18n translation function. */
 const t = (key, substitutions) => window.YABMI18n.t(key, substitutions);
 
@@ -191,6 +196,7 @@ const {
 
 // Proxy so sub-module factories (faviconModule, etc.) can reference rerenderAfterTreeChange
 // before the tree module assigns the real implementation.
+/** @type {BookmarkTreeModule["rerenderAfterTreeChange"]} */
 let rerenderAfterTreeChange = async () => {};
 
 const faviconModule = window.YABMFaviconCacheModule.createFaviconCacheModule({
@@ -200,7 +206,9 @@ const faviconModule = window.YABMFaviconCacheModule.createFaviconCacheModule({
   showTopProgress,
   hideTopProgress,
   updateTopProgress,
-  rerenderAfterTreeChange: (...args) => rerenderAfterTreeChange(...args),
+  rerenderAfterTreeChange: (
+    /** @type {Parameters<BookmarkTreeModule["rerenderAfterTreeChange"]>} */ ...args
+  ) => rerenderAfterTreeChange(...args),
 });
 
 const {
@@ -282,7 +290,9 @@ function getWebdavIndicatorTooltip(text) {
  */
 function setWebdavStatusIndicator(stateKey, tooltipText) {
   const indicator = document.getElementById("webdav-status-indicator");
-  const icon = document.getElementById("webdav-status-icon");
+  const icon = /** @type {HTMLImageElement|null} */ (
+    document.getElementById("webdav-status-icon")
+  );
   if (!indicator || !icon) {
     return;
   }
@@ -301,6 +311,7 @@ function setWebdavStatusIndicator(stateKey, tooltipText) {
 }
 
 // Proxy — replaced by the real implementation after all modules and DOM refs are ready.
+/** @type {BookmarkTreeModuleDeps["refreshWebdavStatusBar"]} */
 let refreshWebdavStatusBar = async () => {};
 
 const modalsModule = window.YABMModalsModule.createModalsModule({
@@ -308,7 +319,9 @@ const modalsModule = window.YABMModalsModule.createModalsModule({
   setStatus,
   showTopToast,
   setWebdavStatusIndicator,
-  refreshWebdavStatusBar: (...args) => refreshWebdavStatusBar(...args),
+  refreshWebdavStatusBar: (
+    /** @type {Parameters<BookmarkTreeModuleDeps["refreshWebdavStatusBar"]>} */ ...args
+  ) => refreshWebdavStatusBar(...args),
 });
 
 const {
@@ -340,7 +353,8 @@ function updateMainLayoutMetrics() {
   updateBookmarkListScrollbar();
 }
 
-const treeModule = window.YABMBookmarkTreeModule.createBookmarkTreeModule({
+/** @type {BookmarkTreeModuleDeps} */
+const treeModuleDeps = {
   t,
   getCachedFaviconForBookmark,
   getBookmarkNodesInFolder,
@@ -357,16 +371,30 @@ const treeModule = window.YABMBookmarkTreeModule.createBookmarkTreeModule({
   closeEditContextMenu,
   updateMainLayoutMetrics,
   updateBookmarkListScrollbar,
-  refreshWebdavStatusBar: (...args) => refreshWebdavStatusBar(...args),
-});
+  refreshWebdavStatusBar: (
+    /** @type {Parameters<BookmarkTreeModuleDeps["refreshWebdavStatusBar"]>} */ ...args
+  ) => refreshWebdavStatusBar(...args),
+};
 
+/** @type {BookmarkTreeModule} */
+const treeModule =
+  window.YABMBookmarkTreeModule.createBookmarkTreeModule(treeModuleDeps);
+
+/** @type {BookmarkTreeModule["bindBookmarkTreeObservers"]} */
 let bindBookmarkTreeObservers;
+/** @type {BookmarkTreeModule["closeSortMenu"]} */
 let closeSortMenu;
+/** @type {BookmarkTreeModule["closeTreeContextMenu"]} */
 let closeTreeContextMenu;
+/** @type {BookmarkTreeModule["createContainerDragHandlers"]} */
 let createContainerDragHandlers;
+/** @type {BookmarkTreeModule["handleSortMenuApply"]} */
 let handleSortMenuApply;
+/** @type {BookmarkTreeModule["isTreeContextMenuOpen"]} */
 let isTreeContextMenuOpen;
+/** @type {BookmarkTreeModule["renderBookmarks"]} */
 let renderBookmarks;
+/** @type {BookmarkTreeModule["setAllFoldersOpen"]} */
 let setAllFoldersOpen;
 
 ({
@@ -388,7 +416,7 @@ let editContextMenuOpen = false;
  * contentEditable element) that is neither read-only nor disabled.
  * Used to decide whether to show the text edit context menu on right-click.
  * @param {EventTarget|null} target
- * @returns {boolean}
+ * @returns {target is HTMLElement}
  */
 function isEditableTarget(target) {
   return Boolean(
@@ -405,7 +433,7 @@ function isEditableTarget(target) {
         (target instanceof HTMLTextAreaElement &&
           !target.readOnly &&
           !target.disabled) ||
-        target.isContentEditable),
+        /** @type {HTMLElement} */ (target).isContentEditable),
   );
 }
 
@@ -607,7 +635,9 @@ function openEditContextMenu(target, x, y) {
 function setSyncButtonsDisabled(disabled) {
   const ids = ["upload-bookmarks", "download-bookmarks", "webdav-refresh"];
   for (const id of ids) {
-    const el = document.getElementById(id);
+    const el = /** @type {HTMLButtonElement|null} */ (
+      document.getElementById(id)
+    );
     if (el) {
       el.disabled = disabled;
     }
@@ -628,7 +658,9 @@ function setWebdavStatusBarState({
   const urlEl = document.getElementById("webdav-url");
   const countEl = document.getElementById("webdav-count");
   const browserCountEl = document.getElementById("browser-count");
-  const refreshBtn = document.getElementById("webdav-refresh");
+  const refreshBtn = /** @type {HTMLButtonElement|null} */ (
+    document.getElementById("webdav-refresh")
+  );
 
   if (urlEl && typeof urlText === "string") {
     urlEl.textContent = urlText;
@@ -677,7 +709,9 @@ async function getBrowserBookmarkEntryCount() {
 refreshWebdavStatusBar = async function refreshWebdavStatusBarImpl({
   interactive = false,
 } = {}) {
-  const refreshBtn = document.getElementById("webdav-refresh");
+  const refreshBtn = /** @type {HTMLButtonElement|null} */ (
+    document.getElementById("webdav-refresh")
+  );
   if (refreshBtn) {
     refreshBtn.disabled = true;
   }
@@ -887,6 +921,7 @@ function bindTreeActions() {
   const appTooltip = document.getElementById("app-tooltip");
   const sortAscBtn = document.getElementById("sort-asc");
   const sortDescBtn = document.getElementById("sort-desc");
+  /** @type {HTMLElement|null} */
   let tooltipTarget = null;
   let languageMenuOpen = false;
   let themeMenuOpen = false;
@@ -994,7 +1029,9 @@ function bindTreeActions() {
         (preferred === option.value
           ? '<span class="language-item-check icon-font" aria-hidden="true">check</span>'
           : "");
-      const flagImg = item.querySelector(".language-flag-img");
+      const flagImg = /** @type {HTMLImageElement|null} */ (
+        item.querySelector(".language-flag-img")
+      );
       if (flagImg) {
         flagImg.addEventListener("error", () => {
           const fallback = flagImg.dataset.fallback || "🌐";
@@ -1110,6 +1147,11 @@ function bindTreeActions() {
     appTooltip.style.top = `${top}px`;
   };
 
+  /**
+   * @param {HTMLElement} target
+   * @param {number} x
+   * @param {number} y
+   */
   const showAppTooltip = (target, x, y) => {
     if (!appTooltip) {
       return;
@@ -1164,7 +1206,9 @@ function bindTreeActions() {
   document
     .getElementById("cfg-new-file-name")
     ?.addEventListener("input", () => {
-      const newRadio = document.querySelector('input[value="__new__"]');
+      const newRadio = /** @type {HTMLInputElement|null} */ (
+        document.querySelector('input[value="__new__"]')
+      );
       if (newRadio) {
         newRadio.checked = true;
       }
@@ -1201,7 +1245,7 @@ function bindTreeActions() {
     if (
       scrollbarThumb &&
       event.target &&
-      scrollbarThumb.contains(event.target)
+      scrollbarThumb.contains(/** @type {Node} */ (event.target))
     ) {
       return;
     }
@@ -1254,10 +1298,11 @@ function bindTreeActions() {
   });
 
   document.addEventListener("click", (event) => {
+    const target = /** @type {Node|null} */ (event.target);
     if (
       editContextMenuOpen &&
       editContextMenu &&
-      !editContextMenu.contains(event.target)
+      !editContextMenu.contains(target)
     ) {
       closeEditContextMenu();
     }
@@ -1265,15 +1310,15 @@ function bindTreeActions() {
     if (
       isTreeContextMenuOpen() &&
       treeContextMenu &&
-      !treeContextMenu.contains(event.target)
+      !treeContextMenu.contains(target)
     ) {
       closeTreeContextMenu();
     }
 
     if (languageMenuOpen) {
       const inLanguageMenu = Boolean(
-        (languageMenu && languageMenu.contains(event.target)) ||
-          (openLanguageMenuBtn && openLanguageMenuBtn.contains(event.target)),
+        (languageMenu && languageMenu.contains(target)) ||
+          (openLanguageMenuBtn && openLanguageMenuBtn.contains(target)),
       );
       if (!inLanguageMenu) {
         closeLanguageMenu();
@@ -1282,8 +1327,8 @@ function bindTreeActions() {
 
     if (themeMenuOpen) {
       const inThemeMenu = Boolean(
-        (themeMenu && themeMenu.contains(event.target)) ||
-          (openThemeMenuBtn && openThemeMenuBtn.contains(event.target)),
+        (themeMenu && themeMenu.contains(target)) ||
+          (openThemeMenuBtn && openThemeMenuBtn.contains(target)),
       );
       if (!inThemeMenu) {
         closeThemeMenu();
@@ -1293,7 +1338,7 @@ function bindTreeActions() {
     if (!sortMenu || sortMenu.classList.contains("hidden")) {
       return;
     }
-    if (sortMenu.contains(event.target)) {
+    if (sortMenu.contains(target)) {
       return;
     }
     closeSortMenu();
@@ -1330,7 +1375,9 @@ function bindTreeActions() {
   );
 
   document.addEventListener("mouseover", (event) => {
-    const target = event.target?.closest?.("[data-tooltip]");
+    const target = /** @type {HTMLElement|null|undefined} */ (
+      /** @type {Element|null} */ (event.target)?.closest?.("[data-tooltip]")
+    );
     if (!target) {
       return;
     }
@@ -1348,17 +1395,20 @@ function bindTreeActions() {
     if (!tooltipTarget) {
       return;
     }
-    const related = event.relatedTarget;
+    const related = /** @type {Node|null} */ (event.relatedTarget);
     if (related && tooltipTarget.contains(related)) {
       return;
     }
-    if (event.target && tooltipTarget.contains(event.target)) {
+    const target = /** @type {Node|null} */ (event.target);
+    if (target && tooltipTarget.contains(target)) {
       hideAppTooltip();
     }
   });
 
   document.addEventListener("focusin", (event) => {
-    const target = event.target?.closest?.("[data-tooltip]");
+    const target = /** @type {HTMLElement|null|undefined} */ (
+      /** @type {Element|null} */ (event.target)?.closest?.("[data-tooltip]")
+    );
     if (!target) {
       return;
     }
@@ -1367,7 +1417,7 @@ function bindTreeActions() {
   });
 
   document.addEventListener("focusout", (event) => {
-    const target = event.target;
+    const target = /** @type {Node|null} */ (event.target);
     if (tooltipTarget && target && tooltipTarget.contains(target)) {
       hideAppTooltip();
     }
@@ -1377,7 +1427,7 @@ function bindTreeActions() {
 
   bookmarkListEl?.addEventListener("contextmenu", (event) => {
     event.preventDefault();
-    const target = event.target;
+    const target = /** @type {Element|null} */ (event.target);
     const hasNodeMenu = Boolean(
       target &&
         typeof target.closest === "function" &&
@@ -1389,7 +1439,7 @@ function bindTreeActions() {
   });
 
   document.addEventListener("contextmenu", (event) => {
-    const target = event.target;
+    const target = /** @type {Element|null} */ (event.target);
     if (isEditableTarget(target)) {
       event.preventDefault();
       openEditContextMenu(target, event.clientX, event.clientY);
