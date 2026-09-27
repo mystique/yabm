@@ -45,18 +45,25 @@
       dragState.parentId = node.parentId;
       event.dataTransfer.effectAllowed = "move";
       event.dataTransfer.setData("text/plain", node.id);
+
       const sourceEl = event.currentTarget;
-      sourceEl?.classList.add("drag-source");
+      if (!(sourceEl instanceof HTMLElement)) {
+        return;
+      }
+      sourceEl.classList.add("drag-source");
 
       // Build a styled ghost element that tracks the cursor during the drag.
       removeDragGhost();
       const previewSource =
         nodeType === "bookmark"
-          ? sourceEl?.querySelector(".bookmark-item") || sourceEl
+          ? sourceEl.querySelector(".bookmark-item") || sourceEl
           : sourceEl;
-      if (previewSource && event.dataTransfer?.setDragImage) {
+      if (previewSource instanceof HTMLElement && event.dataTransfer?.setDragImage) {
         const rect = previewSource.getBoundingClientRect();
         const ghost = previewSource.cloneNode(true);
+        if (!(ghost instanceof HTMLElement)) {
+          return;
+        }
         ghost.classList.remove("drag-source", "drag-over");
         ghost.classList.add("drag-ghost");
         ghost.style.width = `${Math.max(140, Math.round(rect.width))}px`;
@@ -83,7 +90,9 @@
       dragState.nodeType = null;
       dragState.parentId = null;
       dragState.currentDragOverFolderId = null;
-      event.currentTarget?.classList.remove("drag-source");
+      if (event.currentTarget instanceof HTMLElement) {
+        event.currentTarget.classList.remove("drag-source");
+      }
       containerHandlers?.clearCurrentHighlight?.();
       removeDragGhost();
     }
@@ -159,8 +168,12 @@
       dragState.currentDragOverFolderId = null;
 
       // Clear visual highlight
-      const folder = event.target?.closest?.(".folder");
-      folder?.classList.remove("drag-over");
+      if (event.target instanceof Element) {
+        const folder = event.target.closest(".folder");
+        if (folder instanceof HTMLElement) {
+          folder.classList.remove("drag-over");
+        }
+      }
 
       try {
         const canDrop = await canDropNodeInFolder(
@@ -227,8 +240,12 @@
         event.dataTransfer.dropEffect = "move";
 
         // Find the target folder under the cursor
-        const folder = event.target?.closest?.(".folder");
-        if (!folder) {
+        if (!(event.target instanceof Element)) {
+          clearCurrentHighlight();
+          return;
+        }
+        const folder = event.target.closest(".folder");
+        if (!(folder instanceof HTMLElement)) {
           // Not over any folder, clear highlight
           clearCurrentHighlight();
           return;
@@ -243,12 +260,12 @@
         }
 
         // Skip dropping a folder into its own subtree
-        if (
-          dragState.nodeType === "folder" &&
-          folder.contains(document.querySelector(`[data-folder-id="${dragState.nodeId}"]`))
-        ) {
-          clearCurrentHighlight();
-          return;
+        if (dragState.nodeType === "folder") {
+          const draggedFolderEl = document.querySelector(`[data-folder-id="${dragState.nodeId}"]`);
+          if (draggedFolderEl && folder.contains(draggedFolderEl)) {
+            clearCurrentHighlight();
+            return;
+          }
         }
 
         // Only update highlight if the target folder changed
@@ -268,8 +285,13 @@
       function handleDrop(event) {
         if (!dragState.nodeId) return;
 
-        const folder = event.target?.closest?.(".folder");
-        if (!folder) return;
+        if (!(event.target instanceof Element)) {
+          return;
+        }
+        const folder = event.target.closest(".folder");
+        if (!(folder instanceof HTMLElement)) {
+          return;
+        }
 
         const folderId = folder.dataset.folderId;
 
@@ -295,7 +317,7 @@
        */
       function handleDragLeave(event) {
         // Check if we truly left the container
-        if (event.relatedTarget && container.contains(event.relatedTarget)) {
+        if (event.relatedTarget instanceof Node && container.contains(event.relatedTarget)) {
           return;
         }
         clearCurrentHighlight();

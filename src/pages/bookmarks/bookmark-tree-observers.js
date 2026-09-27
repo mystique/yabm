@@ -88,6 +88,16 @@
      * Each event triggers a debounced refresh so the UI reflects external changes
      * (e.g. changes made in the Chrome bookmark manager or another extension).
      * No-ops if the bookmarks API is unavailable (e.g. in non-extension contexts).
+     *
+     * Chrome bookmark event signatures:
+     * - onCreated: (id: string, bookmark: chrome.bookmarks.BookmarkTreeNode) => void
+     * - onRemoved: (id: string, removeInfo: {parentId: string, index: number, node: chrome.bookmarks.BookmarkTreeNode}) => void
+     * - onChanged: (id: string, changeInfo: {title: string, url?: string}) => void
+     * - onMoved: (id: string, moveInfo: {parentId: string, index: number, oldParentId: string, oldIndex: number}) => void
+     * - onChildrenReordered: (id: string, reorderInfo: {childIds: string[]}) => void
+     * - onImportEnded: () => void
+     *
+     * @returns {void}
      */
     function bindBookmarkTreeObservers() {
       const onCreated = chrome?.bookmarks?.onCreated;
@@ -95,6 +105,11 @@
         return;
       }
 
+      /**
+       * Shared listener that ignores event parameters and triggers a debounced refresh.
+       * All bookmark events use the same refresh logic regardless of event-specific data.
+       * @type {(...args: any[]) => void}
+       */
       const listener = () => queueExternalTreeRefresh();
       chrome.bookmarks.onCreated.addListener(listener);
       chrome.bookmarks.onRemoved.addListener(listener);

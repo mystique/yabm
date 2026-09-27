@@ -4,10 +4,10 @@
 
 **Blocked by:** 04: Typecheck foundational bookmarks modules.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Align bookmark mutation return types with the Chrome bookmarks API.
-- [ ] Make observer callback inputs and refresh results explicit.
-- [ ] Preserve mutation error reporting and user-visible status feedback.
-- [ ] Preserve create, update, delete, move, sort, and external-change refresh behavior.
-- [ ] Verify the affected modules pass lint and page-layer typecheck.
+- [x] Align bookmark mutation return types with the Chrome bookmarks API.
+- [x] Make observer callback inputs and refresh results explicit.
+- [x] Preserve mutation error reporting and user-visible status feedback.
+- [x] Preserve create, update, delete, move, sort, and external-change refresh behavior.
+- [x] Verify the affected modules pass lint and page-layer typecheck.

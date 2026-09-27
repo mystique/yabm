@@ -31,8 +31,8 @@
      * Runs an async bookmark mutation, automatically reporting success and error
      * states to the status bar. An optional `afterSuccess` callback executes
      * (e.g. re-render) only when the mutation completes without throwing.
-     * @param {() => Promise<void>} run - The async mutation to execute.
-     * @param {{ successKey?: string, errorKey?: string, afterSuccess?: Function }} [options]
+     * @param {() => Promise<any>} run - The async mutation to execute.
+     * @param {{ successKey?: string, errorKey?: string, afterSuccess?: () => Promise<void> | void }} [options]
      * @returns {Promise<void>}
      */
     async function runBookmarkMutation(run, options) {
@@ -97,6 +97,7 @@
     /**
      * Asks for one or two confirmations (the second if the folder contains bookmarks),
      * then recursively removes the folder and purges its cached favicons.
+     * Chrome's removeTree API returns Promise<void>.
      * @param {chrome.bookmarks.BookmarkTreeNode} node - The folder to delete.
      * @returns {Promise<void>}
      */
@@ -132,7 +133,9 @@
         async () => {
           const bookmarkIds = getBookmarkNodesInFolder(node).map((item) => item.id);
           await removeFaviconsByBookmarkIds(bookmarkIds);
-          await chrome.bookmarks.removeTree(node.id);
+          /** @type {Promise<void>} */
+          const removeResult = chrome.bookmarks.removeTree(node.id);
+          await removeResult;
         },
         {
           successKey: "folderDeleted",
@@ -145,6 +148,7 @@
     /**
      * Opens the editor modal to collect a folder name, then creates a new
      * Chrome bookmark folder as a child of `parentNode`.
+     * Chrome's create API returns Promise<chrome.bookmarks.BookmarkTreeNode>.
      * @param {chrome.bookmarks.BookmarkTreeNode} parentNode - Destination parent folder.
      * @returns {Promise<void>}
      */
@@ -160,11 +164,14 @@
       }
 
       await runBookmarkMutation(
-        () =>
-          chrome.bookmarks.create({
+        async () => {
+          /** @type {Promise<chrome.bookmarks.BookmarkTreeNode>} */
+          const createResult = chrome.bookmarks.create({
             parentId: parentNode.id,
             title: result.name || t("newFolderDefault"),
-          }),
+          });
+          await createResult;
+        },
         {
           successKey: "folderCreated",
           errorKey: "createFolderFailed",
@@ -176,6 +183,7 @@
     /**
      * Opens the editor modal pre-filled with the folder's current title and
      * saves the updated name via the Chrome bookmarks API.
+     * Chrome's update API returns Promise<chrome.bookmarks.BookmarkTreeNode>.
      * @param {chrome.bookmarks.BookmarkTreeNode} node - The folder to rename.
      * @returns {Promise<void>}
      */
@@ -191,10 +199,13 @@
       }
 
       await runBookmarkMutation(
-        () =>
-          chrome.bookmarks.update(node.id, {
+        async () => {
+          /** @type {Promise<chrome.bookmarks.BookmarkTreeNode>} */
+          const updateResult = chrome.bookmarks.update(node.id, {
             title: result.name || t("untitled"),
-          }),
+          });
+          await updateResult;
+        },
         {
           successKey: "folderUpdated",
           errorKey: "updateFolderFailed",
@@ -206,6 +217,7 @@
     /**
      * Opens the editor modal to collect a title and URL, validates the URL,
      * then creates a new bookmark as a child of `parentNode`.
+     * Chrome's create API returns Promise<chrome.bookmarks.BookmarkTreeNode>.
      * @param {chrome.bookmarks.BookmarkTreeNode} parentNode - Destination parent folder.
      * @returns {Promise<void>}
      */
@@ -225,11 +237,13 @@
       await runBookmarkMutation(
         async () => {
           const url = ensureValidUrl(result.url);
-          await chrome.bookmarks.create({
+          /** @type {Promise<chrome.bookmarks.BookmarkTreeNode>} */
+          const createResult = chrome.bookmarks.create({
             parentId: parentNode.id,
             title: result.name || url,
             url,
           });
+          await createResult;
         },
         {
           successKey: "bookmarkCreated",
@@ -242,6 +256,7 @@
     /**
      * Opens the editor modal pre-filled with the bookmark's current title and URL.
      * If the URL changes, the stale favicon cache entry is removed before saving.
+     * Chrome's update API returns Promise<chrome.bookmarks.BookmarkTreeNode>.
      * @param {chrome.bookmarks.BookmarkTreeNode} node - The bookmark to edit.
      * @returns {Promise<void>}
      */
@@ -264,10 +279,12 @@
           if (node.url !== url) {
             await removeFaviconsByBookmarkIds([node.id]);
           }
-          await chrome.bookmarks.update(node.id, {
+          /** @type {Promise<chrome.bookmarks.BookmarkTreeNode>} */
+          const updateResult = chrome.bookmarks.update(node.id, {
             title: result.name || url,
             url,
           });
+          await updateResult;
         },
         {
           successKey: "bookmarkUpdated",

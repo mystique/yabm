@@ -6,14 +6,22 @@
  */
 (function () {
   /**
+   * @typedef {Object} MenuModuleDeps
+   * @property {(key: string, substitutions?: string[]) => string} t
+   * @property {(mutation: () => Promise<void>, options: { successKey: string, errorKey: string, afterSuccess: () => void }) => Promise<void>} runBookmarkMutation
+   * @property {(folderIds: string[]) => Promise<void>} rerenderAfterTreeChange
+   */
+
+  /**
    * Factory that creates the bookmark tree menu module.
-   * @param {{ t: Function, runBookmarkMutation: Function, rerenderAfterTreeChange: Function }} deps
-   * @returns {{ closeSortMenu: Function, closeTreeContextMenu: Function, handleSortMenuApply: Function, isTreeContextMenuOpen: Function, openSortMenu: Function, openTreeContextMenu: Function, sortFolderAndRerender: Function }}
+   * @param {MenuModuleDeps} deps
+   * @returns {{ closeSortMenu: () => void, closeTreeContextMenu: () => void, handleSortMenuApply: (descending: boolean) => Promise<void>, isTreeContextMenuOpen: () => boolean, openSortMenu: (folderNode: chrome.bookmarks.BookmarkTreeNode, anchorEl: HTMLElement) => void, openTreeContextMenu: (options: { x: number, y: number, items: Array<{label?: string, icon?: string, danger?: boolean, type?: string, onClick?: () => void | Promise<void>}> }) => void, sortFolderAndRerender: (folderId: string, descending: boolean) => Promise<void> }}
    */
   function createBookmarkTreeMenuModule(deps) {
     const { t, runBookmarkMutation, rerenderAfterTreeChange } = deps;
 
     // Stores the folder ID of the currently open sort menu, or null when closed.
+    /** @type {{ folderId: string } | null} */
     let sortMenuContext = null;
     // Tracks whether the right-click context menu is currently open.
     let treeContextMenuOpen = false;

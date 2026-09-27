@@ -7,9 +7,43 @@
  */
 (function () {
   /**
+   * @typedef {Object} RenderModuleDeps
+   * @property {(key: string, substitutions?: string[]) => string} t
+   * @property {(openFolderIds: Set<string> | null) => void} applyOpenFolderIds
+   * @property {(options: { ariaLabel: string, icon: string, onClick: (event?: Event) => void, danger?: boolean }) => HTMLButtonElement} createActionButton
+   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => string | null} getCachedFaviconForBookmark
+   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => { bookmarkCount: number, folderCount: number }} getFolderStats
+   * @property {() => Set<string>} getOpenFolderIds
+   * @property {(tree: chrome.bookmarks.BookmarkTreeNode[]) => chrome.bookmarks.BookmarkTreeNode[]} getTopLevelFolders
+   * @property {() => Promise<void>} ensureFaviconCacheLoaded
+   * @property {(tree: chrome.bookmarks.BookmarkTreeNode[]) => Promise<void>} pruneFaviconCacheForTree
+   * @property {() => void} closeEditContextMenu
+   * @property {() => void} closeTreeContextMenu
+   * @property {() => void} closeSortMenu
+   * @property {(options: { x: number, y: number, items: Array<{ label?: string, icon?: string, danger?: boolean, type?: string, onClick?: () => void | Promise<void> }> }) => void} openTreeContextMenu
+   * @property {(folderNode: chrome.bookmarks.BookmarkTreeNode, anchorEl: HTMLElement) => void} openSortMenu
+   * @property {(event: DragEvent, node: chrome.bookmarks.BookmarkTreeNode, type: string) => void} handleNodeDragStart
+   * @property {(event: DragEvent) => void} handleNodeDragEnd
+   * @property {(details: HTMLDetailsElement) => void} toggleFolder
+   * @property {(details: HTMLDetailsElement, open: boolean, saveState: boolean) => void} setFolderOpen
+   * @property {(folders: chrome.bookmarks.BookmarkTreeNode[]) => void} updateTreeSummaryStats
+   * @property {() => void} updateMainLayoutMetrics
+   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} copyBookmarkUrl
+   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} refreshBookmarkFaviconWithStatus
+   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} refreshFolderFavicons
+   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} deleteBookmarkNode
+   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} deleteFolderNode
+   * @property {(parentNode: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} addFolderNode
+   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} editFolderNode
+   * @property {(parentNode: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} addBookmarkNode
+   * @property {(node: chrome.bookmarks.BookmarkTreeNode) => Promise<void>} editBookmarkNode
+   * @property {(folderId: string, descending: boolean) => Promise<void>} sortFolderAndRerender
+   */
+
+  /**
    * Factory that creates the bookmark tree render module.
-   * @param {object} deps - All dependency functions injected by the orchestrator.
-   * @returns {{ renderBookmarks: Function }}
+   * @param {RenderModuleDeps} deps - All dependency functions injected by the orchestrator.
+   * @returns {{ renderBookmarks: (openFolderIds?: Set<string> | null) => Promise<void> }}
    */
   function createBookmarkTreeRenderModule(deps) {
     const {
@@ -71,7 +105,9 @@
             {
               label: t("menuOpenBookmark"),
               icon: "open_in_new",
-              onClick: () => window.open(node.url, "_blank", "noopener"),
+              onClick: () => {
+                window.open(node.url, "_blank", "noopener");
+              },
             },
             {
               label: t("menuCopyBookmarkUrl"),
@@ -101,7 +137,7 @@
 
       const a = document.createElement("a");
       a.className = "bookmark-item";
-      a.href = node.url;
+      a.href = node.url || "";
       a.target = "_blank";
       a.rel = "noopener noreferrer";
       a.dataset.tooltip = node.url || "";
@@ -136,11 +172,11 @@
 
       const title = document.createElement("span");
       title.className = "bookmark-title";
-      title.textContent = node.title || node.url;
+      title.textContent = node.title || node.url || "";
 
       const url = document.createElement("span");
       url.className = "bookmark-url";
-      url.textContent = node.url;
+      url.textContent = node.url || "";
 
       textWrap.append(title, url);
       main.append(favicon, fallbackFavicon, textWrap);
@@ -306,7 +342,10 @@
         createActionButton({
           ariaLabel: t("sortFolder"),
           icon: "sort",
-          onClick: (event) => openSortMenu(node, event.currentTarget),
+          onClick: (/** @type {Event} */ event) => {
+            const target = /** @type {HTMLElement} */ (event.currentTarget);
+            openSortMenu(node, target);
+          },
         }),
         createActionButton({
           ariaLabel: t("addFolder"),
@@ -375,6 +414,9 @@
       closeSortMenu();
       await ensureFaviconCacheLoaded();
       const container = document.getElementById("bookmark-list");
+      if (!container) {
+        return;
+      }
       const tree = await chrome.bookmarks.getTree();
       await pruneFaviconCacheForTree(tree);
       const folders = getTopLevelFolders(tree);
