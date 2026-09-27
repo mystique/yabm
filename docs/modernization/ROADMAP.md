@@ -121,6 +121,7 @@ Make the page code less fragile by reducing manual global coupling and improving
 - DOM helpers remain page-local until reuse across pages is demonstrated.
 - No new test framework or top-level directory reorganization is included.
 - The implementation plan and tracer-bullet tickets are published in `.scratch/phase-2-modernization/`.
+- Runtime ESM migration is deferred (recorded 2026-09-27). Revisit it only after the Phase 2 Chrome smoke checks pass and page-layer lint/typecheck stay stable, as a separate task with explicit regression verification. See the ESM Deferral section in [STATUS.md](STATUS.md).
 
 ### Risks
 
