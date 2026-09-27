@@ -13,7 +13,25 @@
   function createBookmarkTreeDndModule(deps) {
     const { t, setStatus, rerenderAfterTreeChange } = deps;
 
+    /**
+     * @typedef {'bookmark'|'folder'} DragNodeType
+     */
+
+    /**
+     * Drag state snapshot passed to drop handling.
+     * @typedef {Object} CapturedDragState
+     * @property {string|null} nodeId - Chrome bookmark ID of the dragged node.
+     * @property {DragNodeType|null} nodeType - Type of the dragged node.
+     * @property {string|null} parentId - Original parent folder ID.
+     */
+
+    /**
+     * Live drag state, including the currently highlighted drop target.
+     * @typedef {CapturedDragState & { currentDragOverFolderId: string|null }} DragState
+     */
+
     // Tracks the node currently being dragged so drop handlers can validate targets.
+    /** @type {DragState} */
     const dragState = {
       nodeId: null,                  // Chrome bookmark ID of the dragged node.
       nodeType: null,                // 'bookmark' or 'folder'.
@@ -21,6 +39,7 @@
       currentDragOverFolderId: null, // Currently highlighted drop target folder ID.
     };
     // Cloned ghost element appended off-screen to serve as the drag image.
+    /** @type {HTMLElement|null} */
     let dragGhostEl = null;
 
     /**
@@ -37,7 +56,7 @@
      * Initialises drag state and attaches a styled ghost image to the drag operation.
      * @param {DragEvent} event - The native dragstart event.
      * @param {chrome.bookmarks.BookmarkTreeNode} node - The bookmark/folder being dragged.
-     * @param {'bookmark'|'folder'} nodeType - Type of the node being dragged.
+     * @param {DragNodeType} nodeType - Type of the node being dragged.
      */
     function handleNodeDragStart(event, node, nodeType) {
       dragState.nodeId = node.id;
@@ -46,14 +65,14 @@
       event.dataTransfer.effectAllowed = "move";
       event.dataTransfer.setData("text/plain", node.id);
 
+      // Build a styled ghost element that tracks the cursor during the drag.
+      removeDragGhost();
       const sourceEl = event.currentTarget;
       if (!(sourceEl instanceof HTMLElement)) {
         return;
       }
       sourceEl.classList.add("drag-source");
 
-      // Build a styled ghost element that tracks the cursor during the drag.
-      removeDragGhost();
       const previewSource =
         nodeType === "bookmark"
           ? sourceEl.querySelector(".bookmark-item") || sourceEl
@@ -123,7 +142,7 @@
      * Validates whether the dragged node may be dropped into `targetFolderId`.
      * Prevents moving a folder into itself or into one of its own descendants.
      * @param {string|null} dragNodeId - ID of the node being dragged.
-     * @param {'bookmark'|'folder'} dragNodeType
+     * @param {DragNodeType|null} dragNodeType
      * @param {string|null} targetFolderId - ID of the destination folder.
      * @returns {Promise<boolean>}
      */
@@ -147,10 +166,7 @@
      * Chrome bookmarks API, and triggers a re-render.
      * @param {DragEvent} event
      * @param {chrome.bookmarks.BookmarkTreeNode} targetFolderNode - Destination folder.
-     * @param {Object} [capturedDragState] - Drag state captured before async operation.
-     * @param {string} [capturedDragState.nodeId] - ID of dragged node.
-     * @param {'bookmark'|'folder'} [capturedDragState.nodeType] - Type of dragged node.
-     * @param {string} [capturedDragState.parentId] - Original parent folder ID.
+     * @param {CapturedDragState} [capturedDragState] - Drag state captured before async operation.
      * @returns {Promise<void>}
      */
     async function handleFolderDrop(event, targetFolderNode, capturedDragState) {
@@ -294,6 +310,9 @@
         }
 
         const folderId = folder.dataset.folderId;
+        if (!folderId) {
+          return;
+        }
 
         // Capture drag state before async operation to prevent race with dragend
         const capturedDragState = {
