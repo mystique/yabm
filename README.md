@@ -50,9 +50,7 @@ A Chrome extension for visual bookmark management with optional WebDAV sync.
 |  |  |- theme.js             # Theme loading and application (window.YABMTheme)
 |  |  `- sync-utils.js        # WebDAV + import/export (window.YABMSync)
 |  |- assets/
-|  |  |- icons/               # Extension icons
-|  |  |- fonts/               # Custom fonts (Space Grotesk, Material Symbols)
-|  |  `- twemoji/             # Twemoji SVGs for locale/status icons
+|  |  `- icons/               # Extension icons (fonts and Twemoji load from CDN)
 |  `- _locales/               # i18n message bundles (11 languages)
 |- tools/
 |  `- build.cjs               # Build script (src/ -> dist/)

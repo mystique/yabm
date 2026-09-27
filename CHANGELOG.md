@@ -4,6 +4,36 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project follows Semantic Versioning.
 
+## [Unreleased]
+
+### Added
+
+- Dark mode with a Light / Dark / System theme picker on the bookmarks and options pages; the choice is saved and shared across extension pages
+- Clicking the toolbar icon focuses an existing bookmarks tab instead of opening a duplicate
+- Full translations for German, Spanish, French, Italian, Portuguese, Russian, Japanese, and Korean (these locales previously showed English text)
+- Drag-and-drop visual feedback (drag source, drop target, and drag preview styling)
+- Favicon refresh now reports when an update is already running instead of starting a second one
+- Favicon cache entries for deleted bookmarks are pruned automatically
+
+### Changed
+
+- Fonts (Space Grotesk, Material Symbols) load from Google Fonts and Twemoji icons load from jsDelivr instead of being bundled; the pages now need network access to render these assets
+- Extension pages now declare an explicit Content Security Policy limited to these font/icon hosts and HTTPS connections
+- Dropping an item onto a folder no longer auto-expands that folder
+- Bookmarks page code is split into focused modules (tree state, rendering, menus, mutations, observers, drag-and-drop, modals, favicon cache, notifications, scrollbar)
+- Developer tooling: npm scripts for build (esbuild to `dist/`), lint (ESLint), and JSDoc typecheck (TypeScript `checkJs`) covering all extension JavaScript; the runtime still uses classic script tags
+- A missing required page element now shows an error message instead of silently leaving the page unresponsive
+
+### Fixed
+
+- Folders can no longer be dropped into their own descendants
+- A race where the drag state was cleared before the drop finished, which could make a valid drop fail
+- Dropping onto a folder element with no folder ID no longer triggers an unhandled error
+
+### Removed
+
+- Bundled font files and local Twemoji SVGs (replaced by the CDN assets above)
+
 ## [0.1.0] - 2026-02-23
 
 ### Added
