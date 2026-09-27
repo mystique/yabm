@@ -33,11 +33,12 @@ const t = (key, substitutions) => window.YABMI18n.t(key, substitutions);
 
 /**
  * Get a DOM element by ID
+ * @template {HTMLElement} T
  * @param {string} id - Element ID
- * @returns {HTMLElement|null}
+ * @returns {T|null}
  */
 function $(id) {
-  return document.getElementById(id);
+  return /** @type {T|null} */ (document.getElementById(id));
 }
 
 /**
@@ -47,6 +48,7 @@ function $(id) {
  */
 function setStatus(message, type) {
   const el = $("status");
+  if (!el) return;
   const hasMessage = Boolean(message && String(message).trim());
   el.className = "status";
   if (!hasMessage) {
@@ -81,7 +83,7 @@ function normalizeFileName(fileName) {
  * @returns {string} - Formatted size string
  */
 function formatFileSize(sizeValue) {
-  const bytes = Number.parseInt(sizeValue, 10);
+  const bytes = Number.parseInt(String(sizeValue), 10);
   if (!Number.isFinite(bytes) || bytes < 0) {
     return "-";
   }
@@ -102,7 +104,7 @@ function formatFileSize(sizeValue) {
 /**
  * Parse ISO date string and format as date and time components
  * @param {string} lastModifiedValue - ISO 8601 date string
- * @returns {object} - { dateText: "YYYY-MM-DD", timeText: "HH:MM:SS" }
+ * @returns {{ dateText: string, timeText: string }} - Date and time strings
  */
 function formatLastModifiedParts(lastModifiedValue) {
   const date = new Date(lastModifiedValue);
@@ -121,12 +123,12 @@ function formatLastModifiedParts(lastModifiedValue) {
 
 /**
  * Build HTML fragment for file size and modification timestamp
- * @param {object} file - File metadata object with size and lastModified
+ * @param {FileMetadata} file - File metadata object with size and lastModified
  * @returns {string} - HTML string with file-size and file-datetime spans
  */
 function buildFileMetaHtml(file) {
-  const sizeText = formatFileSize(file?.size);
-  const { dateText, timeText } = formatLastModifiedParts(file?.lastModified);
+  const sizeText = formatFileSize(file.size);
+  const { dateText, timeText } = formatLastModifiedParts(file.lastModified);
   return `<span class="file-size">${sizeText}</span><span class="file-datetime"><span>${dateText}</span><span>${timeText}</span></span>`;
 }
 
@@ -137,6 +139,7 @@ function buildFileMetaHtml(file) {
  */
 function renderFileList(files, selectedName) {
   const container = $("files-container");
+  if (!container) return;
   container.innerHTML = "";
 
   // Create a new file entry
@@ -180,8 +183,9 @@ function renderFileList(files, selectedName) {
 
   // Try to find the exact file name
   for (const radio of radios) {
-    if (radio.value === target) {
-      radio.checked = true;
+    const input = /** @type {HTMLInputElement} */ (radio);
+    if (input.value === target) {
+      input.checked = true;
       selected = true;
       break;
     }
@@ -189,7 +193,7 @@ function renderFileList(files, selectedName) {
 
   // Fallback to "Create New" option if target file is not found
   if (!selected) {
-    const newRadio = container.querySelector('input[value="__new__"]');
+    const newRadio = /** @type {HTMLInputElement|null} */ (container.querySelector('input[value="__new__"]'));
     if (newRadio) {
       newRadio.checked = true;
     }
@@ -201,13 +205,14 @@ function renderFileList(files, selectedName) {
  * @returns {string} - Selected file name (normalized if creating new)
  */
 function getSelectedFileName() {
-  const checked = document.querySelector('input[name="file-select"]:checked');
+  const checked = /** @type {HTMLInputElement|null} */ (document.querySelector('input[name="file-select"]:checked'));
   if (!checked) {
     return "";
   }
 
   if (checked.value === "__new__") {
-    return normalizeFileName($("new-file-name").value);
+    const input = /** @type {HTMLInputElement|null} */ ($("new-file-name"));
+    return normalizeFileName(input ? input.value : "");
   }
 
   return checked.value;
@@ -222,24 +227,39 @@ async function loadSavedConfig() {
     return;
   }
 
-  $("directory-url").value = config.directoryUrl || "";
-  $("username").value = config.username || "";
-  $("password").value = config.password || "";
-  $("new-file-name").value = config.fileName || "bookmarks.html";
+  const directoryUrl = /** @type {HTMLInputElement|null} */ ($("directory-url"));
+  const username = /** @type {HTMLInputElement|null} */ ($("username"));
+  const password = /** @type {HTMLInputElement|null} */ ($("password"));
+  const newFileName = /** @type {HTMLInputElement|null} */ ($("new-file-name"));
+
+  if (directoryUrl) directoryUrl.value = config.directoryUrl || "";
+  if (username) username.value = config.username || "";
+  if (password) password.value = config.password || "";
+  if (newFileName) newFileName.value = config.fileName || "bookmarks.html";
 }
 
 /**
  * Test WebDAV connection and list available files
  */
 async function testConnection() {
-  const testBtn = $("test-connection");
+  const testBtn = /** @type {HTMLButtonElement|null} */ ($("test-connection"));
+  const directoryUrlInput = /** @type {HTMLInputElement|null} */ ($("directory-url"));
+  const usernameInput = /** @type {HTMLInputElement|null} */ ($("username"));
+  const passwordInput = /** @type {HTMLInputElement|null} */ ($("password"));
+  const fileSection = $("file-section");
+  const newFileNameInput = /** @type {HTMLInputElement|null} */ ($("new-file-name"));
+
+  if (!testBtn || !directoryUrlInput || !usernameInput || !passwordInput || !fileSection || !newFileNameInput) {
+    return;
+  }
+
   testBtn.disabled = true;
   setStatus(t("testingConnection"), "");
 
   try {
-    const directoryUrl = $("directory-url").value.trim();
-    const username = $("username").value.trim();
-    const password = $("password").value;
+    const directoryUrl = directoryUrlInput.value.trim();
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
 
     const result = await window.YABMSync.listDirectoryFiles({
       directoryUrl,
@@ -251,8 +271,8 @@ async function testConnection() {
     state.directoryUrl = result.directoryUrl;
     state.files = result.files;
 
-    $("file-section").classList.remove("hidden");
-    renderFileList(result.files, normalizeFileName($("new-file-name").value));
+    fileSection.classList.remove("hidden");
+    renderFileList(result.files, normalizeFileName(newFileNameInput.value));
 
     if (!result.files.length) {
       setStatus(t("connSuccessNoFiles"), "success");
@@ -263,7 +283,7 @@ async function testConnection() {
     state.tested = false;
     state.directoryUrl = "";
     state.files = [];
-    $("file-section").classList.add("hidden");
+    fileSection.classList.add("hidden");
     setStatus(t("connectionFailed", [error.message]), "error");
   } finally {
     testBtn.disabled = false;
@@ -286,10 +306,17 @@ async function saveConfig() {
     return;
   }
 
+  const usernameInput = /** @type {HTMLInputElement|null} */ ($("username"));
+  const passwordInput = /** @type {HTMLInputElement|null} */ ($("password"));
+
+  if (!usernameInput || !passwordInput) {
+    return;
+  }
+
   const payload = {
     directoryUrl: state.directoryUrl,
-    username: $("username").value.trim(),
-    password: $("password").value,
+    username: usernameInput.value.trim(),
+    password: passwordInput.value,
     fileName
   };
 
@@ -305,12 +332,24 @@ async function saveConfig() {
  * Attach event listeners to form controls for interactivity
  */
 function bindEvents() {
-  $("test-connection").addEventListener("click", testConnection);
-  $("save-config").addEventListener("click", saveConfig);
+  const testBtn = $("test-connection");
+  const saveBtn = $("save-config");
+  const newFileNameInput = /** @type {HTMLInputElement|null} */ ($("new-file-name"));
+  const directoryUrlInput = $("directory-url");
+  const usernameInput = $("username");
+  const passwordInput = $("password");
+  const fileSection = $("file-section");
+
+  if (!testBtn || !saveBtn || !newFileNameInput || !directoryUrlInput || !usernameInput || !passwordInput || !fileSection) {
+    return;
+  }
+
+  testBtn.addEventListener("click", testConnection);
+  saveBtn.addEventListener("click", saveConfig);
 
   // Auto-switch radio when typing in new file name input
-  $("new-file-name").addEventListener("input", () => {
-    const newRadio = document.querySelector('input[value="__new__"]');
+  newFileNameInput.addEventListener("input", () => {
+    const newRadio = /** @type {HTMLInputElement|null} */ (document.querySelector('input[value="__new__"]'));
     if (newRadio) {
       newRadio.checked = true;
     }
@@ -324,12 +363,12 @@ function bindEvents() {
     state.tested = false;
     state.directoryUrl = "";
     state.files = [];
-    $("file-section").classList.add("hidden");
+    fileSection.classList.add("hidden");
   };
 
-  $("directory-url").addEventListener("input", invalidate);
-  $("username").addEventListener("input", invalidate);
-  $("password").addEventListener("input", invalidate);
+  directoryUrlInput.addEventListener("input", invalidate);
+  usernameInput.addEventListener("input", invalidate);
+  passwordInput.addEventListener("input", invalidate);
 }
 
 /**

@@ -17,6 +17,7 @@
   "include": [
     "src/background/**/*.js",
     "src/lib/**/*.js",
+    "src/pages/options/**/*.js",
     "tools/**/*.cjs",
     "types/**/*.d.ts"
   ],
