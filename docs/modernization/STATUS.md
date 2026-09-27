@@ -27,26 +27,21 @@ When continuing the modernization work in a new task:
 - Overall status: all Phase 2 tickets (01-10) are done; automated checks and the manual Chrome smoke checklist passed
 - Last updated: 2026-09-27
 - Recommended next task: start the Phase 3 Preparation Tasks below
-
-### 2026-09-27
-
-- Confirmed the Phase 2 strategy:
-  - strengthen script-tag factory modules instead of migrating to ESM;
-  - type-check the page layer incrementally;
-  - keep DOM helpers page-local until reuse is demonstrated;
-  - do not introduce a test framework or Phase 3 directory reorganization.
-- Synchronized the Phase 2 status and roadmap.
-- Published the Phase 2 specification at `.scratch/phase-2-modernization/spec.md` with `ready-for-agent` status.
+- Phase 2 tickets and spec: `.scratch/phase-2-modernization/` (all `done`)
 
 ## Completed Work
 
-### 2026-09-27 (Phase 2 code)
+### 2026-09-27 (Phase 2)
 
+Strategy (agreed before implementation): strengthen script-tag factory modules instead of migrating to ESM; typecheck the page layer incrementally; keep DOM helpers page-local until reuse is demonstrated; no test framework and no Phase 3 directory reorganization.
+
+- Synchronized the roadmap and status with the Phase 2 plan and published the spec and tickets under `.scratch/phase-2-modernization/`.
 - Removed redundant Chrome runtime type declarations (`1b2e2c0`).
-- Brought `src/pages/options/options.js` into `checkJs` (`af6659c`).
-- Brought every `src/pages/bookmarks/*.js` module into `checkJs` in batches (`b6f2513`, `a882416`, `916a0b0`, `91d4b68`, `aae551e`, `423614c`).
+- Brought `src/pages/options/options.js` into `checkJs` with local DOM narrowing and file-metadata contracts (`af6659c`).
+- Brought every `src/pages/bookmarks/*.js` module into `checkJs` in dependency-ordered batches (`b6f2513`, `a882416`, `916a0b0`, `91d4b68`, `aae551e`, `423614c`).
 - Injected the sync service into `modals.js` and recorded the global boundary audit (`2cd34c4`, `27c1084`).
-- Review fixes: missing-element early returns now throw into existing user-visible error paths; mutation typing simplified (`a3efdec`, `4652387`).
+- Review fixes: missing-element early returns now throw into existing user-visible error paths; mutation typing simplified; ticket statuses corrected (`a3efdec`, `4652387`, `5b9d655`).
+- Recorded acceptance evidence and the ESM deferral (`9bba1e5`); the maintainer's manual Chrome smoke checklist passed (`506760e`).
 - Commit `a882416` mixes ticket 05, 06, and 07 work because an agent ran `git add -A`. History was left as is.
 
 ### 2026-03-18
@@ -149,34 +144,13 @@ Current `checkJs` scope includes:
 - `tools/**/*.cjs`
 - `types/**/*.d.ts`
 
-The whole page layer is in scope. New bookmarks modules must be added to `tsconfig.json` explicitly.
+The whole page layer is in scope, in non-strict mode (`"strict": false`). New bookmarks modules must be added to `tsconfig.json` explicitly.
 
 ### Lint Baseline
 
 `npm run lint` passes with zero warnings.
 
 ## Next Work Queue
-
-### Phase 2 Entry Tasks
-
-- [x] Synchronize the roadmap and operational status with the approved Phase 2 plan.
-- [x] Publish the Phase 2 tracer-bullet tickets under `.scratch/phase-2-modernization/issues/`.
-- [x] Remove redundant Chrome runtime declarations.
-- [x] Add local DOM narrowing and data-shape contracts for the options page.
-- [x] Expand `tsconfig.json` to include the options page.
-- [x] Verify options startup, configuration save/clear, and WebDAV connection test.
-- [x] Add bookmarks foundational modules to `checkJs` in small batches.
-- [x] Add bookmarks rendering/menu modules to `checkJs`.
-- [x] Add bookmarks mutations/observers modules to `checkJs`.
-- [x] Add bookmarks drag-and-drop module to `checkJs`.
-- [x] Add bookmarks tree and page orchestrators to `checkJs`.
-
-### Phase 2 Boundary and Acceptance Tasks
-
-- [x] Audit global reads and keep runtime-global access concentrated in page bootstrap code (see Page Global Boundaries).
-- [x] Run the automated Phase 2 acceptance checks and record the evidence (see Verification Log).
-- [x] Run the Phase 2 Manual Chrome Smoke Checklist (passed).
-- [x] Record that runtime ESM remains deferred (see ESM Deferral).
 
 ### Phase 3 Preparation Tasks
 

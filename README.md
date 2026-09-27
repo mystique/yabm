@@ -47,12 +47,22 @@ A Chrome extension for visual bookmark management with optional WebDAV sync.
 |  |     `- options.css
 |  |- lib/
 |  |  |- i18n.js              # i18n loader and translator (window.YABMI18n)
+|  |  |- theme.js             # Theme loading and application (window.YABMTheme)
 |  |  `- sync-utils.js        # WebDAV + import/export (window.YABMSync)
 |  |- assets/
 |  |  |- icons/               # Extension icons
 |  |  |- fonts/               # Custom fonts (Space Grotesk, Material Symbols)
 |  |  `- twemoji/             # Twemoji SVGs for locale/status icons
 |  `- _locales/               # i18n message bundles (11 languages)
+|- tools/
+|  `- build.cjs               # Build script (src/ -> dist/)
+|- types/
+|  `- yabm-globals.d.ts       # window.YABM* global declarations for typecheck
+|- docs/
+|  `- modernization/          # Modernization roadmap and status
+|- package.json               # Dev tooling scripts (build, lint, typecheck, check)
+|- tsconfig.json              # JSDoc typecheck (checkJs) scope
+|- eslint.config.cjs
 |- README.md
 |- AGENTS.md                  # Agent/coding assistant instructions
 |- LICENSE
@@ -154,10 +164,12 @@ Modernization planning and progress tracking live in:
 - [docs/modernization/ROADMAP.md](docs/modernization/ROADMAP.md)
 - [docs/modernization/STATUS.md](docs/modernization/STATUS.md)
 
+Runtime model:
+
 - Manifest V3 extension
-- Scripts load via `<script>` tags (no ESM imports)
-- Global namespaces: `window.YABMI18n`, `window.YABMSync`
-- Module pattern via factory functions (e.g., `createBookmarkTreeModule`)
+- Scripts load via `<script>` tags (no ESM imports; ESM migration is deliberately deferred)
+- Shared library globals: `window.YABMI18n`, `window.YABMTheme`, `window.YABMSync`
+- Bookmarks feature modules use factory functions (e.g., `createBookmarkTreeModule(deps)`) that receive their dependencies from the page bootstrap
 
 ### Tooling Setup
 
@@ -176,12 +188,14 @@ npm run check
 
 - `npm run build` copies the extension into `dist/` and transpiles JavaScript with esbuild without changing the current runtime architecture.
 - `npm run lint` runs ESLint across the repository JavaScript.
-- `npm run typecheck` runs TypeScript in `checkJs` mode for the shared libraries, background scripts, and tooling layer.
+- `npm run typecheck` runs TypeScript in `checkJs` mode for the shared libraries, background scripts, all page scripts (bookmarks and options), and the tooling layer.
 - `npm run check` runs lint, typecheck, and build in sequence.
 
 Load `src/` in Chrome for the legacy direct-edit flow, or load `dist/` when you want to verify the tooling build output.
 
 ### Quick Syntax Check
+
+Run `node --check` on each JS file you modify, for example:
 
 ```powershell
 node --check src/pages/bookmarks/bookmarks.js
@@ -193,11 +207,15 @@ node --check src/background/service-worker.js
 
 ### Manual Testing
 
+There is no automated test runner. After changes, verify in Chrome:
+
 1. Load extension in Chrome Developer Mode
 2. Verify bookmark tree renders correctly
 3. Test CRUD operations (create/edit/delete/move)
 4. Test WebDAV connection and sync
 5. Test locale switching via Chrome language settings
+
+A fuller smoke checklist is kept in [docs/modernization/STATUS.md](docs/modernization/STATUS.md).
 
 For detailed development conventions, see [AGENTS.md](./AGENTS.md).
 

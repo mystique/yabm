@@ -28,7 +28,7 @@ Do not use this document as a daily progress log. Update [docs/modernization/STA
 | Phase | Name | Status | Outcome |
 | --- | --- | --- | --- |
 | 1 | Tooling Baseline | Completed | Build, lint, and JSDoc type checking exist and are documented |
-| 2 | Module Boundary Modernization | In progress | Bring page code into the checkable dependency model while preserving script-tag runtime loading |
+| 2 | Module Boundary Modernization | Completed | The whole page layer is typechecked and service globals are confined to the page bootstraps; script-tag runtime loading is preserved |
 | 3 | Directory and Feature Architecture | Not started | Reorganize the repo into a more modern app/core/shared/features structure |
 
 ## Phase 1: Tooling Baseline
@@ -69,7 +69,7 @@ Completed.
 
 ### Known Residual Items
 
-- Page scripts still need to enter the formal `checkJs` scope.
+- Page scripts still needed to enter the formal `checkJs` scope (resolved in Phase 2).
 - Runtime globals remain a deliberate compatibility boundary until page-layer type safety is stable.
 
 ## Phase 2: Module Boundary Modernization
@@ -128,6 +128,25 @@ Make the page code less fragile by reducing manual global coupling and improving
 - DOM-heavy code will expose many historical typing gaps
 - changing module boundaries too aggressively can break script load assumptions
 - ESM migration should not begin until the page layer has a stable type/lint baseline
+
+### Completed Work
+
+- removed redundant Chrome runtime type declarations
+- brought `src/pages/options/options.js` and every `src/pages/bookmarks/*.js` file into `checkJs`
+- made factory `deps` objects and returned module APIs explicit with file-scope JSDoc typedefs
+- replaced silent missing-element early returns with thrown errors that reach existing user-visible error paths
+- moved the `modals.js` sync service read behind factory injection; remaining global access is documented in [STATUS.md](STATUS.md)
+- recorded that runtime ESM migration stays deferred
+
+### Exit Status
+
+Completed 2026-09-27. Automated checks and the manual Chrome smoke checklist passed. Evidence is in the [STATUS.md](STATUS.md) Verification Log.
+
+### Known Residual Items
+
+- `types/yabm-globals.d.ts` still declares every `window.YABM*` global as `any`, so cross-file contracts are only checked where modules reference each other's typedefs through JSDoc `import()`.
+- `checkJs` runs non-strict (`"strict": false`).
+- `bookmark-tree.js` still reads the tree sub-module factories from globals as the tree composition root.
 
 ## Phase 3: Directory and Feature Architecture
 
