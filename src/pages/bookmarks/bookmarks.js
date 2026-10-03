@@ -31,7 +31,7 @@ const LANGUAGE_OPTIONS = [
   { value: window.YABMI18n.AUTO_LANGUAGE, label: "Auto (Browser)", flag: "🌐" },
   { value: "en", label: "English", flag: "🇺🇸" },
   { value: "zh_CN", label: "Chinese (Simplified)", flag: "🇨🇳" },
-  { value: "zh_TW", label: "Chinese (Traditional)", flag: "🇹🇼" },
+  { value: "zh_TW", label: "Chinese (Traditional)", flag: "🇭🇰" },
   { value: "de", label: "Deutsch", flag: "🇩🇪" },
   { value: "es", label: "Espanol", flag: "🇪🇸" },
   { value: "fr", label: "Francais", flag: "🇫🇷" },
