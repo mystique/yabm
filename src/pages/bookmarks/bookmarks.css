@@ -301,7 +301,7 @@
     --action-btn-danger-hover-bg: #3d2222;
 
     /* Bookmark item colors */
-    --bookmark-bg: #15202f;
+    --bookmark-bg: var(--card);
     --bookmark-favicon-fallback-text: #7a9ab8;
     --bookmark-favicon-fallback-bg: #1a2838;
     --bookmark-favicon-fallback-border: #284060;
@@ -2021,7 +2021,6 @@ h1 {
 :root[data-theme="dark"] .container,
 :root[data-theme="dark"] .folder[data-level="0"],
 :root[data-theme="dark"] .folder:not([data-level="0"]) .folder-header,
-:root[data-theme="dark"] .bookmark-row,
 :root[data-theme="dark"] .bookmark-list,
 :root[data-theme="dark"] .modal-body,
 :root[data-theme="dark"] .file-item,
@@ -2046,7 +2045,6 @@ h1 {
 :root[data-theme="dark"] .container,
 :root[data-theme="dark"] .folder[data-level="0"],
 :root[data-theme="dark"] .folder:not([data-level="0"]) .folder-header,
-:root[data-theme="dark"] .bookmark-row,
 :root[data-theme="dark"] .sync-status,
 :root[data-theme="dark"] .modal-body,
 :root[data-theme="dark"] .file-item,
@@ -2071,11 +2069,6 @@ h1 {
     background: linear-gradient(90deg, var(--card-soft), transparent);
 }
 
-:root[data-theme="dark"] .bookmark-row {
-    background: var(--card-soft);
-}
-
-:root[data-theme="dark"] .bookmark-row:hover,
 :root[data-theme="dark"] .sort-menu-item:hover,
 :root[data-theme="dark"] .tree-context-item:hover,
 :root[data-theme="dark"] .language-menu-item-active,
