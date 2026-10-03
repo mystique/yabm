@@ -6,22 +6,7 @@
  * Loaded directly by the extension as a standalone page.
  */
 
-/**
- * @typedef {object} FileMetadata
- * @property {string} name - File name
- * @property {string} lastModified - ISO 8601 date string
- * @property {number|string} size - File size in bytes
- */
-
-/**
- * State object to track test results and available files
- * @type {{ tested: boolean, directoryUrl: string, files: FileMetadata[] }}
- */
-const state = {
-  tested: false,           // Whether connection test succeeded
-  directoryUrl: "",        // Normalized WebDAV directory URL from last test
-  files: []                // Array of file metadata from directory listing
-};
+/** @typedef {import("../../lib/webdav-config-session.js").WebdavConfigFile} FileMetadata */
 
 /**
  * Translate a message key using the i18n library
@@ -100,6 +85,22 @@ function getFormElements() {
   };
 }
 
+/** @returns {import("../../lib/webdav-config-session.js").WebdavConfigForm} */
+function readConfigForm() {
+  const form = getFormElements();
+  return {
+    directoryUrl: form.directoryUrl.value,
+    username: form.username.value,
+    password: form.password.value,
+    newFileName: form.newFileName.value,
+  };
+}
+
+const configSession = window.YABMWebdavConfigSession.createSession({
+  sync: window.YABMSync,
+  readForm: readConfigForm,
+});
+
 /**
  * Set the status message and visibility
  * @param {string} message - Status text to display
@@ -121,19 +122,6 @@ function setStatus(message, type) {
   if (type) {
     el.classList.add(type);
   }
-}
-
-/**
- * Normalize a file name to standard Netscape bookmark HTML format
- * @param {string} fileName - Input file name
- * @returns {string} - Normalized file name (lowercase, .html extension)
- */
-function normalizeFileName(fileName) {
-  const value = (fileName || "").trim();
-  if (!value) {
-    return "bookmarks.html";
-  }
-  return value.toLowerCase().endsWith(".html") ? value : `${value}.html`;
 }
 
 /**
@@ -194,9 +182,9 @@ function buildFileMetaHtml(file) {
 /**
  * Render the file list UI with radio buttons for selection
  * @param {FileMetadata[]} files - Array of file metadata objects
- * @param {string} [selectedName] - File name to pre-select (if present)
+ * @param {string} selectedFile - Session-selected radio value.
  */
-function renderFileList(files, selectedName) {
+function renderFileList(files, selectedFile) {
   const container = requireElement("files-container");
   container.innerHTML = "";
 
@@ -234,47 +222,20 @@ function renderFileList(files, selectedName) {
     container.appendChild(item);
   }
 
-  // Set the default selection logic
-  const target = selectedName || "bookmarks.html";
-  const radios = container.querySelectorAll('input[name="file-select"]');
-  let selected = false;
-
-  // Try to find the exact file name
-  for (const radio of radios) {
-    if (!(radio instanceof HTMLInputElement)) {
-      continue;
-    }
-    if (radio.value === target) {
-      radio.checked = true;
-      selected = true;
-      break;
-    }
-  }
-
-  // Fallback to "Create New" option if target file is not found
-  if (!selected) {
-    const newRadio = container.querySelector('input[value="__new__"]');
-    if (newRadio instanceof HTMLInputElement) {
-      newRadio.checked = true;
+  for (const radio of container.querySelectorAll('input[name="file-select"]')) {
+    if (radio instanceof HTMLInputElement) {
+      radio.checked = radio.value === selectedFile;
     }
   }
 }
 
 /**
- * Get the currently selected file name from the radio button group
- * @returns {string} - Selected file name (normalized if creating new)
+ * Get the selected radio value; the session resolves new-file names.
+ * @returns {string}
  */
-function getSelectedFileName() {
+function getSelectedFile() {
   const checked = document.querySelector('input[name="file-select"]:checked');
-  if (!(checked instanceof HTMLInputElement)) {
-    return "";
-  }
-
-  if (checked.value === "__new__") {
-    return normalizeFileName(requireInput("new-file-name").value);
-  }
-
-  return checked.value;
+  return checked instanceof HTMLInputElement ? checked.value : "";
 }
 
 /**
@@ -291,6 +252,7 @@ async function loadSavedConfig() {
   form.username.value = config.username || "";
   form.password.value = config.password || "";
   form.newFileName.value = config.fileName || "bookmarks.html";
+  configSession.invalidate();
 }
 
 /**
@@ -309,23 +271,13 @@ async function testConnection() {
     setStatus(t("testingConnection"), "");
 
     fileSection = requireElement("file-section");
-    const form = getFormElements();
-    const directoryUrl = form.directoryUrl.value.trim();
-    const username = form.username.value.trim();
-    const password = form.password.value;
-
-    const result = await window.YABMSync.listDirectoryFiles({
-      directoryUrl,
-      username,
-      password
-    });
-
-    state.tested = true;
-    state.directoryUrl = result.directoryUrl;
-    state.files = result.files;
+    const result = await configSession.test();
+    if (!result) {
+      return;
+    }
 
     fileSection.classList.remove("hidden");
-    renderFileList(result.files, normalizeFileName(form.newFileName.value));
+    renderFileList(result.files, result.selectedFile);
 
     if (!result.files.length) {
       setStatus(t("connSuccessNoFiles"), "success");
@@ -333,9 +285,7 @@ async function testConnection() {
       setStatus(t("connSuccessFoundFiles", [String(result.files.length)]), "success");
     }
   } catch (error) {
-    state.tested = false;
-    state.directoryUrl = "";
-    state.files = [];
+    configSession.invalidate();
     if (fileSection) {
       fileSection.classList.add("hidden");
     }
@@ -352,28 +302,12 @@ async function testConnection() {
  * Requires a successful connection test first
  */
 async function saveConfig() {
-  if (!state.tested) {
-    setStatus(t("testBeforeSave"), "error");
-    return;
-  }
-
   try {
-    // Lookups stay inside the try so a missing element surfaces in the status
-    const fileName = getSelectedFileName();
-    if (!fileName) {
-      setStatus(t("selectOrEnterFile"), "error");
+    const validationError = await configSession.save(getSelectedFile());
+    if (validationError) {
+      setStatus(t(validationError), "error");
       return;
     }
-
-    const form = getFormElements();
-    const payload = {
-      directoryUrl: state.directoryUrl,
-      username: form.username.value.trim(),
-      password: form.password.value,
-      fileName
-    };
-
-    await window.YABMSync.saveConfig(payload);
     setStatus(t("configurationSaved"), "success");
   } catch (error) {
     setStatus(t("saveFailed", [error.message]), "error");
@@ -403,9 +337,7 @@ function bindEvents() {
    * Prevents saving outdated connection state.
    */
   const invalidate = () => {
-    state.tested = false;
-    state.directoryUrl = "";
-    state.files = [];
+    configSession.invalidate();
     fileSection.classList.add("hidden");
   };
 

@@ -17,6 +17,9 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ### Changed
 
+- WebDAV configuration testing and saving now share one session rule across the options page and bookmarks modal, including stale-request protection.
+- Bookmark tree changes use one refresh coordinator so renders, open folders, favicon state, and WebDAV status stay ordered across page actions and Chrome events.
+- Drag-and-drop owns its visual cleanup through the complete drag lifecycle, including cancelled and failed asynchronous drops.
 - Fonts (Space Grotesk, Material Symbols) load from Google Fonts and Twemoji icons load from jsDelivr instead of being bundled; the pages now need network access to render these assets
 - Extension pages now declare an explicit Content Security Policy limited to these font/icon hosts and HTTPS connections
 - Dropping an item onto a folder no longer auto-expands that folder
@@ -26,6 +29,9 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ### Fixed
 
+- A completed WebDAV request from old credentials can no longer restore save eligibility after the form changes.
+- Bookmark refresh requests that arrive during another refresh are processed after the current pass.
+- Drag cancellation, target lookup failures, and failed moves now clear source styling, drop highlights, and drag previews.
 - Folders can no longer be dropped into their own descendants
 - A race where the drag state was cleared before the drop finished, which could make a valid drop fail
 - Dropping onto a folder element with no folder ID no longer triggers an unhandled error

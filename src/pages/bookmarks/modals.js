@@ -41,6 +41,7 @@
  * @property {(stateKey: 'notConfigured'|'checking'|'ready'|'error', tooltipText: string) => void} setWebdavStatusIndicator
  * @property {(options?: { interactive?: boolean }) => Promise<void>} refreshWebdavStatusBar
  * @property {ModalsSyncService} sync
+ * @property {(deps: import("../../lib/webdav-config-session.js").WebdavConfigSessionDeps) => import("../../lib/webdav-config-session.js").WebdavConfigSession} createConfigSession
  */
 
 /**
@@ -92,6 +93,10 @@
       refreshWebdavStatusBar,
       sync,
     } = deps;
+    const configSession = deps.createConfigSession({
+      sync,
+      readForm: readConfigForm,
+    });
 
     /** CSS transition duration for modal open/close animations (ms). */
     const MODAL_ANIM_MS = 180;
@@ -136,18 +141,6 @@
       }
       return el;
     }
-
-    /**
-     * Transient state for the WebDAV config wizard.
-     * `tested` must be true before the user can save; it is reset whenever
-     * any credential field changes in a way that invalidates the connection test.
-     * @type {{ tested: boolean, directoryUrl: string, files: WebdavFileMetadata[] }}
-     */
-    const configState = {
-      tested: false,
-      directoryUrl: "",
-      files: [],
-    };
 
     /**
      * Updates a status element's text, visibility, and type modifier class.
@@ -251,18 +244,14 @@
       modalCloseTimers.set(modal, timer);
     }
 
-    /**
-     * Normalises a file name to lowercase with a `.html` extension.
-     * Defaults to `"bookmarks.html"` when the input is blank.
-     * @param {string} fileName
-     * @returns {string}
-     */
-    function normalizeFileName(fileName) {
-      const value = (fileName || "").trim();
-      if (!value) {
-        return "bookmarks.html";
-      }
-      return value.toLowerCase().endsWith(".html") ? value : `${value}.html`;
+    /** @returns {import("../../lib/webdav-config-session.js").WebdavConfigForm} */
+    function readConfigForm() {
+      return {
+        directoryUrl: requireInput("cfg-directory-url").value,
+        username: requireInput("cfg-username").value,
+        password: requireInput("cfg-password").value,
+        newFileName: requireInput("cfg-new-file-name").value,
+      };
     }
 
     /**
@@ -324,11 +313,11 @@
 
     /**
      * Populates the config modal's file selection list with existing WebDAV files
-     * plus a "Create new file" option, pre-selecting `selectedName` when possible.
+     * plus a "Create new file" option, using the session's initial selection.
      * @param {WebdavFileMetadata[]} files
-     * @param {string} selectedName - File name to pre-select.
+     * @param {string} selectedFile - Session-selected radio value.
      */
-    function renderConfigFileList(files, selectedName) {
+    function renderConfigFileList(files, selectedFile) {
       const container = requireElement("cfg-files");
       container.innerHTML = "";
 
@@ -362,47 +351,22 @@
         container.appendChild(item);
       }
 
-      const target = selectedName || "bookmarks.html";
-      const radios = container.querySelectorAll('input[name="cfg-file-select"]');
-      let matched = false;
-
-      for (const radio of radios) {
-        if (!(radio instanceof HTMLInputElement)) {
-          continue;
-        }
-        if (radio.value === target) {
-          radio.checked = true;
-          matched = true;
-          break;
-        }
-      }
-
-      if (!matched) {
-        const newRadio = container.querySelector('input[value="__new__"]');
-        if (newRadio instanceof HTMLInputElement) {
-          newRadio.checked = true;
+      for (const radio of container.querySelectorAll('input[name="cfg-file-select"]')) {
+        if (radio instanceof HTMLInputElement) {
+          radio.checked = radio.value === selectedFile;
         }
       }
     }
 
     /**
-     * Returns the currently selected file name from the config file-picker.
-     * When "Create new file" is selected, derives the name from the filename input.
+     * Returns the selected radio value; the session resolves new-file names.
      * @returns {string}
      */
-    function getSelectedConfigFileName() {
+    function getSelectedConfigFile() {
       const checked = document.querySelector(
         'input[name="cfg-file-select"]:checked',
       );
-      if (!(checked instanceof HTMLInputElement)) {
-        return "";
-      }
-
-      if (checked.value === "__new__") {
-        return normalizeFileName(requireInput("cfg-new-file-name").value);
-      }
-
-      return checked.value;
+      return checked instanceof HTMLInputElement ? checked.value : "";
     }
 
     /**
@@ -411,9 +375,7 @@
      * cannot be used to save a config to a different server.
      */
     function invalidateConfigTest() {
-      configState.tested = false;
-      configState.directoryUrl = "";
-      configState.files = [];
+      configSession.invalidate();
       const section = requireElement("cfg-file-section");
       section.classList.remove("is-open");
     }
@@ -461,25 +423,13 @@
       setConfigStatus(t("testingWebdavConnection"), "");
 
       try {
-        const directoryUrl = requireInput("cfg-directory-url").value.trim();
-        const username = requireInput("cfg-username").value.trim();
-        const password = requireInput("cfg-password").value;
-
-        const result = await sync.listDirectoryFiles({
-          directoryUrl,
-          username,
-          password,
-        });
-
-        configState.tested = true;
-        configState.directoryUrl = result.directoryUrl;
-        configState.files = result.files;
+        const result = await configSession.test();
+        if (!result) {
+          return;
+        }
 
         requireElement("cfg-file-section").classList.add("is-open");
-        renderConfigFileList(
-          result.files,
-          normalizeFileName(requireInput("cfg-new-file-name").value),
-        );
+        renderConfigFileList(result.files, result.selectedFile);
 
         if (!result.files.length) {
           setConfigStatus(t("connSuccessNoFiles"), "success");
@@ -503,26 +453,12 @@
      * @returns {Promise<void>}
      */
     async function saveConfigFromModal() {
-      if (!configState.tested) {
-        setConfigStatus(t("testBeforeSave"), "error");
-        return;
-      }
-
-      const fileName = getSelectedConfigFileName();
-      if (!fileName) {
-        setConfigStatus(t("selectOrEnterFile"), "error");
-        return;
-      }
-
-      const payload = {
-        directoryUrl: configState.directoryUrl,
-        username: requireInput("cfg-username").value.trim(),
-        password: requireInput("cfg-password").value,
-        fileName,
-      };
-
       try {
-        await sync.saveConfig(payload);
+        const validationError = await configSession.save(getSelectedConfigFile());
+        if (validationError) {
+          setConfigStatus(t(validationError), "error");
+          return;
+        }
         setConfigStatus(t("configurationSaved"), "success");
         setStatus(t("configurationSaved"), "success");
         closeConfigModal();
@@ -549,7 +485,7 @@
       }
 
       try {
-        await sync.clearConfig();
+        await configSession.clear();
         requireInput("cfg-directory-url").value = "";
         requireInput("cfg-username").value = "";
         requireInput("cfg-password").value = "";

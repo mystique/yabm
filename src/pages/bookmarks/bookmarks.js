@@ -7,6 +7,7 @@
  * Depends on the following globals (loaded via <script> tags before this file):
  *   - window.YABMI18n          (i18n.js)
  *   - window.YABMSync          (sync-utils.js)
+ *   - window.YABMWebdavConfigSession (webdav-config-session.js)
  *   - window.YABMNotificationsModule
  *   - window.YABMScrollbarModule
  *   - window.YABMFaviconCacheModule
@@ -323,6 +324,7 @@ const modalsModule = window.YABMModalsModule.createModalsModule({
     /** @type {Parameters<BookmarkTreeModuleDeps["refreshWebdavStatusBar"]>} */ ...args
   ) => refreshWebdavStatusBar(...args),
   sync: window.YABMSync,
+  createConfigSession: window.YABMWebdavConfigSession.createSession,
 });
 
 const {
@@ -1264,8 +1266,7 @@ function bindTreeActions() {
   });
   // Attach container-level drag handlers for bookmark/folder drag-and-drop
   if (bookmarkListEl && createContainerDragHandlers) {
-    const containerHandlers = createContainerDragHandlers(bookmarkListEl);
-    containerHandlers.attach();
+    createContainerDragHandlers(bookmarkListEl).attach();
   }
   if (!isGlobalEventsBound()) {
     setGlobalEventsBound(true);

@@ -27,7 +27,10 @@
 
     /**
      * Live drag state, including the currently highlighted drop target.
-     * @typedef {CapturedDragState & { currentDragOverFolderId: string|null }} DragState
+     * @typedef {CapturedDragState & {
+     *   currentDragOverFolderId: string|null,
+     *   sourceEl: HTMLElement|null
+     * }} DragState
      */
 
     // Tracks the node currently being dragged so drop handlers can validate targets.
@@ -37,6 +40,7 @@
       nodeType: null,                // 'bookmark' or 'folder'.
       parentId: null,                // Original parent folder ID (used to skip no-op drops).
       currentDragOverFolderId: null, // Currently highlighted drop target folder ID.
+      sourceEl: null,                 // Source element carrying the drag-source class.
     };
     // Cloned ghost element appended off-screen to serve as the drag image.
     /** @type {HTMLElement|null} */
@@ -53,22 +57,65 @@
     }
 
     /**
+     * Clears the currently highlighted folder without dropping the state ID
+     * before the corresponding DOM element has been found.
+     */
+    function clearCurrentHighlight() {
+      const folderId = dragState.currentDragOverFolderId;
+      if (!folderId) {
+        return;
+      }
+      document
+        .querySelector(`[data-folder-id="${folderId}"]`)
+        ?.classList.remove("drag-over");
+      dragState.currentDragOverFolderId = null;
+    }
+
+    /**
+     * Removes every visual artefact owned by the active drag operation.
+     * @param {EventTarget|null} [sourceEl]
+     */
+    function cleanupDragVisuals(sourceEl = null) {
+      clearCurrentHighlight();
+      if (dragState.sourceEl) {
+        dragState.sourceEl.classList.remove("drag-source");
+      }
+      if (sourceEl instanceof HTMLElement) {
+        sourceEl.classList.remove("drag-source");
+      }
+      removeDragGhost();
+    }
+
+    function resetDragState() {
+      dragState.nodeId = null;
+      dragState.nodeType = null;
+      dragState.parentId = null;
+      dragState.currentDragOverFolderId = null;
+      dragState.sourceEl = null;
+    }
+
+    /**
      * Initialises drag state and attaches a styled ghost image to the drag operation.
      * @param {DragEvent} event - The native dragstart event.
      * @param {chrome.bookmarks.BookmarkTreeNode} node - The bookmark/folder being dragged.
      * @param {DragNodeType} nodeType - Type of the node being dragged.
      */
     function handleNodeDragStart(event, node, nodeType) {
+      const sourceEl =
+        event.currentTarget instanceof HTMLElement ? event.currentTarget : null;
+      cleanupDragVisuals(sourceEl);
+      resetDragState();
+
       dragState.nodeId = node.id;
       dragState.nodeType = nodeType;
       dragState.parentId = node.parentId;
+      dragState.sourceEl = sourceEl;
       event.dataTransfer.effectAllowed = "move";
       event.dataTransfer.setData("text/plain", node.id);
 
       // Build a styled ghost element that tracks the cursor during the drag.
       removeDragGhost();
-      const sourceEl = event.currentTarget;
-      if (!(sourceEl instanceof HTMLElement)) {
+      if (!sourceEl) {
         return;
       }
       sourceEl.classList.add("drag-source");
@@ -102,18 +149,10 @@
     /**
      * Cleans up drag state and visual artefacts when a drag operation ends.
      * @param {DragEvent} event - The native dragend event.
-     * @param {{ clearCurrentHighlight?: Function }} [containerHandlers] - Optional handlers for cleanup.
      */
-    function handleNodeDragEnd(event, containerHandlers) {
-      dragState.nodeId = null;
-      dragState.nodeType = null;
-      dragState.parentId = null;
-      dragState.currentDragOverFolderId = null;
-      if (event.currentTarget instanceof HTMLElement) {
-        event.currentTarget.classList.remove("drag-source");
-      }
-      containerHandlers?.clearCurrentHighlight?.();
-      removeDragGhost();
+    function handleNodeDragEnd(event) {
+      cleanupDragVisuals(event.currentTarget);
+      resetDragState();
     }
 
     /**
@@ -138,6 +177,9 @@
       return false;
     }
 
+    function getErrorMessage(error) {
+      return error?.message || String(error);
+    }
     /**
      * Validates whether the dragged node may be dropped into `targetFolderId`.
      * Prevents moving a folder into itself or into one of its own descendants.
@@ -179,18 +221,10 @@
       event.preventDefault();
       event.stopPropagation();
 
-      dragState.nodeId = null;
-      dragState.nodeType = null;
-      dragState.currentDragOverFolderId = null;
-
-      // Clear visual highlight
-      if (event.target instanceof Element) {
-        const folder = event.target.closest(".folder");
-        if (folder instanceof HTMLElement) {
-          folder.classList.remove("drag-over");
-        }
+      if (!capturedDragState) {
+        cleanupDragVisuals();
+        resetDragState();
       }
-
       try {
         const canDrop = await canDropNodeInFolder(
           dragNodeId,
@@ -220,7 +254,7 @@
         setStatus(t("movedSuccessfully"), "success");
         await rerenderAfterTreeChange();
       } catch (error) {
-        setStatus(t("moveFailed", [error.message]), "error");
+        setStatus(t("moveFailed", [getErrorMessage(error)]), "error");
       }
     }
 
@@ -229,21 +263,9 @@
      * This approach eliminates flickering by tracking the current drag-over folder
      * and only updating highlights when the target actually changes.
      * @param {HTMLElement} container - The #bookmark-list container element.
-     * @returns {{ attach: Function, detach: Function, clearCurrentHighlight: Function }}
+     * @returns {{ attach: Function, detach: Function }}
      */
     function createContainerDragHandlers(container) {
-      /**
-       * Clears the highlight from the currently highlighted folder, if any.
-       */
-      function clearCurrentHighlight() {
-        if (dragState.currentDragOverFolderId) {
-          const folder = document.querySelector(
-            `[data-folder-id="${dragState.currentDragOverFolderId}"]`,
-          );
-          folder?.classList.remove("drag-over");
-          dragState.currentDragOverFolderId = null;
-        }
-      }
 
       /**
        * Handles dragover events at the container level.
@@ -277,8 +299,10 @@
 
         // Skip dropping a folder into its own subtree
         if (dragState.nodeType === "folder") {
-          const draggedFolderEl = document.querySelector(`[data-folder-id="${dragState.nodeId}"]`);
-          if (draggedFolderEl && folder.contains(draggedFolderEl)) {
+          const draggedFolderEl = document.querySelector(
+            `[data-folder-id="${dragState.nodeId}"]`,
+          );
+          if (draggedFolderEl && draggedFolderEl.contains(folder)) {
             clearCurrentHighlight();
             return;
           }
@@ -314,19 +338,30 @@
           return;
         }
 
-        // Capture drag state before async operation to prevent race with dragend
+        // Capture drag state before async operation to prevent race with dragend.
         const capturedDragState = {
           nodeId: dragState.nodeId,
           nodeType: dragState.nodeType,
           parentId: dragState.parentId,
         };
+        event.preventDefault();
+        event.stopPropagation();
+        cleanupDragVisuals();
+        resetDragState();
 
-        // Fetch the folder node and call the drop handler
-        chrome.bookmarks.get(folderId).then(([targetFolderNode]) => {
-          if (targetFolderNode) {
-            handleFolderDrop(event, targetFolderNode, capturedDragState);
-          }
-        });
+        // Fetching the target is asynchronous, so report query failures here.
+        Promise.resolve()
+          .then(() => chrome.bookmarks.get(folderId))
+          .then(([targetFolderNode]) => {
+            if (!targetFolderNode) {
+              setStatus(t("moveFailed", [t("folderNotFound")]), "error");
+              return;
+            }
+            return handleFolderDrop(event, targetFolderNode, capturedDragState);
+          })
+          .catch((error) => {
+            setStatus(t("moveFailed", [getErrorMessage(error)]), "error");
+          });
       }
 
       /**
@@ -360,7 +395,7 @@
         container.removeEventListener("dragleave", handleDragLeave);
       }
 
-      return { attach, detach, clearCurrentHighlight };
+      return { attach, detach };
     }
 
     return {

@@ -26,46 +26,54 @@
      * @param {string[]} [extraOpenFolderIds=[]] - Additional folder IDs to keep open.
      * @returns {Promise<void>}
      */
-    async function rerenderAfterTreeChange(extraOpenFolderIds = []) {
+    let treeChangeRefreshPromise = null;
+    let pendingOpenFolderIds = new Set();
+
+    /**
+     * Coordinates every tree refresh, keeping requests received during an
+     * in-flight render for a follow-up pass.
+     * @param {string[]} [extraOpenFolderIds=[]]
+     * @returns {Promise<void>}
+     */
+    function rerenderAfterTreeChange(extraOpenFolderIds = []) {
       const openFolderIds = getOpenFolderIds();
       for (const folderId of extraOpenFolderIds) {
         openFolderIds.add(folderId);
       }
-      await renderBookmarks(openFolderIds);
-      await refreshWebdavStatusBar();
+      for (const folderId of openFolderIds) {
+        pendingOpenFolderIds.add(folderId);
+      }
+      if (!treeChangeRefreshPromise) {
+        treeChangeRefreshPromise = (async () => {
+          try {
+            do {
+              const foldersToOpen = pendingOpenFolderIds;
+              pendingOpenFolderIds = new Set();
+              await renderBookmarks(foldersToOpen);
+              await refreshWebdavStatusBar();
+            } while (pendingOpenFolderIds.size > 0);
+          } finally {
+            treeChangeRefreshPromise = null;
+          }
+        })();
+      }
+      return treeChangeRefreshPromise;
     }
 
-    // Debounce timer handle; reset on each incoming bookmark event.
+    // Debounce external events while routing the actual refresh through the
+    // same coordinator used by page actions.
     let treeChangeDebounceTimer = null;
-    // True while an async refresh is in progress, preventing overlapping fetches.
-    let treeChangeRefreshInFlight = false;
-    // Set to true when a new event arrives while a refresh is already in flight,
-    // so that a follow-up refresh is scheduled once the current one finishes.
-    let treeChangeRefreshPending = false;
+
 
     /**
-     * Performs a full tree refresh in response to an external bookmark change.
-     * If another refresh is already running, sets a pending flag so a follow-up
-     * refresh is automatically queued when the current one completes.
+     * Refreshes for an external event and keeps failures visible to the user.
      * @returns {Promise<void>}
      */
     async function refreshAfterExternalTreeChange() {
-      if (treeChangeRefreshInFlight) {
-        treeChangeRefreshPending = true;
-        return;
-      }
-
-      treeChangeRefreshInFlight = true;
       try {
         await rerenderAfterTreeChange();
       } catch (error) {
         setStatus(t("loadBookmarksFailed", [error.message]), "error");
-      } finally {
-        treeChangeRefreshInFlight = false;
-        if (treeChangeRefreshPending) {
-          treeChangeRefreshPending = false;
-          queueExternalTreeRefresh();
-        }
       }
     }
 

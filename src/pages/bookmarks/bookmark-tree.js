@@ -39,7 +39,7 @@
  * @property {() => void} bindBookmarkTreeObservers
  * @property {RenderModuleDeps["closeTreeContextMenu"]} closeTreeContextMenu
  * @property {RenderModuleDeps["closeSortMenu"]} closeSortMenu
- * @property {(container: HTMLElement) => { attach: Function, detach: Function, clearCurrentHighlight: Function }} createContainerDragHandlers
+ * @property {(container: HTMLElement) => { attach: Function, detach: Function }} createContainerDragHandlers
  * @property {(descending: boolean) => Promise<void>} handleSortMenuApply
  * @property {() => boolean} isTreeContextMenuOpen
  * @property {(openFolderIds?: Set<string> | null) => Promise<void>} renderBookmarks
@@ -131,7 +131,6 @@
         setStatus,
         getNameForNode,
         getFolderStats,
-        getOpenFolderIds,
         getBookmarkNodesInFolder,
         removeFaviconsByBookmarkIds,
         ensureValidUrl,
@@ -139,9 +138,6 @@
         openPromptModal,
         openEditorModal,
         rerenderAfterTreeChange,
-        renderBookmarks: (
-          /** @type {Parameters<BookmarkTreeModule["renderBookmarks"]>} */ ...args
-        ) => renderBookmarks(...args),
       });
     const {
       addBookmarkNode,

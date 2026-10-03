@@ -7,7 +7,7 @@
 (function () {
   /**
    * Factory that creates the mutations module.
-   * @param {{ t: Function, setStatus: Function, getNameForNode: Function, getFolderStats: Function, getOpenFolderIds: Function, getBookmarkNodesInFolder: Function, removeFaviconsByBookmarkIds: Function, ensureValidUrl: Function, refreshBookmarkFavicon: Function, openPromptModal: Function, openEditorModal: Function, rerenderAfterTreeChange: Function, renderBookmarks: Function }} deps
+   * @param {{ t: Function, setStatus: Function, getNameForNode: Function, getFolderStats: Function, getBookmarkNodesInFolder: Function, removeFaviconsByBookmarkIds: Function, ensureValidUrl: Function, refreshBookmarkFavicon: Function, openPromptModal: Function, openEditorModal: Function, rerenderAfterTreeChange: Function }} deps
    * @returns {{ addBookmarkNode: Function, addFolderNode: Function, deleteBookmarkNode: Function, deleteFolderNode: Function, editBookmarkNode: Function, editFolderNode: Function, refreshBookmarkFaviconWithStatus: Function, runBookmarkMutation: Function }}
    */
   function createBookmarkTreeMutationsModule(deps) {
@@ -16,7 +16,6 @@
       setStatus,
       getNameForNode,
       getFolderStats,
-      getOpenFolderIds,
       getBookmarkNodesInFolder,
       removeFaviconsByBookmarkIds,
       ensureValidUrl,
@@ -24,7 +23,6 @@
       openPromptModal,
       openEditorModal,
       rerenderAfterTreeChange,
-      renderBookmarks,
     } = deps;
 
     /**
@@ -80,7 +78,6 @@
         return;
       }
 
-      const openFolderIds = getOpenFolderIds();
       await runBookmarkMutation(
         async () => {
           await removeFaviconsByBookmarkIds([node.id]);
@@ -89,7 +86,7 @@
         {
           successKey: "bookmarkDeleted",
           errorKey: "deleteFailed",
-          afterSuccess: () => renderBookmarks(openFolderIds),
+          afterSuccess: () => rerenderAfterTreeChange(),
         },
       );
     }
@@ -127,7 +124,6 @@
         }
       }
 
-      const openFolderIds = getOpenFolderIds();
       await runBookmarkMutation(
         async () => {
           const bookmarkIds = getBookmarkNodesInFolder(node).map((item) => item.id);
@@ -137,7 +133,7 @@
         {
           successKey: "folderDeleted",
           errorKey: "deleteFailed",
-          afterSuccess: () => renderBookmarks(openFolderIds),
+          afterSuccess: () => rerenderAfterTreeChange(),
         },
       );
     }
