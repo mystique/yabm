@@ -18,6 +18,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 ### Changed
 
 - WebDAV configuration testing and saving now share one session rule across the options page and bookmarks modal, including stale-request protection.
+- Folder expand and collapse markers use an arrow icon instead of a greater-than character
 - Bookmark tree changes use one refresh coordinator so renders, open folders, favicon state, and WebDAV status stay ordered across page actions and Chrome events.
 - Drag-and-drop owns its visual cleanup through the complete drag lifecycle, including cancelled and failed asynchronous drops.
 - Fonts (Space Grotesk, Material Symbols) load from Google Fonts and Twemoji icons load from jsDelivr instead of being bundled; the pages now need network access to render these assets

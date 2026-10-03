@@ -306,8 +306,9 @@
       left.className = "folder-left";
 
       const chevron = document.createElement("span");
-      chevron.className = "folder-chevron";
-      chevron.textContent = ">";
+      chevron.className = "folder-chevron icon-font";
+      chevron.setAttribute("aria-hidden", "true");
+      chevron.textContent = "arrow_right";
 
       const folderIcon = document.createElement("span");
       folderIcon.className = "folder-fixed-icon";
