@@ -13,12 +13,14 @@
  *   - window.YABMScrollbarModule
  *   - window.YABMFaviconCacheModule
  *   - window.YABMModalsModule
+ *   - window.YABMBookmarkOverlayModule
  *   - window.YABMBookmarkTreeModule
  */
 
 /**
  * @typedef {import("./bookmark-tree.js").BookmarkTreeModule} BookmarkTreeModule
  * @typedef {import("./bookmark-tree.js").BookmarkTreeModuleDeps} BookmarkTreeModuleDeps
+ * @typedef {import("./bookmark-overlay.js").BookmarkOverlayModule} BookmarkOverlayModule
  */
 
 /** Shorthand wrapper around the active i18n translation function. */
@@ -358,6 +360,20 @@ function updateMainLayoutMetrics() {
   updateBookmarkListScrollbar();
 }
 
+/** @type {BookmarkOverlayModule["createOverlay"]} */
+const createOverlay = window.YABMBookmarkOverlayModule.createOverlay;
+
+/**
+ * The bookmark edit context menu. Owned by this page but registered with the
+ * overlay module, so the tree layer can close it through the same handle.
+ */
+const editContextMenu = createOverlay({
+  id: "editContextMenu",
+  getElement: () => document.getElementById("edit-context-menu"),
+  fallbackSize: { width: 220, height: 260 },
+  clearContent: true,
+});
+
 /** @type {BookmarkTreeModuleDeps} */
 const treeModuleDeps = {
   t,
@@ -373,7 +389,8 @@ const treeModuleDeps = {
   setStatus,
   openPromptModal,
   openEditorModal,
-  closeEditContextMenu,
+  createOverlay,
+  editContextMenu,
   updateMainLayoutMetrics,
   updateBookmarkListScrollbar,
   refreshWebdavStatusBar: (
@@ -395,8 +412,6 @@ let closeTreeContextMenu;
 let createContainerDragHandlers;
 /** @type {BookmarkTreeModule["handleSortMenuApply"]} */
 let handleSortMenuApply;
-/** @type {BookmarkTreeModule["isTreeContextMenuOpen"]} */
-let isTreeContextMenuOpen;
 /** @type {BookmarkTreeModule["renderBookmarks"]} */
 let renderBookmarks;
 /** @type {BookmarkTreeModule["setAllFoldersOpen"]} */
@@ -408,13 +423,10 @@ let setAllFoldersOpen;
   closeTreeContextMenu,
   createContainerDragHandlers,
   handleSortMenuApply,
-  isTreeContextMenuOpen,
   renderBookmarks,
   rerenderAfterTreeChange,
   setAllFoldersOpen,
 } = treeModule);
-
-let editContextMenuOpen = false;
 
 /**
  * Returns `true` if `target` is an editable text field (input, textarea, or
@@ -440,19 +452,6 @@ function isEditableTarget(target) {
           !target.disabled) ||
         /** @type {HTMLElement} */ (target).isContentEditable),
   );
-}
-
-/**
- * Closes and empties the text-editing context menu (cut/copy/paste/etc.).
- */
-function closeEditContextMenu() {
-  const menu = document.getElementById("edit-context-menu");
-  if (!menu) {
-    return;
-  }
-  menu.classList.add("hidden");
-  menu.innerHTML = "";
-  editContextMenuOpen = false;
 }
 
 /**
@@ -529,7 +528,6 @@ function openEditContextMenu(target, x, y) {
   closeTreeContextMenu();
   closeSortMenu();
   menu.innerHTML = "";
-  editContextMenuOpen = true;
 
   const selectedText = getSelectionTextFromEditable(target);
   const hasSelection = selectedText.length > 0;
@@ -547,7 +545,7 @@ function openEditContextMenu(target, x, y) {
     button.addEventListener("click", async (event) => {
       event.preventDefault();
       event.stopPropagation();
-      closeEditContextMenu();
+      editContextMenu.close();
       if (!disabled) {
         await onClick();
       }
@@ -623,13 +621,7 @@ function openEditContextMenu(target, x, y) {
     }),
   );
 
-  menu.classList.remove("hidden");
-  const width = menu.offsetWidth || 220;
-  const height = menu.offsetHeight || 260;
-  const left = Math.min(window.innerWidth - width - 8, Math.max(8, x));
-  const top = Math.min(window.innerHeight - height - 8, Math.max(8, y));
-  menu.style.left = `${left}px`;
-  menu.style.top = `${top}px`;
+  editContextMenu.openAt(x, y);
 }
 
 /**
@@ -920,16 +912,11 @@ function bindTreeActions() {
   const scrollbarDownBtn = document.getElementById("bookmark-scroll-down");
   const scrollbarThumb = document.getElementById("bookmark-scrollbar-thumb");
   const topToast = document.getElementById("top-toast");
-  const sortMenu = document.getElementById("folder-sort-menu");
-  const treeContextMenu = document.getElementById("tree-context-menu");
-  const editContextMenu = document.getElementById("edit-context-menu");
-  const appTooltip = document.getElementById("app-tooltip");
+  const appTooltipEl = document.getElementById("app-tooltip");
   const sortAscBtn = document.getElementById("sort-asc");
   const sortDescBtn = document.getElementById("sort-desc");
   /** @type {HTMLElement|null} */
   let tooltipTarget = null;
-  let languageMenuOpen = false;
-  let themeMenuOpen = false;
 
   webdavStatusIcon?.addEventListener("error", () => {
     const indicator = document.getElementById("webdav-status-indicator");
@@ -939,44 +926,36 @@ function bindTreeActions() {
     indicator.textContent = webdavStatusIcon.dataset.fallback || "?";
   });
 
-  const closeLanguageMenu = () => {
-    if (!languageMenu) {
-      return;
-    }
-    languageMenu.classList.add("hidden");
-    languageMenuOpen = false;
-  };
+  const languageMenuOverlay = createOverlay({
+    id: "languageMenu",
+    getElement: () => languageMenu,
+    // Fallback sizes only apply to a zero measurement; the real menus are
+    // taller than this once populated.
+    fallbackSize: { width: 220, height: 360 },
+    anchorGap: 8,
+  });
 
-  const closeThemeMenu = () => {
-    if (!themeMenu) {
-      return;
-    }
-    themeMenu.classList.add("hidden");
-    themeMenuOpen = false;
-  };
+  const themeMenuOverlay = createOverlay({
+    id: "themeMenu",
+    getElement: () => themeMenu,
+    fallbackSize: { width: 220, height: 120 },
+    anchorGap: 8,
+  });
 
-  const positionMenu = (menuEl, anchorEl) => {
-    if (!menuEl || !anchorEl) {
-      return;
-    }
-    const rect = anchorEl.getBoundingClientRect();
-    const width = menuEl.offsetWidth || 220;
-    const left = Math.min(
-      window.innerWidth - width - 10,
-      Math.max(10, rect.right - width),
-    );
-    const top = Math.min(window.innerHeight - 10, rect.bottom + 8);
-    menuEl.style.left = `${left}px`;
-    menuEl.style.top = `${top}px`;
-  };
-
-  const positionLanguageMenu = () => {
-    positionMenu(languageMenu, openLanguageMenuBtn);
-  };
-
-  const positionThemeMenu = () => {
-    positionMenu(themeMenu, openThemeMenuBtn);
-  };
+  const appTooltip = createOverlay({
+    id: "appTooltip",
+    getElement: () => appTooltipEl,
+    fallbackSize: { width: 180, height: 36 },
+    offset: { x: 12, y: 12 },
+    clearContent: true,
+    // A tooltip is dismissed by leaving the element it describes, not by an
+    // outside click: that click is frequently the click on the described
+    // element itself, which would blank the text mid-hover.
+    dismissOnOutsideClick: false,
+    onClose: () => {
+      tooltipTarget = null;
+    },
+  });
 
   const updateLanguageButtonTooltip = () => {
     if (!openLanguageMenuBtn) {
@@ -1047,7 +1026,7 @@ function bindTreeActions() {
         });
       }
       item.addEventListener("click", async () => {
-        closeLanguageMenu();
+        languageMenuOverlay.close();
         try {
           await updatePageLanguage(option.value);
         } catch (error) {
@@ -1090,7 +1069,7 @@ function bindTreeActions() {
           ? '<span class="language-item-check icon-font" aria-hidden="true">check</span>'
           : "");
       item.addEventListener("click", async () => {
-        closeThemeMenu();
+        themeMenuOverlay.close();
         try {
           await updatePageTheme(option.value);
         } catch (error) {
@@ -1106,50 +1085,18 @@ function bindTreeActions() {
     if (!languageMenu) {
       return;
     }
-    closeThemeMenu();
+    themeMenuOverlay.close();
     renderLanguageMenu();
-    languageMenu.classList.remove("hidden");
-    languageMenuOpen = true;
-    positionLanguageMenu();
+    languageMenuOverlay.openBelow(openLanguageMenuBtn);
   };
 
   const openThemeMenu = () => {
     if (!themeMenu) {
       return;
     }
-    closeLanguageMenu();
+    languageMenuOverlay.close();
     renderThemeMenu();
-    themeMenu.classList.remove("hidden");
-    themeMenuOpen = true;
-    positionThemeMenu();
-  };
-
-  const hideAppTooltip = () => {
-    if (!appTooltip) {
-      return;
-    }
-    appTooltip.classList.add("hidden");
-    appTooltip.textContent = "";
-    tooltipTarget = null;
-  };
-
-  const positionAppTooltip = (x, y) => {
-    if (!appTooltip || appTooltip.classList.contains("hidden")) {
-      return;
-    }
-    const width = appTooltip.offsetWidth || 180;
-    const height = appTooltip.offsetHeight || 36;
-    const offset = 12;
-    const left = Math.min(
-      window.innerWidth - width - 10,
-      Math.max(10, x + offset),
-    );
-    const top = Math.min(
-      window.innerHeight - height - 10,
-      Math.max(10, y + offset),
-    );
-    appTooltip.style.left = `${left}px`;
-    appTooltip.style.top = `${top}px`;
+    themeMenuOverlay.openBelow(openThemeMenuBtn);
   };
 
   /**
@@ -1158,18 +1105,14 @@ function bindTreeActions() {
    * @param {number} y
    */
   const showAppTooltip = (target, x, y) => {
-    if (!appTooltip) {
-      return;
-    }
     const text = target?.dataset?.tooltip?.trim();
-    if (!text) {
-      hideAppTooltip();
+    if (!text || !appTooltipEl) {
+      appTooltip.close();
       return;
     }
     tooltipTarget = target;
-    appTooltip.textContent = text;
-    appTooltip.classList.remove("hidden");
-    positionAppTooltip(x, y);
+    appTooltipEl.textContent = text;
+    appTooltip.openAt(x, y);
   };
 
   expandAllBtn?.addEventListener("click", () => setAllFoldersOpen(true));
@@ -1177,17 +1120,19 @@ function bindTreeActions() {
 
   openConfigBtn?.addEventListener("click", openConfigModal);
   openLanguageMenuBtn?.addEventListener("click", (event) => {
+    // Keeps the overlay module's outside-click handler from seeing this click,
+    // so the trigger toggles its own menu instead of dismissing it.
     event.stopPropagation();
-    if (languageMenuOpen) {
-      closeLanguageMenu();
+    if (languageMenuOverlay.isOpen()) {
+      languageMenuOverlay.close();
     } else {
       openLanguageMenu();
     }
   });
   openThemeMenuBtn?.addEventListener("click", (event) => {
     event.stopPropagation();
-    if (themeMenuOpen) {
-      closeThemeMenu();
+    if (themeMenuOverlay.isOpen()) {
+      themeMenuOverlay.close();
     } else {
       openThemeMenu();
     }
@@ -1301,82 +1246,12 @@ function bindTreeActions() {
     await handleSortMenuApply(true);
   });
 
-  document.addEventListener("click", (event) => {
-    const target = /** @type {Node|null} */ (event.target);
-    if (
-      editContextMenuOpen &&
-      editContextMenu &&
-      !editContextMenu.contains(target)
-    ) {
-      closeEditContextMenu();
-    }
-
-    if (
-      isTreeContextMenuOpen() &&
-      treeContextMenu &&
-      !treeContextMenu.contains(target)
-    ) {
-      closeTreeContextMenu();
-    }
-
-    if (languageMenuOpen) {
-      const inLanguageMenu = Boolean(
-        (languageMenu && languageMenu.contains(target)) ||
-          (openLanguageMenuBtn && openLanguageMenuBtn.contains(target)),
-      );
-      if (!inLanguageMenu) {
-        closeLanguageMenu();
-      }
-    }
-
-    if (themeMenuOpen) {
-      const inThemeMenu = Boolean(
-        (themeMenu && themeMenu.contains(target)) ||
-          (openThemeMenuBtn && openThemeMenuBtn.contains(target)),
-      );
-      if (!inThemeMenu) {
-        closeThemeMenu();
-      }
-    }
-
-    if (!sortMenu || sortMenu.classList.contains("hidden")) {
-      return;
-    }
-    if (sortMenu.contains(target)) {
-      return;
-    }
-    closeSortMenu();
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      closeEditContextMenu();
-      closeTreeContextMenu();
-      closeSortMenu();
-      closeLanguageMenu();
-      closeThemeMenu();
-      hideAppTooltip();
-    }
-  });
+  // Overlay dismissal (outside click, Escape, scroll, resize) is owned by the
+  // overlay module, which installed its listeners when the first overlay was
+  // registered. Only the layout recompute remains here.
   window.addEventListener("resize", () => {
-    closeEditContextMenu();
-    closeLanguageMenu();
-    closeThemeMenu();
-    hideAppTooltip();
     updateMainLayoutMetrics();
   });
-  window.addEventListener("scroll", closeEditContextMenu, true);
-  window.addEventListener("resize", closeTreeContextMenu);
-  window.addEventListener(
-    "scroll",
-    () => {
-      closeTreeContextMenu();
-      closeLanguageMenu();
-      closeThemeMenu();
-      hideAppTooltip();
-    },
-    true,
-  );
 
   document.addEventListener("mouseover", (event) => {
     const target = /** @type {HTMLElement|null|undefined} */ (
@@ -1392,7 +1267,7 @@ function bindTreeActions() {
     if (!tooltipTarget) {
       return;
     }
-    positionAppTooltip(event.clientX, event.clientY);
+    appTooltip.reposition(event.clientX, event.clientY);
   });
 
   document.addEventListener("mouseout", (event) => {
@@ -1405,7 +1280,7 @@ function bindTreeActions() {
     }
     const target = /** @type {Node|null} */ (event.target);
     if (target && tooltipTarget.contains(target)) {
-      hideAppTooltip();
+      appTooltip.close();
     }
   });
 
@@ -1423,7 +1298,7 @@ function bindTreeActions() {
   document.addEventListener("focusout", (event) => {
     const target = /** @type {Node|null} */ (event.target);
     if (tooltipTarget && target && tooltipTarget.contains(target)) {
-      hideAppTooltip();
+      appTooltip.close();
     }
   });
 

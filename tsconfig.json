@@ -18,6 +18,7 @@
     "src/background/**/*.js",
     "src/lib/**/*.js",
     "src/pages/options/**/*.js",
+    "src/pages/bookmarks/bookmark-overlay.js",
     "src/pages/bookmarks/bookmark-tree-state.js",
     "src/pages/bookmarks/bookmark-tree-render.js",
     "src/pages/bookmarks/bookmark-tree-menu.js",

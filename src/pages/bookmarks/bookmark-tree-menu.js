@@ -1,15 +1,20 @@
 /**
  * @file bookmark-tree-menu.js
  * Context menu and sort-menu management for the bookmark tree.
- * Handles rendering, positioning, open/close lifecycle, and sort operations.
- * Exposed as `window.YABMBookmarkTreeMenuModule`.
+ * Builds the menu contents and delegates positioning, open state, and
+ * dismissal to the overlay module. Exposed as `window.YABMBookmarkTreeMenuModule`.
+ */
+/**
+ * @typedef {import("./bookmark-overlay.js").BookmarkOverlay} BookmarkOverlay
+ * @typedef {import("./bookmark-overlay.js").BookmarkOverlayModule} BookmarkOverlayModule
  */
 /**
  * @typedef {Object} MenuModuleDeps
  * @property {(key: string, substitutions?: string[]) => string} t
  * @property {(run: () => Promise<any>, options?: { successKey?: string, errorKey?: string, afterSuccess?: () => Promise<void> | void }) => Promise<void>} runBookmarkMutation
  * @property {(extraOpenFolderIds?: string[]) => Promise<void>} rerenderAfterTreeChange
- * @property {() => void} closeEditContextMenu - Closes the bookmark edit menu, which is owned by the modals layer.
+ * @property {BookmarkOverlayModule["createOverlay"]} createOverlay - Registers this module's menus as viewport-anchored overlays.
+ * @property {BookmarkOverlay} editContextMenu - The bookmark edit overlay, owned by the bookmarks page; closed alongside the tree menus.
  */
 
 /**
@@ -29,7 +34,6 @@
  * @property {() => void} closeSortMenu
  * @property {() => void} closeTreeContextMenu
  * @property {(descending: boolean) => Promise<void>} handleSortMenuApply
- * @property {() => boolean} isTreeContextMenuOpen
  * @property {(folderNode: chrome.bookmarks.BookmarkTreeNode, anchorEl: HTMLElement) => void} openSortMenu
  * @property {(options: { x: number, y: number, items: TreeContextMenuItem[] }) => void} openTreeContextMenu
  * @property {(folderId: string, descending: boolean) => Promise<void>} sortFolderAndRerender
@@ -42,25 +46,39 @@
    * @returns {MenuModule}
    */
   function createBookmarkTreeMenuModule(deps) {
-    const { t, runBookmarkMutation, rerenderAfterTreeChange, closeEditContextMenu } = deps;
+    const { t, runBookmarkMutation, rerenderAfterTreeChange, createOverlay, editContextMenu } = deps;
 
     // Stores the folder ID of the currently open sort menu, or null when closed.
     /** @type {{ folderId: string } | null} */
     let sortMenuContext = null;
-    // Tracks whether the right-click context menu is currently open.
-    let treeContextMenuOpen = false;
+
+    const treeContextMenu = createOverlay({
+      id: "treeContextMenu",
+      getElement: () => document.getElementById("tree-context-menu"),
+      fallbackSize: { width: 220, height: 180 },
+      clearContent: true,
+    });
+
+    const sortMenu = createOverlay({
+      id: "sortMenu",
+      getElement: () => document.getElementById("folder-sort-menu"),
+      fallbackSize: { width: 180, height: 90 },
+      anchorGap: 6,
+      // PRESERVED DIFFERENCE: scroll and resize leave this menu open. Every
+      // other overlay dismisses on both, and this looks like an oversight, but
+      // the refactor is behaviour-preserving, so it is kept as-is and made
+      // explicit rather than silently unified. Worth a follow-up decision.
+      dismissOnViewportChange: false,
+      onClose: () => {
+        sortMenuContext = null;
+      },
+    });
 
     /**
      * Closes and empties the bookmark tree context menu.
      */
     function closeTreeContextMenu() {
-      const menu = document.getElementById("tree-context-menu");
-      if (!menu) {
-        return;
-      }
-      menu.classList.add("hidden");
-      menu.innerHTML = "";
-      treeContextMenuOpen = false;
+      treeContextMenu.close();
     }
 
     /**
@@ -107,27 +125,14 @@
         menu.appendChild(button);
       }
 
-      menu.classList.remove("hidden");
-      treeContextMenuOpen = true;
-
-      const width = menu.offsetWidth || 220;
-      const height = menu.offsetHeight || 180;
-      const left = Math.min(window.innerWidth - width - 8, Math.max(8, x));
-      const top = Math.min(window.innerHeight - height - 8, Math.max(8, y));
-      menu.style.left = `${left}px`;
-      menu.style.top = `${top}px`;
+      treeContextMenu.openAt(x, y);
     }
 
     /**
      * Closes the folder sort menu and clears its context.
      */
     function closeSortMenu() {
-      const menu = document.getElementById("folder-sort-menu");
-      if (!menu) {
-        return;
-      }
-      menu.classList.add("hidden");
-      sortMenuContext = null;
+      sortMenu.close();
     }
 
     /**
@@ -135,9 +140,9 @@
      * to replace the tree DOM does not have to know which menus exist.
      */
     function closeAllMenus() {
-      closeEditContextMenu();
-      closeTreeContextMenu();
-      closeSortMenu();
+      editContextMenu.close();
+      treeContextMenu.close();
+      sortMenu.close();
     }
 
     /**
@@ -148,37 +153,19 @@
      * @param {HTMLElement} anchorEl - The button that triggered the menu.
      */
     function openSortMenu(folderNode, anchorEl) {
-      const menu = document.getElementById("folder-sort-menu");
-      if (!menu || !anchorEl) {
+      if (!anchorEl) {
         return;
       }
 
-      if (
-        !menu.classList.contains("hidden") &&
-        sortMenuContext?.folderId === folderNode.id
-      ) {
+      if (sortMenu.isOpen() && sortMenuContext?.folderId === folderNode.id) {
         closeSortMenu();
         return;
       }
       closeTreeContextMenu();
 
-      sortMenuContext = { folderId: folderNode.id };
-      const rect = anchorEl.getBoundingClientRect();
-      menu.classList.remove("hidden");
-
-      const menuWidth = menu.offsetWidth || 180;
-      const menuHeight = menu.offsetHeight || 90;
-      const left = Math.min(
-        window.innerWidth - menuWidth - 8,
-        Math.max(8, rect.right - menuWidth),
-      );
-      const top = Math.min(
-        window.innerHeight - menuHeight - 8,
-        Math.max(8, rect.bottom + 6),
-      );
-
-      menu.style.left = `${left}px`;
-      menu.style.top = `${top}px`;
+      sortMenuContext = sortMenu.openBelow(anchorEl)
+        ? { folderId: folderNode.id }
+        : null;
     }
 
     /**
@@ -249,20 +236,11 @@
       await sortFolderAndRerender(folderId, descending);
     }
 
-    /**
-     * Returns whether the right-click context menu is currently open.
-     * @returns {boolean}
-     */
-    function isTreeContextMenuOpen() {
-      return treeContextMenuOpen;
-    }
-
     return {
       closeAllMenus,
       closeSortMenu,
       closeTreeContextMenu,
       handleSortMenuApply,
-      isTreeContextMenuOpen,
       openSortMenu,
       openTreeContextMenu,
       sortFolderAndRerender,

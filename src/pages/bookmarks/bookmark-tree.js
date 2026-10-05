@@ -12,6 +12,8 @@
  * @typedef {import("./bookmark-tree-menu.js").MenuModuleDeps} MenuModuleDeps
  * @typedef {import("./bookmark-tree-menu.js").MenuModule} MenuModule
  * @typedef {import("./bookmark-tree-node-actions.js").NodeActionMutations} NodeActionMutations
+ * @typedef {import("./bookmark-overlay.js").BookmarkOverlayModule} BookmarkOverlayModule
+ * @typedef {import("./bookmark-overlay.js").BookmarkOverlay} BookmarkOverlay
  */
 
 /**
@@ -30,7 +32,8 @@
  * @property {(message: string, type: 'success'|'error'|'') => void} setStatus
  * @property {(options: { title?: string, message?: string, confirmLabel?: string, cancelLabel?: string }) => Promise<boolean>} openPromptModal
  * @property {(options: { title?: string, nameLabel?: string, nameValue?: string, urlValue?: string, urlVisible?: boolean, saveLabel?: string }) => Promise<{ name: string, url: string } | null>} openEditorModal
- * @property {MenuModuleDeps["closeEditContextMenu"]} closeEditContextMenu
+ * @property {MenuModuleDeps["createOverlay"]} createOverlay
+ * @property {MenuModuleDeps["editContextMenu"]} editContextMenu
  * @property {RenderModuleDeps["updateMainLayoutMetrics"]} updateMainLayoutMetrics
  * @property {() => void} updateBookmarkListScrollbar
  * @property {(options?: { interactive?: boolean }) => Promise<void>} refreshWebdavStatusBar
@@ -44,7 +47,6 @@
  * @property {MenuModule["closeSortMenu"]} closeSortMenu
  * @property {(container: HTMLElement) => { attach: Function, detach: Function }} createContainerDragHandlers
  * @property {(descending: boolean) => Promise<void>} handleSortMenuApply
- * @property {() => boolean} isTreeContextMenuOpen
  * @property {(openFolderIds?: Set<string> | null) => Promise<void>} renderBookmarks
  * @property {MenuModuleDeps["rerenderAfterTreeChange"]} rerenderAfterTreeChange
  * @property {(open: boolean) => void} setAllFoldersOpen
@@ -74,7 +76,8 @@
       setStatus,
       openPromptModal,
       openEditorModal,
-      closeEditContextMenu,
+      createOverlay,
+      editContextMenu,
       updateMainLayoutMetrics,
       updateBookmarkListScrollbar,
       refreshWebdavStatusBar,
@@ -157,7 +160,8 @@
         t,
         runBookmarkMutation,
         rerenderAfterTreeChange,
-        closeEditContextMenu,
+        createOverlay,
+        editContextMenu,
       },
     );
     const {
@@ -165,7 +169,6 @@
       closeSortMenu,
       closeTreeContextMenu,
       handleSortMenuApply,
-      isTreeContextMenuOpen,
       openSortMenu,
       openTreeContextMenu,
       sortFolderAndRerender,
@@ -225,7 +228,6 @@
       closeSortMenu,
       createContainerDragHandlers,
       handleSortMenuApply,
-      isTreeContextMenuOpen,
       renderBookmarks,
       rerenderAfterTreeChange,
       setAllFoldersOpen,
