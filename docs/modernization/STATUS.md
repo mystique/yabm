@@ -31,6 +31,18 @@ When continuing the modernization work in a new task:
 
 ## Completed Work
 
+### 2026-10-06 (Architecture deepening, Candidate 2 — page bootstrap)
+
+- Gave `bookmarks.js` a single job: build collaborators, construct modules, wire the page's own handlers and `initPage`. The file shrank from 1,380 to 564 lines.
+- Extracted the WebDAV connection chip, the status bar, and the upload/download actions into `src/pages/bookmarks/bookmark-webdav-status.js` (`setStatusIndicator`, `refreshStatusBar`, `uploadBookmarks`, `downloadBookmarks`). The button-disabling rules, the count queries, and the icon fallback listener now live with the code that depends on them.
+- Extracted the rich-text context menu into `src/pages/bookmarks/bookmark-edit-menu.js` (one entry point: `handleContextMenu`), which hides the editable-target test, the selection read/replace helpers, and the menu catalogue.
+- Extracted the language and theme pickers into `src/pages/bookmarks/bookmark-appearance-menu.js` (`bindTriggerButtons`, `refreshTriggerTooltips`); both menus, their option tables, the Twemoji flag lookup, and the two overlays stay private.
+- Extracted the shared `[data-tooltip]` behaviour into `src/pages/bookmarks/bookmark-tooltip.js` (`bindEvents`), owning the hover/focus bookkeeping and the tooltip overlay.
+- The composition root keeps only the collaborators it owns (`t`, `setStatus`, clipboard, layout metrics, the `editContextMenu` overlay) and passes them down; the new modules read no `window.YABM*` global.
+- Pure refactor: DOM structure, class names, data attributes, listener registration order, i18n keys, and async ordering are unchanged. No locale strings added or renamed.
+- Note for Phase 3: the Twemoji CDN base URL now appears in two modules (WebDAV chip, language flags). It is not shared by the options page, so it was not promoted to `src/lib/`.
+- Verification: `node --check` on all five touched files; `npm run check` green (lint + typecheck + build); re-grepped `src/` for every moved symbol with no dangling call sites. Manual Chrome click-through of the WebDAV chip, tooltips, picker menus, and the edit context menu is still outstanding.
+
 ### 2026-09-28 (Architecture deepening, Candidate 3)
 
 - Deepened `bookmark-tree-render.js`: its injected dependency list dropped from 30 named functions to 12 entries (5 collaborators, 4 state helpers, `t`, layout, drag attach). The returned surface is still just `renderBookmarks`.
