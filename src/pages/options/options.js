@@ -6,8 +6,6 @@
  * Loaded directly by the extension as a standalone page.
  */
 
-/** @typedef {import("../../lib/webdav-config-session.js").WebdavConfigFile} FileMetadata */
-
 /**
  * Translate a message key using the i18n library
  * @param {string} key - The i18n message key
@@ -101,6 +99,12 @@ const configSession = window.YABMWebdavConfigSession.createSession({
   readForm: readConfigForm,
 });
 
+const filePicker = window.YABMWebdavFilePicker.createPicker({
+  container: requireElement("files-container"),
+  radioName: "file-select",
+  createNewFileLabel: () => t("createNewFile"),
+});
+
 /**
  * Set the status message and visibility
  * @param {string} message - Status text to display
@@ -122,120 +126,6 @@ function setStatus(message, type) {
   if (type) {
     el.classList.add(type);
   }
-}
-
-/**
- * Format byte size to human-readable string (B, KB, MB, GB, TB)
- * @param {number|string} sizeValue - Size in bytes
- * @returns {string} - Formatted size string
- */
-function formatFileSize(sizeValue) {
-  const bytes = Number.parseInt(String(sizeValue), 10);
-  if (!Number.isFinite(bytes) || bytes < 0) {
-    return "-";
-  }
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-  const units = ["KB", "MB", "GB", "TB"];
-  let value = bytes / 1024;
-  let unitIndex = 0;
-  while (value >= 1024 && unitIndex < units.length - 1) {
-    value /= 1024;
-    unitIndex += 1;
-  }
-  const text = value >= 100 ? value.toFixed(0) : value.toFixed(2);
-  return `${text.replace(/\.?0+$/, "")} ${units[unitIndex]}`;
-}
-
-/**
- * Parse ISO date string and format as date and time components
- * @param {string} lastModifiedValue - ISO 8601 date string
- * @returns {{ dateText: string, timeText: string }} - Date and time strings
- */
-function formatLastModifiedParts(lastModifiedValue) {
-  const date = new Date(lastModifiedValue);
-  if (!lastModifiedValue || Number.isNaN(date.getTime())) {
-    return {
-      dateText: "---- -- --",
-      timeText: "--:--:--",
-    };
-  }
-  const pad = (n) => String(n).padStart(2, "0");
-  return {
-    dateText: `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`,
-    timeText: `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`,
-  };
-}
-
-/**
- * Build HTML fragment for file size and modification timestamp
- * @param {FileMetadata} file - File metadata object with size and lastModified
- * @returns {string} - HTML string with file-size and file-datetime spans
- */
-function buildFileMetaHtml(file) {
-  const sizeText = formatFileSize(file.size);
-  const { dateText, timeText } = formatLastModifiedParts(file.lastModified);
-  return `<span class="file-size">${sizeText}</span><span class="file-datetime"><span>${dateText}</span><span>${timeText}</span></span>`;
-}
-
-/**
- * Render the file list UI with radio buttons for selection
- * @param {FileMetadata[]} files - Array of file metadata objects
- * @param {string} selectedFile - Session-selected radio value.
- */
-function renderFileList(files, selectedFile) {
-  const container = requireElement("files-container");
-  container.innerHTML = "";
-
-  // Create a new file entry
-  const createOption = document.createElement("div");
-  createOption.className = "file-item";
-  createOption.innerHTML =
-    '<label><input type="radio" name="file-select" value="__new__">' +
-    `<span>${t("createNewFile")}</span></label>`;
-  container.appendChild(createOption);
-
-  // List each discovered file from the directory
-  for (const file of files) {
-    const item = document.createElement("div");
-    item.className = "file-item";
-
-    const label = document.createElement("label");
-    const radio = document.createElement("input");
-    radio.type = "radio";
-    radio.name = "file-select";
-    radio.value = file.name;
-
-    const name = document.createElement("span");
-    name.className = "file-name";
-    name.textContent = file.name;
-
-    label.append(radio, name);
-    item.appendChild(label);
-
-    const meta = document.createElement("span");
-    meta.className = "file-meta";
-    meta.innerHTML = buildFileMetaHtml(file);
-    item.appendChild(meta);
-
-    container.appendChild(item);
-  }
-
-  for (const radio of container.querySelectorAll('input[name="file-select"]')) {
-    if (radio instanceof HTMLInputElement) {
-      radio.checked = radio.value === selectedFile;
-    }
-  }
-}
-
-/**
- * Get the selected radio value; the session resolves new-file names.
- * @returns {string}
- */
-function getSelectedFile() {
-  const checked = document.querySelector('input[name="file-select"]:checked');
-  return checked instanceof HTMLInputElement ? checked.value : "";
 }
 
 /**
@@ -277,7 +167,7 @@ async function testConnection() {
     }
 
     fileSection.classList.remove("hidden");
-    renderFileList(result.files, result.selectedFile);
+    filePicker.render(result.files, result.selectedFile);
 
     if (!result.files.length) {
       setStatus(t("connSuccessNoFiles"), "success");
@@ -303,7 +193,7 @@ async function testConnection() {
  */
 async function saveConfig() {
   try {
-    const validationError = await configSession.save(getSelectedFile());
+    const validationError = await configSession.save(filePicker.readSelection());
     if (validationError) {
       setStatus(t(validationError), "error");
       return;

@@ -1,4 +1,5 @@
 import type { WebdavConfigSession, WebdavConfigSessionDeps } from "../src/lib/webdav-config-session.js";
+import type { WebdavFilePicker, WebdavFilePickerDeps } from "../src/lib/webdav-file-picker.js";
 
 declare global {
   interface Window {
@@ -6,6 +7,9 @@ declare global {
     YABMSync: any;
     YABMWebdavConfigSession: {
       createSession(deps: WebdavConfigSessionDeps): WebdavConfigSession;
+    };
+    YABMWebdavFilePicker: {
+      createPicker(deps: WebdavFilePickerDeps): WebdavFilePicker;
     };
     YABMTheme: any;
     YABMNotificationsModule: any;

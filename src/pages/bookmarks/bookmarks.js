@@ -8,6 +8,7 @@
  *   - window.YABMI18n          (i18n.js)
  *   - window.YABMSync          (sync-utils.js)
  *   - window.YABMWebdavConfigSession (webdav-config-session.js)
+ *   - window.YABMWebdavFilePicker (webdav-file-picker.js)
  *   - window.YABMNotificationsModule
  *   - window.YABMScrollbarModule
  *   - window.YABMFaviconCacheModule
@@ -325,6 +326,7 @@ const modalsModule = window.YABMModalsModule.createModalsModule({
   ) => refreshWebdavStatusBar(...args),
   sync: window.YABMSync,
   createConfigSession: window.YABMWebdavConfigSession.createSession,
+  createFilePicker: window.YABMWebdavFilePicker.createPicker,
 });
 
 const {
