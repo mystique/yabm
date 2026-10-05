@@ -21,6 +21,7 @@ declare global {
     YABMBookmarkTreeObserversModule: any;
     YABMBookmarkTreeMutationsModule: any;
     YABMBookmarkTreeMenuModule: any;
+    YABMBookmarkTreeNodeActionsModule: any;
     YABMBookmarkTreeRenderModule: any;
     YABMBookmarkTreeModule: any;
   }

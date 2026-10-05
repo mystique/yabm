@@ -9,6 +9,7 @@
  * @property {(key: string, substitutions?: string[]) => string} t
  * @property {(run: () => Promise<any>, options?: { successKey?: string, errorKey?: string, afterSuccess?: () => Promise<void> | void }) => Promise<void>} runBookmarkMutation
  * @property {(extraOpenFolderIds?: string[]) => Promise<void>} rerenderAfterTreeChange
+ * @property {() => void} closeEditContextMenu - Closes the bookmark edit menu, which is owned by the modals layer.
  */
 
 /**
@@ -24,6 +25,7 @@
 /**
  * Public API returned by `createBookmarkTreeMenuModule`.
  * @typedef {Object} MenuModule
+ * @property {() => void} closeAllMenus
  * @property {() => void} closeSortMenu
  * @property {() => void} closeTreeContextMenu
  * @property {(descending: boolean) => Promise<void>} handleSortMenuApply
@@ -40,7 +42,7 @@
    * @returns {MenuModule}
    */
   function createBookmarkTreeMenuModule(deps) {
-    const { t, runBookmarkMutation, rerenderAfterTreeChange } = deps;
+    const { t, runBookmarkMutation, rerenderAfterTreeChange, closeEditContextMenu } = deps;
 
     // Stores the folder ID of the currently open sort menu, or null when closed.
     /** @type {{ folderId: string } | null} */
@@ -126,6 +128,16 @@
       }
       menu.classList.add("hidden");
       sortMenuContext = null;
+    }
+
+    /**
+     * Closes every menu the tree layer can have open, so a caller that is about
+     * to replace the tree DOM does not have to know which menus exist.
+     */
+    function closeAllMenus() {
+      closeEditContextMenu();
+      closeTreeContextMenu();
+      closeSortMenu();
     }
 
     /**
@@ -246,6 +258,7 @@
     }
 
     return {
+      closeAllMenus,
       closeSortMenu,
       closeTreeContextMenu,
       handleSortMenuApply,

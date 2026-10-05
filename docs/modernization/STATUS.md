@@ -31,6 +31,16 @@ When continuing the modernization work in a new task:
 
 ## Completed Work
 
+### 2026-09-28 (Architecture deepening, Candidate 3)
+
+- Deepened `bookmark-tree-render.js`: its injected dependency list dropped from 30 named functions to 12 entries (5 collaborators, 4 state helpers, `t`, layout, drag attach). The returned surface is still just `renderBookmarks`.
+- Extracted the per-node action catalogue (inline action bar for both row kinds, plus the bookmark and folder context-menu item sets) into `src/pages/bookmarks/bookmark-tree-node-actions.js`. The renderer no longer knows about any of the nine mutations, `openSortMenu`, `sortFolderAndRerender`, `openTreeContextMenu`, or `createActionButton`.
+- Favicon resolution and its fallback chain now sit behind one call (`createFaviconCell`) in the renderer, with the cache services grouped into a single `favicons` collaborator instead of three top-level deps.
+- Added `attachNodeDragHandlers` to `bookmark-tree-dnd.js` so per-row drag wiring is owned by the drag module.
+- Added `closeAllMenus` to `bookmark-tree-menu.js` so the render cycle no longer takes three separate menu closers.
+- Pure refactor: rendered DOM structure, class names, data attributes, listener registration order, i18n keys, and accessibility attributes are unchanged. No new locale strings.
+- Verification: `node --check` on all five touched files; `npm run check` green (lint + typecheck + build); re-grepped `src/` for the removed render deps (`handleNodeDragStart`, `handleNodeDragEnd`, `createActionButton`, `openTreeContextMenu`, `openSortMenu`, `setFolderOpen`, and the nine mutations) with no dangling call sites. Manual Chrome click-through of context menus, action bars, drag, and favicon fallback is still outstanding.
+
 ### 2026-09-27 (Phase 2)
 
 Strategy (agreed before implementation): strengthen script-tag factory modules instead of migrating to ESM; typecheck the page layer incrementally; keep DOM helpers page-local until reuse is demonstrated; no test framework and no Phase 3 directory reorganization.

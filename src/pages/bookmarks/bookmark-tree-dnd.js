@@ -8,7 +8,7 @@
   /**
    * Factory that creates the drag-and-drop module.
    * @param {{ t: Function, setStatus: Function, rerenderAfterTreeChange: Function }} deps
-   * @returns {{ createContainerDragHandlers: Function, handleNodeDragStart: Function, handleNodeDragEnd: Function, handleFolderDrop: Function }}
+   * @returns {{ attachNodeDragHandlers: Function, createContainerDragHandlers: Function, handleNodeDragStart: Function, handleNodeDragEnd: Function, handleFolderDrop: Function }}
    */
   function createBookmarkTreeDndModule(deps) {
     const { t, setStatus, rerenderAfterTreeChange } = deps;
@@ -153,6 +153,20 @@
     function handleNodeDragEnd(event) {
       cleanupDragVisuals(event.currentTarget);
       resetDragState();
+    }
+
+    /**
+     * Wires a rendered row element into the drag lifecycle: the row can be
+     * dragged, and the drag is cleaned up when it ends.
+     * @param {HTMLElement} element - The row element (bookmark row or folder summary).
+     * @param {chrome.bookmarks.BookmarkTreeNode} node - The node the row represents.
+     * @param {DragNodeType} nodeType - Type of the node being dragged.
+     */
+    function attachNodeDragHandlers(element, node, nodeType) {
+      element.addEventListener("dragstart", (event) =>
+        handleNodeDragStart(event, node, nodeType),
+      );
+      element.addEventListener("dragend", handleNodeDragEnd);
     }
 
     /**
@@ -399,6 +413,7 @@
     }
 
     return {
+      attachNodeDragHandlers,
       createContainerDragHandlers,
       handleNodeDragStart,
       handleNodeDragEnd,

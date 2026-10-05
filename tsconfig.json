@@ -21,6 +21,7 @@
     "src/pages/bookmarks/bookmark-tree-state.js",
     "src/pages/bookmarks/bookmark-tree-render.js",
     "src/pages/bookmarks/bookmark-tree-menu.js",
+    "src/pages/bookmarks/bookmark-tree-node-actions.js",
     "src/pages/bookmarks/bookmark-tree-mutations.js",
     "src/pages/bookmarks/bookmark-tree-observers.js",
     "src/pages/bookmarks/bookmark-tree-dnd.js",

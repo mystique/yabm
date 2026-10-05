@@ -8,26 +8,29 @@
 
 /**
  * @typedef {import("./bookmark-tree-render.js").RenderModuleDeps} RenderModuleDeps
+ * @typedef {import("./bookmark-tree-render.js").RenderFavicons} RenderFavicons
  * @typedef {import("./bookmark-tree-menu.js").MenuModuleDeps} MenuModuleDeps
+ * @typedef {import("./bookmark-tree-menu.js").MenuModule} MenuModule
+ * @typedef {import("./bookmark-tree-node-actions.js").NodeActionMutations} NodeActionMutations
  */
 
 /**
  * Dependencies injected by the bookmarks page bootstrap (bookmarks.js).
  * @typedef {Object} BookmarkTreeModuleDeps
  * @property {RenderModuleDeps["t"]} t
- * @property {RenderModuleDeps["getCachedFaviconForBookmark"]} getCachedFaviconForBookmark
+ * @property {RenderFavicons["getCachedFaviconForBookmark"]} getCachedFaviconForBookmark
  * @property {(node: chrome.bookmarks.BookmarkTreeNode) => chrome.bookmarks.BookmarkTreeNode[]} getBookmarkNodesInFolder
- * @property {RenderModuleDeps["copyBookmarkUrl"]} copyBookmarkUrl
+ * @property {NodeActionMutations["copyBookmarkUrl"]} copyBookmarkUrl
  * @property {(node: chrome.bookmarks.BookmarkTreeNode, options?: { silent?: boolean }) => Promise<void>} refreshBookmarkFavicon
- * @property {RenderModuleDeps["refreshFolderFavicons"]} refreshFolderFavicons
+ * @property {NodeActionMutations["refreshFolderFavicons"]} refreshFolderFavicons
  * @property {(ids: string[]) => Promise<void>} removeFaviconsByBookmarkIds
  * @property {(rawUrl: string) => string} ensureValidUrl
- * @property {RenderModuleDeps["ensureFaviconCacheLoaded"]} ensureFaviconCacheLoaded
- * @property {RenderModuleDeps["pruneFaviconCacheForTree"]} pruneFaviconCacheForTree
+ * @property {RenderFavicons["ensureFaviconCacheLoaded"]} ensureFaviconCacheLoaded
+ * @property {RenderFavicons["pruneFaviconCacheForTree"]} pruneFaviconCacheForTree
  * @property {(message: string, type: 'success'|'error'|'') => void} setStatus
  * @property {(options: { title?: string, message?: string, confirmLabel?: string, cancelLabel?: string }) => Promise<boolean>} openPromptModal
  * @property {(options: { title?: string, nameLabel?: string, nameValue?: string, urlValue?: string, urlVisible?: boolean, saveLabel?: string }) => Promise<{ name: string, url: string } | null>} openEditorModal
- * @property {RenderModuleDeps["closeEditContextMenu"]} closeEditContextMenu
+ * @property {MenuModuleDeps["closeEditContextMenu"]} closeEditContextMenu
  * @property {RenderModuleDeps["updateMainLayoutMetrics"]} updateMainLayoutMetrics
  * @property {() => void} updateBookmarkListScrollbar
  * @property {(options?: { interactive?: boolean }) => Promise<void>} refreshWebdavStatusBar
@@ -37,8 +40,8 @@
  * Public API returned by `createBookmarkTreeModule`.
  * @typedef {Object} BookmarkTreeModule
  * @property {() => void} bindBookmarkTreeObservers
- * @property {RenderModuleDeps["closeTreeContextMenu"]} closeTreeContextMenu
- * @property {RenderModuleDeps["closeSortMenu"]} closeSortMenu
+ * @property {MenuModule["closeTreeContextMenu"]} closeTreeContextMenu
+ * @property {MenuModule["closeSortMenu"]} closeSortMenu
  * @property {(container: HTMLElement) => { attach: Function, detach: Function }} createContainerDragHandlers
  * @property {(descending: boolean) => Promise<void>} handleSortMenuApply
  * @property {() => boolean} isTreeContextMenuOpen
@@ -120,9 +123,8 @@
       rerenderAfterTreeChange,
     });
     const {
+      attachNodeDragHandlers,
       createContainerDragHandlers,
-      handleNodeDragEnd,
-      handleNodeDragStart,
     } = dndModule;
 
     const mutationsModule =
@@ -155,9 +157,11 @@
         t,
         runBookmarkMutation,
         rerenderAfterTreeChange,
+        closeEditContextMenu,
       },
     );
     const {
+      closeAllMenus,
       closeSortMenu,
       closeTreeContextMenu,
       handleSortMenuApply,
@@ -167,38 +171,50 @@
       sortFolderAndRerender,
     } = menuModule;
 
+    // The per-node action catalogue: what a bookmark or folder row can do, and
+    // the context menu entries it offers. Owned by one module so the renderer
+    // never sees the individual mutations or the menu closers.
+    const nodeActionsModule =
+      window.YABMBookmarkTreeNodeActionsModule.createBookmarkTreeNodeActionsModule({
+        t,
+        createActionButton,
+        setFolderOpen,
+        mutations: {
+          addBookmarkNode,
+          addFolderNode,
+          copyBookmarkUrl,
+          deleteBookmarkNode,
+          deleteFolderNode,
+          editBookmarkNode,
+          editFolderNode,
+          refreshBookmarkFaviconWithStatus,
+          refreshFolderFavicons,
+        },
+        menus: {
+          openSortMenu,
+          openTreeContextMenu,
+          sortFolderAndRerender,
+        },
+      });
+
     const renderModule = window.YABMBookmarkTreeRenderModule.createBookmarkTreeRenderModule(
       {
         t,
         applyOpenFolderIds,
-        createActionButton,
-        getCachedFaviconForBookmark,
         getFolderStats,
         getOpenFolderIds,
         getTopLevelFolders,
-        ensureFaviconCacheLoaded,
-        pruneFaviconCacheForTree,
-        closeEditContextMenu,
-        closeTreeContextMenu,
-        closeSortMenu,
-        openTreeContextMenu,
-        openSortMenu,
-        handleNodeDragStart,
-        handleNodeDragEnd,
         toggleFolder,
-        setFolderOpen,
         updateTreeSummaryStats,
         updateMainLayoutMetrics,
-        copyBookmarkUrl,
-        refreshBookmarkFaviconWithStatus,
-        refreshFolderFavicons,
-        deleteBookmarkNode,
-        deleteFolderNode,
-        addFolderNode,
-        editFolderNode,
-        addBookmarkNode,
-        editBookmarkNode,
-        sortFolderAndRerender,
+        closeAllMenus,
+        favicons: {
+          ensureFaviconCacheLoaded,
+          getCachedFaviconForBookmark,
+          pruneFaviconCacheForTree,
+        },
+        nodeActions: nodeActionsModule,
+        attachNodeDragHandlers,
       },
     );
     renderBookmarks = renderModule.renderBookmarks;
