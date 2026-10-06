@@ -34,7 +34,11 @@
 - WebDAV PROPFIND transport + 解析：`:77-400`（14 个函数，其中约 30 行是 transport）
 - **Netscape HTML 导入/导出引擎 + 原子回滚：`:403-857`，约 455 行，15 个函数**
 
-第三块才是数据丢失风险所在：`overwriteWithBookmarksHtml` (`:784-857`) 会清空三个根文件夹再重建。这既不是 transport 也不是 protocol。`webdav-file-picker.js` 与 `webdav-config-session.js` 都没有触碰它。
+第三块才是数据丢失风险所在：`overwriteWithBookmarksHtml` (`:784-857`) 会快照三个根文件夹 → 清空 → 从下载的文档重建 → 失败则回滚。这既不是 transport 也不是 protocol。`webdav-file-picker.js` 与 `webdav-config-session.js` 都没有触碰它。
+
+**已核实**：该动作是本模块中**唯一**会删除书签的路径——`chrome.bookmarks.remove` / `removeTree` 在 `src/lib/sync-utils.js` 中仅出现于 `:640` 与 `:642`，均在该函数体内。其余 sync action 只会向集合中增加内容。
+
+`GLOSSARY.md` 已为此补上术语 **Download and replace**（区别于其余不具破坏性的 sync action）与 **Bookmarks file**，理由见 `ff1a017`。拆该模块时须沿用这两个术语。
 
 ## 结论
 
