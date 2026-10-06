@@ -1,137 +1,41 @@
 /**
  * @file bookmarks.js
- * Main entry point for the YABM bookmarks page.
- * Initialises all sub-modules, wires DOM event listeners, manages the
- * WebDAV status bar, and coordinates language switching.
+ * Composition root for the YABM bookmarks page.
+ *
+ * This file has one job: build the page's collaborators, construct every
+ * feature module with them, and wire the page's own event handlers and startup
+ * sequence. Feature behaviour lives in the modules it constructs; see
+ * bookmark-webdav-status.js (connection status and sync actions),
+ * bookmark-edit-menu.js (the rich-text context menu), bookmark-appearance-menu.js
+ * (language and theme pickers), and bookmark-tooltip.js (shared tooltip).
  *
  * Depends on the following globals (loaded via <script> tags before this file):
  *   - window.YABMI18n          (i18n.js)
+ *   - window.YABMTheme         (theme.js)
  *   - window.YABMSync          (sync-utils.js)
  *   - window.YABMWebdavConfigSession (webdav-config-session.js)
+ *   - window.YABMWebdavFilePicker (webdav-file-picker.js)
  *   - window.YABMNotificationsModule
  *   - window.YABMScrollbarModule
  *   - window.YABMFaviconCacheModule
  *   - window.YABMModalsModule
+ *   - window.YABMBookmarkOverlayModule
+ *   - window.YABMWebdavStatusModule
+ *   - window.YABMEditMenuModule
+ *   - window.YABMAppearanceMenuModule
+ *   - window.YABMTooltipModule
  *   - window.YABMBookmarkTreeModule
  */
 
 /**
  * @typedef {import("./bookmark-tree.js").BookmarkTreeModule} BookmarkTreeModule
  * @typedef {import("./bookmark-tree.js").BookmarkTreeModuleDeps} BookmarkTreeModuleDeps
+ * @typedef {import("./bookmark-overlay.js").BookmarkOverlayModule} BookmarkOverlayModule
+ * @typedef {import("./modals.js").ModalsModuleDeps} ModalsModuleDeps
  */
 
 /** Shorthand wrapper around the active i18n translation function. */
 const t = (key, substitutions) => window.YABMI18n.t(key, substitutions);
-
-/**
- * Available UI language options shown in the language picker menu.
- * Each entry maps a BCP-47-style locale value to a human-readable label and flag emoji.
- */
-const LANGUAGE_OPTIONS = [
-  { value: window.YABMI18n.AUTO_LANGUAGE, label: "Auto (Browser)", flag: "🌐" },
-  { value: "en", label: "English", flag: "🇺🇸" },
-  { value: "zh_CN", label: "Chinese (Simplified)", flag: "🇨🇳" },
-  { value: "zh_TW", label: "Chinese (Traditional)", flag: "🇭🇰" },
-  { value: "de", label: "Deutsch", flag: "🇩🇪" },
-  { value: "es", label: "Espanol", flag: "🇪🇸" },
-  { value: "fr", label: "Francais", flag: "🇫🇷" },
-  { value: "it", label: "Italiano", flag: "🇮🇹" },
-  { value: "ja", label: "Japanese", flag: "🇯🇵" },
-  { value: "ko", label: "Korean", flag: "🇰🇷" },
-  { value: "pt", label: "Portugues", flag: "🇵🇹" },
-  { value: "ru", label: "Русский", flag: "🇷🇺" },
-];
-
-/** Available UI theme options shown in the theme picker menu. */
-const THEME_OPTIONS = [
-  { value: window.YABMTheme.LIGHT_THEME, labelKey: "themeLight", iconLigature: "light_mode" },
-  { value: window.YABMTheme.DARK_THEME, labelKey: "themeDark", iconLigature: "dark_mode" },
-  { value: window.YABMTheme.SYSTEM_THEME, labelKey: "themeSystem", iconLigature: "desktop_windows" },
-];
-
-/** LRU-style cache mapping flag emoji strings to their resolved Twemoji asset URLs. */
-const flagIconCache = new Map();
-/** Base URL for Twemoji SVG assets on jsDelivr CDN. */
-const TWEMOJI_CDN_BASE = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg";
-
-/**
- * Maps logical WebDAV status keys to their CSS class, Twemoji codepoint, and text fallback.
- * The fallback text is shown when the icon image fails to load.
- */
-const WEBDAV_ICON_STATES = {
-  notConfigured: {
-    cssClass: "is-not-configured",
-    codepoint: "26aa",
-    fallback: "?",
-  },
-  checking: { cssClass: "is-checking", codepoint: "23f3", fallback: "..." },
-  ready: { cssClass: "is-ready", codepoint: "1f7e2", fallback: "OK" },
-  error: { cssClass: "is-error", codepoint: "1f534", fallback: "!" },
-};
-/** Flat array of all WebDAV indicator CSS state classes for bulk removal. */
-const WEBDAV_ICON_STATE_CLASSES = Object.values(WEBDAV_ICON_STATES).map(
-  (item) => item.cssClass,
-);
-
-/**
- * Converts a Unicode emoji string to a hyphen-joined hex codepoint string
- * compatible with the Twemoji file naming convention.
- * @param {string} emoji
- * @returns {string} e.g. `"1f1fa-1f1f8"` for 🇺🇸
- */
-function emojiToCodepoints(emoji) {
-  return Array.from(emoji || "")
-    .map((ch) => ch.codePointAt(0).toString(16))
-    .join("-");
-}
-
-/**
- * Returns the CDN URL for a flag emoji's Twemoji SVG asset,
- * caching the result to avoid repeated codepoint conversions.
- * @param {string} flagEmoji
- * @returns {string}
- */
-function getFlagIconSrc(flagEmoji) {
-  if (flagIconCache.has(flagEmoji)) {
-    return flagIconCache.get(flagEmoji);
-  }
-  const code = emojiToCodepoints(flagEmoji || "🌐");
-  const url = `${TWEMOJI_CDN_BASE}/${code}.svg`;
-  flagIconCache.set(flagEmoji, url);
-  return url;
-}
-
-/**
- * Returns the CDN URL for a Twemoji SVG identified by its
- * raw Unicode codepoint string (e.g. `"1f7e2"` for 🟢).
- * @param {string} codepoint
- * @returns {string}
- */
-function getTwemojiIconSrcByCodepoint(codepoint) {
-  return `${TWEMOJI_CDN_BASE}/${codepoint}.svg`;
-}
-
-/**
- * Returns the human-readable label for a language option value.
- * Falls back to `"Auto (Browser)"` when the value is not found.
- * @param {string} value - Locale value, e.g. `"en"` or `"auto"`.
- * @returns {string}
- */
-function getLanguageOptionLabel(value) {
-  const option = LANGUAGE_OPTIONS.find((item) => item.value === value);
-  return option ? option.label : "Auto (Browser)";
-}
-
-/**
- * Returns the localised label for a theme option value.
- * Falls back to the system theme label when the value is not found.
- * @param {string} value
- * @returns {string}
- */
-function getThemeOptionLabel(value) {
-  const option = THEME_OPTIONS.find((item) => item.value === value);
-  return option ? t(option.labelKey) : t("themeSystem");
-}
 
 /**
  * Updates a status element's text, visibility, and type modifier class.
@@ -272,46 +176,10 @@ async function copyBookmarkUrl(node) {
   }
 }
 
-/**
- * Builds a tooltip string for the WebDAV status indicator.
- * Prepends the localised "WebDAV" label when detail text is provided.
- * @param {string} text
- * @returns {string}
- */
-function getWebdavIndicatorTooltip(text) {
-  const detail = (text || "").trim();
-  return detail ? `${t("webdavLabel")}: ${detail}` : t("webdavLabel");
-}
-
-/**
- * Updates the WebDAV connection status indicator icon and tooltip.
- * Switches the icon element's CSS class, tooltip text, and Twemoji image src.
- * @param {'notConfigured'|'checking'|'ready'|'error'} stateKey
- * @param {string} tooltipText - Detail text appended to the label.
- */
-function setWebdavStatusIndicator(stateKey, tooltipText) {
-  const indicator = document.getElementById("webdav-status-indicator");
-  const icon = /** @type {HTMLImageElement|null} */ (
-    document.getElementById("webdav-status-icon")
-  );
-  if (!indicator || !icon) {
-    return;
-  }
-
-  const state =
-    WEBDAV_ICON_STATES[stateKey] || WEBDAV_ICON_STATES.notConfigured;
-  indicator.classList.remove(...WEBDAV_ICON_STATE_CLASSES);
-  indicator.classList.add(state.cssClass);
-  indicator.dataset.tooltip = getWebdavIndicatorTooltip(tooltipText);
-  indicator.setAttribute("aria-label", indicator.dataset.tooltip);
-  indicator.textContent = "";
-  indicator.appendChild(icon);
-  icon.hidden = false;
-  icon.dataset.fallback = state.fallback;
-  icon.src = getTwemojiIconSrcByCodepoint(state.codepoint);
-}
-
-// Proxy — replaced by the real implementation after all modules and DOM refs are ready.
+/** Proxy — replaced by the WebDAV status module once it is constructed. */
+/** @type {ModalsModuleDeps["setWebdavStatusIndicator"]} */
+let setWebdavStatusIndicator = () => {};
+/** Proxy — replaced by the WebDAV status module once it is constructed. */
 /** @type {BookmarkTreeModuleDeps["refreshWebdavStatusBar"]} */
 let refreshWebdavStatusBar = async () => {};
 
@@ -319,12 +187,15 @@ const modalsModule = window.YABMModalsModule.createModalsModule({
   t,
   setStatus,
   showTopToast,
-  setWebdavStatusIndicator,
+  setWebdavStatusIndicator: (
+    /** @type {Parameters<ModalsModuleDeps["setWebdavStatusIndicator"]>} */ ...args
+  ) => setWebdavStatusIndicator(...args),
   refreshWebdavStatusBar: (
     /** @type {Parameters<BookmarkTreeModuleDeps["refreshWebdavStatusBar"]>} */ ...args
   ) => refreshWebdavStatusBar(...args),
   sync: window.YABMSync,
   createConfigSession: window.YABMWebdavConfigSession.createSession,
+  createFilePicker: window.YABMWebdavFilePicker.createPicker,
 });
 
 const {
@@ -356,6 +227,20 @@ function updateMainLayoutMetrics() {
   updateBookmarkListScrollbar();
 }
 
+/** @type {BookmarkOverlayModule["createOverlay"]} */
+const createOverlay = window.YABMBookmarkOverlayModule.createOverlay;
+
+/**
+ * The bookmark edit context menu. Owned by this page but registered with the
+ * overlay module, so the tree layer can close it through the same handle.
+ */
+const editContextMenu = createOverlay({
+  id: "editContextMenu",
+  getElement: () => document.getElementById("edit-context-menu"),
+  fallbackSize: { width: 220, height: 260 },
+  clearContent: true,
+});
+
 /** @type {BookmarkTreeModuleDeps} */
 const treeModuleDeps = {
   t,
@@ -371,7 +256,8 @@ const treeModuleDeps = {
   setStatus,
   openPromptModal,
   openEditorModal,
-  closeEditContextMenu,
+  createOverlay,
+  editContextMenu,
   updateMainLayoutMetrics,
   updateBookmarkListScrollbar,
   refreshWebdavStatusBar: (
@@ -393,8 +279,6 @@ let closeTreeContextMenu;
 let createContainerDragHandlers;
 /** @type {BookmarkTreeModule["handleSortMenuApply"]} */
 let handleSortMenuApply;
-/** @type {BookmarkTreeModule["isTreeContextMenuOpen"]} */
-let isTreeContextMenuOpen;
 /** @type {BookmarkTreeModule["renderBookmarks"]} */
 let renderBookmarks;
 /** @type {BookmarkTreeModule["setAllFoldersOpen"]} */
@@ -406,472 +290,56 @@ let setAllFoldersOpen;
   closeTreeContextMenu,
   createContainerDragHandlers,
   handleSortMenuApply,
-  isTreeContextMenuOpen,
   renderBookmarks,
   rerenderAfterTreeChange,
   setAllFoldersOpen,
 } = treeModule);
 
-let editContextMenuOpen = false;
-
-/**
- * Returns `true` if `target` is an editable text field (input, textarea, or
- * contentEditable element) that is neither read-only nor disabled.
- * Used to decide whether to show the text edit context menu on right-click.
- * @param {EventTarget|null} target
- * @returns {target is HTMLElement}
- */
-function isEditableTarget(target) {
-  return Boolean(
-    target &&
-      ((target instanceof HTMLInputElement &&
-        !target.readOnly &&
-        !target.disabled &&
-        (target.type === "text" ||
-          target.type === "search" ||
-          target.type === "url" ||
-          target.type === "email" ||
-          target.type === "tel" ||
-          target.type === "password")) ||
-        (target instanceof HTMLTextAreaElement &&
-          !target.readOnly &&
-          !target.disabled) ||
-        /** @type {HTMLElement} */ (target).isContentEditable),
-  );
-}
-
-/**
- * Closes and empties the text-editing context menu (cut/copy/paste/etc.).
- */
-function closeEditContextMenu() {
-  const menu = document.getElementById("edit-context-menu");
-  if (!menu) {
-    return;
-  }
-  menu.classList.add("hidden");
-  menu.innerHTML = "";
-  editContextMenuOpen = false;
-}
-
-/**
- * Returns the currently selected text within an editable target element.
- * @param {HTMLElement|null} target
- * @returns {string}
- */
-function getSelectionTextFromEditable(target) {
-  if (!target) {
-    return "";
-  }
-  if (
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement
-  ) {
-    const start = target.selectionStart ?? 0;
-    const end = target.selectionEnd ?? start;
-    return target.value.slice(start, end);
-  }
-  const sel = window.getSelection();
-  return sel ? sel.toString() : "";
-}
-
-/**
- * Replaces the current selection in an editable element with `text`.
- * Handles both native input/textarea elements and `contentEditable` nodes.
- * Dispatches an `input` event so dependent listeners (e.g. validators) react.
- * @param {HTMLElement|null} target
- * @param {string} text - Replacement text (empty string to delete the selection).
- */
-function replaceSelectedTextInEditable(target, text) {
-  if (!target) {
-    return;
-  }
-  if (
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement
-  ) {
-    const start = target.selectionStart ?? target.value.length;
-    const end = target.selectionEnd ?? start;
-    target.setRangeText(text, start, end, "end");
-    target.dispatchEvent(new Event("input", { bubbles: true }));
-    return;
-  }
-  if (target.isContentEditable) {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) {
-      return;
-    }
-    selection.deleteFromDocument();
-    const range = selection.getRangeAt(0);
-    range.insertNode(document.createTextNode(text));
-    range.collapse(false);
-    target.dispatchEvent(new Event("input", { bubbles: true }));
-  }
-}
-
-/**
- * Builds and displays the rich-text context menu (cut/copy/paste/delete/select-all)
- * for an editable element at the given screen coordinates.
- * Copy/cut/delete items are disabled when there is no active selection.
- * @param {HTMLElement} target - The focused editable element.
- * @param {number} x - Horizontal screen position.
- * @param {number} y - Vertical screen position.
- */
-function openEditContextMenu(target, x, y) {
-  const menu = document.getElementById("edit-context-menu");
-  if (!menu) {
-    return;
-  }
-  if (typeof target.focus === "function") {
-    target.focus();
-  }
-  closeTreeContextMenu();
-  closeSortMenu();
-  menu.innerHTML = "";
-  editContextMenuOpen = true;
-
-  const selectedText = getSelectionTextFromEditable(target);
-  const hasSelection = selectedText.length > 0;
-
-  const makeItem = ({ label, icon, onClick, disabled = false }) => {
-    const button = document.createElement("button");
-    button.className = "tree-context-item";
-    button.type = "button";
-    button.setAttribute("role", "menuitem");
-    button.disabled = disabled;
-    button.innerHTML = `
-      <span class="icon-font" aria-hidden="true">${icon}</span>
-      <span>${label}</span>
-    `;
-    button.addEventListener("click", async (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      closeEditContextMenu();
-      if (!disabled) {
-        await onClick();
-      }
-    });
-    return button;
-  };
-
-  const addDivider = () => {
-    const divider = document.createElement("div");
-    divider.className = "tree-context-divider";
-    menu.appendChild(divider);
-  };
-
-  menu.appendChild(
-    makeItem({
-      label: t("contextCut"),
-      icon: "content_cut",
-      disabled: !hasSelection,
-      onClick: async () => document.execCommand("cut"),
-    }),
-  );
-  menu.appendChild(
-    makeItem({
-      label: t("contextCopy"),
-      icon: "content_copy",
-      disabled: !hasSelection,
-      onClick: async () => document.execCommand("copy"),
-    }),
-  );
-  menu.appendChild(
-    makeItem({
-      label: t("contextPaste"),
-      icon: "content_paste",
-      onClick: async () => {
-        try {
-          const text = await navigator.clipboard.readText();
-          replaceSelectedTextInEditable(target, text);
-        } catch {
-          setStatus(t("pastePermissionDenied"), "error");
-        }
-      },
-    }),
-  );
-  menu.appendChild(
-    makeItem({
-      label: t("contextDelete"),
-      icon: "delete",
-      disabled: !hasSelection,
-      onClick: async () => replaceSelectedTextInEditable(target, ""),
-    }),
-  );
-  addDivider();
-  menu.appendChild(
-    makeItem({
-      label: t("contextSelectAll"),
-      icon: "select_all",
-      onClick: async () => {
-        if (
-          target instanceof HTMLInputElement ||
-          target instanceof HTMLTextAreaElement
-        ) {
-          target.select();
-          return;
-        }
-        if (target.isContentEditable) {
-          const range = document.createRange();
-          range.selectNodeContents(target);
-          const sel = window.getSelection();
-          sel?.removeAllRanges();
-          sel?.addRange(range);
-        }
-      },
-    }),
-  );
-
-  menu.classList.remove("hidden");
-  const width = menu.offsetWidth || 220;
-  const height = menu.offsetHeight || 260;
-  const left = Math.min(window.innerWidth - width - 8, Math.max(8, x));
-  const top = Math.min(window.innerHeight - height - 8, Math.max(8, y));
-  menu.style.left = `${left}px`;
-  menu.style.top = `${top}px`;
-}
-
-/**
- * Enables or disables the three WebDAV sync action buttons simultaneously.
- * Used to prevent repeated invocations while an upload/download is in progress.
- * @param {boolean} disabled
- */
-function setSyncButtonsDisabled(disabled) {
-  const ids = ["upload-bookmarks", "download-bookmarks", "webdav-refresh"];
-  for (const id of ids) {
-    const el = /** @type {HTMLButtonElement|null} */ (
-      document.getElementById(id)
-    );
-    if (el) {
-      el.disabled = disabled;
-    }
-  }
-}
-
-/**
- * Updates the WebDAV status bar's URL label, entry counts, and refresh-button state.
- * Passing `undefined` for any string field leaves that element unchanged.
- * @param {{ urlText?: string, countText?: string, browserCountText?: string, refreshDisabled?: boolean }} options
- */
-function setWebdavStatusBarState({
-  urlText,
-  countText,
-  browserCountText,
-  refreshDisabled = false,
-}) {
-  const urlEl = document.getElementById("webdav-url");
-  const countEl = document.getElementById("webdav-count");
-  const browserCountEl = document.getElementById("browser-count");
-  const refreshBtn = /** @type {HTMLButtonElement|null} */ (
-    document.getElementById("webdav-refresh")
-  );
-
-  if (urlEl && typeof urlText === "string") {
-    urlEl.textContent = urlText;
-    urlEl.dataset.tooltip = urlText;
-  }
-  if (countEl && typeof countText === "string") {
-    countEl.textContent = countText;
-  }
-  if (browserCountEl && typeof browserCountText === "string") {
-    browserCountEl.textContent = browserCountText;
-  }
-  if (refreshBtn) {
-    refreshBtn.disabled = refreshDisabled;
-  }
-  requestAnimationFrame(updateMainLayoutMetrics);
-}
-
-/**
- * Recursively counts bookmark entries (nodes with a `url`) in a subtree.
- * Folders themselves are not counted.
- * @param {chrome.bookmarks.BookmarkTreeNode[]} nodes
- * @returns {number}
- */
-function countBrowserBookmarkEntries(nodes) {
-  let total = 0;
-  for (const node of nodes || []) {
-    if (node.url) {
-      total += 1;
-      continue;
-    }
-    total += countBrowserBookmarkEntries(node.children || []);
-  }
-  return total;
-}
-
-/**
- * Fetches the full Chrome bookmark tree and returns the total number of
- * bookmark entries (excluding folders) across all top-level folders.
- * @returns {Promise<number>}
- */
-async function getBrowserBookmarkEntryCount() {
-  const tree = await chrome.bookmarks.getTree();
-  return countBrowserBookmarkEntries(tree?.[0]?.children || []);
-}
-
-refreshWebdavStatusBar = async function refreshWebdavStatusBarImpl({
-  interactive = false,
-} = {}) {
-  const refreshBtn = /** @type {HTMLButtonElement|null} */ (
-    document.getElementById("webdav-refresh")
-  );
-  if (refreshBtn) {
-    refreshBtn.disabled = true;
-  }
-  setWebdavStatusIndicator("checking", t("webdavEntriesRefreshing"));
-
-  try {
-    const config = await window.YABMSync.getConfig();
-    if (!config?.directoryUrl || !config?.fileName) {
-      const browserCount = await getBrowserBookmarkEntryCount();
-      setWebdavStatusBarState({
-        urlText: t("notConfigured"),
-        countText: t("webdavEntriesDash"),
-        browserCountText: t("browserEntries", [String(browserCount)]),
-      });
-      setWebdavStatusIndicator("notConfigured", t("notConfigured"));
-      return;
-    }
-
-    let webdavDisplayUrl = config.directoryUrl;
-    try {
-      const normalizedDirectoryUrl = window.YABMSync.normalizeDirectoryUrl(
-        config.directoryUrl,
-      );
-      webdavDisplayUrl = config.fileName
-        ? window.YABMSync.joinDirectoryAndFile(
-            normalizedDirectoryUrl,
-            config.fileName,
-          )
-        : normalizedDirectoryUrl;
-    } catch {
-      webdavDisplayUrl = config.directoryUrl;
-    }
-
-    setWebdavStatusBarState({
-      urlText: webdavDisplayUrl,
-      countText: t("webdavEntriesRefreshing"),
-      browserCountText: t("browserEntriesRefreshing"),
-      refreshDisabled: true,
-    });
-
-    const [browserCount, webdavEntries] = await Promise.all([
-      getBrowserBookmarkEntryCount(),
-      window.YABMSync.getWebDavBookmarkEntryCount(
-        {
-          directoryUrl: config.directoryUrl,
-          fileName: config.fileName,
-          username: config.username || "",
-          password: config.password || "",
-        },
-        { interactive },
-      ),
-    ]);
-
-    setWebdavStatusBarState({
-      urlText: webdavDisplayUrl,
-      countText: t("webdavEntries", [String(webdavEntries)]),
-      browserCountText: t("browserEntries", [String(browserCount)]),
-    });
-    setWebdavStatusIndicator(
-      "ready",
-      t("webdavEntries", [String(webdavEntries)]),
-    );
-  } catch {
-    const browserCount = await getBrowserBookmarkEntryCount().catch(() => null);
-    setWebdavStatusBarState({
-      countText: t("webdavEntriesError"),
-      browserCountText:
-        browserCount === null
-          ? t("browserEntriesError")
-          : t("browserEntries", [String(browserCount)]),
-    });
-    setWebdavStatusIndicator("error", t("webdavEntriesError"));
-  } finally {
-    if (refreshBtn) {
-      refreshBtn.disabled = false;
-    }
-  }
-};
-
-/**
- * Uploads the current Chrome bookmark tree to the configured WebDAV location
- * after prompting the user for confirmation.
- * @returns {Promise<void>}
- */
-async function handleUpload() {
-  const proceed = await openPromptModal({
-    title: t("confirmUploadTitle"),
-    message: t("confirmUploadMessage"),
-    confirmLabel: t("startUpload"),
-    cancelLabel: t("cancel"),
+/** @type {import("./bookmark-webdav-status.js").WebdavStatusModule} */
+const webdavStatusModule =
+  window.YABMWebdavStatusModule.createWebdavStatusModule({
+    t,
+    setStatus,
+    sync: window.YABMSync,
+    showTopProgress,
+    hideTopProgress,
+    openPromptModal,
+    renderBookmarks,
+    updateMainLayoutMetrics,
   });
-  if (!proceed) {
-    return;
-  }
 
-  setSyncButtonsDisabled(true);
-  setStatus(t("uploadingBookmarks"), "");
-  setWebdavStatusIndicator("checking", t("uploadingBookmarks"));
-  showTopProgress();
+const { uploadBookmarks, downloadBookmarks } = webdavStatusModule;
 
-  try {
-    const config = await window.YABMSync.getConfig();
-    if (!config?.directoryUrl || !config?.fileName) {
-      setStatus(t("configureWebdavFirst"), "error");
-      return;
-    }
+// The modals and tree modules were constructed above with forwarders for these
+// two; they now resolve to the WebDAV status module's implementations.
+setWebdavStatusIndicator = webdavStatusModule.setStatusIndicator;
+refreshWebdavStatusBar = webdavStatusModule.refreshStatusBar;
 
-    await window.YABMSync.uploadBookmarksToWebDav(config);
-    setStatus(t("uploadSuccessful", [config.fileName]), "success");
-  } catch (error) {
-    setStatus(t("uploadFailed", [error.message]), "error");
-  } finally {
-    setSyncButtonsDisabled(false);
-    await refreshWebdavStatusBar();
-    hideTopProgress();
-  }
-}
+/** @type {import("./bookmark-tooltip.js").TooltipModule} */
+const tooltipModule = window.YABMTooltipModule.createTooltipModule({
+  createOverlay,
+});
 
-/**
- * Downloads the bookmark file from WebDAV and imports it into Chrome after
- * prompting the user for confirmation.
- * @returns {Promise<void>}
- */
-async function handleDownload() {
-  const proceed = await openPromptModal({
-    title: t("confirmDownloadTitle"),
-    message: t("confirmDownloadMessage"),
-    confirmLabel: t("continueDownload"),
-    cancelLabel: t("cancel"),
+/** @type {import("./bookmark-edit-menu.js").EditMenuModule} */
+const editMenuModule = window.YABMEditMenuModule.createEditMenuModule({
+  t,
+  setStatus,
+  editContextMenu,
+  closeTreeContextMenu,
+  closeSortMenu,
+});
+
+/** @type {import("./bookmark-appearance-menu.js").AppearanceMenuModule} */
+const appearanceMenuModule =
+  window.YABMAppearanceMenuModule.createAppearanceMenuModule({
+    t,
+    setStatus,
+    i18n: window.YABMI18n,
+    theme: window.YABMTheme,
+    createOverlay,
+    setAppVersion,
+    rerenderAfterTreeChange,
   });
-  if (!proceed) {
-    return;
-  }
-
-  setSyncButtonsDisabled(true);
-  setStatus(t("downloadingBookmarks"), "");
-  setWebdavStatusIndicator("checking", t("downloadingBookmarks"));
-  showTopProgress();
-
-  try {
-    const config = await window.YABMSync.getConfig();
-    if (!config?.directoryUrl || !config?.fileName) {
-      setStatus(t("configureWebdavFirst"), "error");
-      return;
-    }
-
-    await window.YABMSync.downloadBookmarksFromWebDav(config);
-    setStatus(t("downloadSuccessful", [config.fileName]), "success");
-    await renderBookmarks();
-  } catch (error) {
-    setStatus(t("downloadFailed", [error.message]), "error");
-  } finally {
-    setSyncButtonsDisabled(false);
-    await refreshWebdavStatusBar();
-    hideTopProgress();
-  }
-}
 
 /**
  * Reads the extension version from the manifest and writes it into the footer
@@ -899,10 +367,6 @@ function bindTreeActions() {
   const expandAllBtn = document.getElementById("expand-all");
   const collapseAllBtn = document.getElementById("collapse-all");
   const openConfigBtn = document.getElementById("open-config");
-  const openLanguageMenuBtn = document.getElementById("open-language-menu");
-  const openThemeMenuBtn = document.getElementById("open-theme-menu");
-  const languageMenu = document.getElementById("language-menu");
-  const themeMenu = document.getElementById("theme-menu");
   const closeConfigBtn = document.getElementById("close-config");
   const cancelConfigBtn = document.getElementById("cfg-cancel");
   const configTestBtn = document.getElementById("cfg-test");
@@ -911,285 +375,20 @@ function bindTreeActions() {
   const uploadBtn = document.getElementById("upload-bookmarks");
   const downloadBtn = document.getElementById("download-bookmarks");
   const webdavRefreshBtn = document.getElementById("webdav-refresh");
-  const webdavStatusIcon = document.getElementById("webdav-status-icon");
   const bookmarkListEl = document.getElementById("bookmark-list");
   const scrollbarTrack = document.getElementById("bookmark-scrollbar");
   const scrollbarUpBtn = document.getElementById("bookmark-scroll-up");
   const scrollbarDownBtn = document.getElementById("bookmark-scroll-down");
   const scrollbarThumb = document.getElementById("bookmark-scrollbar-thumb");
   const topToast = document.getElementById("top-toast");
-  const sortMenu = document.getElementById("folder-sort-menu");
-  const treeContextMenu = document.getElementById("tree-context-menu");
-  const editContextMenu = document.getElementById("edit-context-menu");
-  const appTooltip = document.getElementById("app-tooltip");
   const sortAscBtn = document.getElementById("sort-asc");
   const sortDescBtn = document.getElementById("sort-desc");
-  /** @type {HTMLElement|null} */
-  let tooltipTarget = null;
-  let languageMenuOpen = false;
-  let themeMenuOpen = false;
-
-  webdavStatusIcon?.addEventListener("error", () => {
-    const indicator = document.getElementById("webdav-status-indicator");
-    if (!indicator) {
-      return;
-    }
-    indicator.textContent = webdavStatusIcon.dataset.fallback || "?";
-  });
-
-  const closeLanguageMenu = () => {
-    if (!languageMenu) {
-      return;
-    }
-    languageMenu.classList.add("hidden");
-    languageMenuOpen = false;
-  };
-
-  const closeThemeMenu = () => {
-    if (!themeMenu) {
-      return;
-    }
-    themeMenu.classList.add("hidden");
-    themeMenuOpen = false;
-  };
-
-  const positionMenu = (menuEl, anchorEl) => {
-    if (!menuEl || !anchorEl) {
-      return;
-    }
-    const rect = anchorEl.getBoundingClientRect();
-    const width = menuEl.offsetWidth || 220;
-    const left = Math.min(
-      window.innerWidth - width - 10,
-      Math.max(10, rect.right - width),
-    );
-    const top = Math.min(window.innerHeight - 10, rect.bottom + 8);
-    menuEl.style.left = `${left}px`;
-    menuEl.style.top = `${top}px`;
-  };
-
-  const positionLanguageMenu = () => {
-    positionMenu(languageMenu, openLanguageMenuBtn);
-  };
-
-  const positionThemeMenu = () => {
-    positionMenu(themeMenu, openThemeMenuBtn);
-  };
-
-  const updateLanguageButtonTooltip = () => {
-    if (!openLanguageMenuBtn) {
-      return;
-    }
-    const preferred = window.YABMI18n.getLanguagePreference();
-    openLanguageMenuBtn.dataset.tooltip = t("languageCurrentTooltip", [
-      getLanguageOptionLabel(preferred),
-    ]);
-  };
-
-  const updateThemeButtonTooltip = () => {
-    if (!openThemeMenuBtn) {
-      return;
-    }
-    openThemeMenuBtn.dataset.tooltip = t("themeCurrentTooltip", [
-      getThemeOptionLabel(window.YABMTheme.getThemePreference()),
-    ]);
-  };
-
-  const updatePageLanguage = async (language) => {
-    await window.YABMI18n.setLanguagePreference(language);
-    window.YABMI18n.apply();
-    renderLanguageMenu();
-    renderThemeMenu();
-    setAppVersion();
-    await rerenderAfterTreeChange();
-  };
-
-  const renderLanguageMenu = () => {
-    if (!languageMenu) {
-      return;
-    }
-    const preferred = window.YABMI18n.getLanguagePreference();
-    languageMenu.innerHTML = "";
-    for (const option of LANGUAGE_OPTIONS) {
-      const item = document.createElement("button");
-      item.type = "button";
-      item.className = "sort-menu-item";
-      item.setAttribute("role", "menuitemradio");
-      item.setAttribute(
-        "aria-checked",
-        preferred === option.value ? "true" : "false",
-      );
-      if (preferred === option.value) {
-        item.classList.add("language-menu-item-active");
-      }
-      const flagClass =
-        option.value === window.YABMI18n.AUTO_LANGUAGE
-          ? "language-item-flag language-item-flag-auto"
-          : "language-item-flag language-item-flag-country";
-      item.innerHTML =
-        `<span class="sort-menu-icon ${flagClass}" aria-hidden="true"><img class="language-flag-img" alt="" src="${getFlagIconSrc(option.flag || "🌐")}" data-fallback="${option.flag || "🌐"}" /></span>` +
-        `<span>${option.label}</span>` +
-        (preferred === option.value
-          ? '<span class="language-item-check icon-font" aria-hidden="true">check</span>'
-          : "");
-      const flagImg = /** @type {HTMLImageElement|null} */ (
-        item.querySelector(".language-flag-img")
-      );
-      if (flagImg) {
-        flagImg.addEventListener("error", () => {
-          const fallback = flagImg.dataset.fallback || "🌐";
-          const holder = flagImg.closest(".language-item-flag");
-          if (holder) {
-            holder.textContent = fallback;
-          }
-        });
-      }
-      item.addEventListener("click", async () => {
-        closeLanguageMenu();
-        try {
-          await updatePageLanguage(option.value);
-        } catch (error) {
-          setStatus(t("initializationFailed", [error.message]), "error");
-        }
-      });
-      languageMenu.appendChild(item);
-    }
-    updateLanguageButtonTooltip();
-  };
-
-  const updatePageTheme = async (theme) => {
-    await window.YABMTheme.setThemePreference(theme);
-    window.YABMTheme.apply();
-    renderThemeMenu();
-  };
-
-  const renderThemeMenu = () => {
-    if (!themeMenu) {
-      return;
-    }
-    const preferred = window.YABMTheme.getThemePreference();
-    themeMenu.innerHTML = "";
-    for (const option of THEME_OPTIONS) {
-      const item = document.createElement("button");
-      item.type = "button";
-      item.className = "sort-menu-item";
-      item.setAttribute("role", "menuitemradio");
-      item.setAttribute(
-        "aria-checked",
-        preferred === option.value ? "true" : "false",
-      );
-      if (preferred === option.value) {
-        item.classList.add("theme-menu-item-active");
-      }
-      item.innerHTML =
-        `<span class="sort-menu-icon theme-menu-icon" aria-hidden="true"><span class="theme-symbol-icon">${option.iconLigature}</span></span>` +
-        `<span>${t(option.labelKey)}</span>` +
-        (preferred === option.value
-          ? '<span class="language-item-check icon-font" aria-hidden="true">check</span>'
-          : "");
-      item.addEventListener("click", async () => {
-        closeThemeMenu();
-        try {
-          await updatePageTheme(option.value);
-        } catch (error) {
-          setStatus(t("initializationFailed", [error.message]), "error");
-        }
-      });
-      themeMenu.appendChild(item);
-    }
-    updateThemeButtonTooltip();
-  };
-
-  const openLanguageMenu = () => {
-    if (!languageMenu) {
-      return;
-    }
-    closeThemeMenu();
-    renderLanguageMenu();
-    languageMenu.classList.remove("hidden");
-    languageMenuOpen = true;
-    positionLanguageMenu();
-  };
-
-  const openThemeMenu = () => {
-    if (!themeMenu) {
-      return;
-    }
-    closeLanguageMenu();
-    renderThemeMenu();
-    themeMenu.classList.remove("hidden");
-    themeMenuOpen = true;
-    positionThemeMenu();
-  };
-
-  const hideAppTooltip = () => {
-    if (!appTooltip) {
-      return;
-    }
-    appTooltip.classList.add("hidden");
-    appTooltip.textContent = "";
-    tooltipTarget = null;
-  };
-
-  const positionAppTooltip = (x, y) => {
-    if (!appTooltip || appTooltip.classList.contains("hidden")) {
-      return;
-    }
-    const width = appTooltip.offsetWidth || 180;
-    const height = appTooltip.offsetHeight || 36;
-    const offset = 12;
-    const left = Math.min(
-      window.innerWidth - width - 10,
-      Math.max(10, x + offset),
-    );
-    const top = Math.min(
-      window.innerHeight - height - 10,
-      Math.max(10, y + offset),
-    );
-    appTooltip.style.left = `${left}px`;
-    appTooltip.style.top = `${top}px`;
-  };
-
-  /**
-   * @param {HTMLElement} target
-   * @param {number} x
-   * @param {number} y
-   */
-  const showAppTooltip = (target, x, y) => {
-    if (!appTooltip) {
-      return;
-    }
-    const text = target?.dataset?.tooltip?.trim();
-    if (!text) {
-      hideAppTooltip();
-      return;
-    }
-    tooltipTarget = target;
-    appTooltip.textContent = text;
-    appTooltip.classList.remove("hidden");
-    positionAppTooltip(x, y);
-  };
 
   expandAllBtn?.addEventListener("click", () => setAllFoldersOpen(true));
   collapseAllBtn?.addEventListener("click", () => setAllFoldersOpen(false));
 
   openConfigBtn?.addEventListener("click", openConfigModal);
-  openLanguageMenuBtn?.addEventListener("click", (event) => {
-    event.stopPropagation();
-    if (languageMenuOpen) {
-      closeLanguageMenu();
-    } else {
-      openLanguageMenu();
-    }
-  });
-  openThemeMenuBtn?.addEventListener("click", (event) => {
-    event.stopPropagation();
-    if (themeMenuOpen) {
-      closeThemeMenu();
-    } else {
-      openThemeMenu();
-    }
-  });
+  appearanceMenuModule.bindTriggerButtons();
   closeConfigBtn?.addEventListener("click", closeConfigModal);
   cancelConfigBtn?.addEventListener("click", closeConfigModal);
   configTestBtn?.addEventListener("click", testConfigConnection);
@@ -1217,8 +416,8 @@ function bindTreeActions() {
       }
     });
 
-  uploadBtn?.addEventListener("click", handleUpload);
-  downloadBtn?.addEventListener("click", handleDownload);
+  uploadBtn?.addEventListener("click", uploadBookmarks);
+  downloadBtn?.addEventListener("click", downloadBookmarks);
   webdavRefreshBtn?.addEventListener("click", () =>
     refreshWebdavStatusBar({ interactive: true }),
   );
@@ -1299,131 +498,14 @@ function bindTreeActions() {
     await handleSortMenuApply(true);
   });
 
-  document.addEventListener("click", (event) => {
-    const target = /** @type {Node|null} */ (event.target);
-    if (
-      editContextMenuOpen &&
-      editContextMenu &&
-      !editContextMenu.contains(target)
-    ) {
-      closeEditContextMenu();
-    }
-
-    if (
-      isTreeContextMenuOpen() &&
-      treeContextMenu &&
-      !treeContextMenu.contains(target)
-    ) {
-      closeTreeContextMenu();
-    }
-
-    if (languageMenuOpen) {
-      const inLanguageMenu = Boolean(
-        (languageMenu && languageMenu.contains(target)) ||
-          (openLanguageMenuBtn && openLanguageMenuBtn.contains(target)),
-      );
-      if (!inLanguageMenu) {
-        closeLanguageMenu();
-      }
-    }
-
-    if (themeMenuOpen) {
-      const inThemeMenu = Boolean(
-        (themeMenu && themeMenu.contains(target)) ||
-          (openThemeMenuBtn && openThemeMenuBtn.contains(target)),
-      );
-      if (!inThemeMenu) {
-        closeThemeMenu();
-      }
-    }
-
-    if (!sortMenu || sortMenu.classList.contains("hidden")) {
-      return;
-    }
-    if (sortMenu.contains(target)) {
-      return;
-    }
-    closeSortMenu();
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      closeEditContextMenu();
-      closeTreeContextMenu();
-      closeSortMenu();
-      closeLanguageMenu();
-      closeThemeMenu();
-      hideAppTooltip();
-    }
-  });
+  // Overlay dismissal (outside click, Escape, scroll, resize) is owned by the
+  // overlay module, which installed its listeners when the first overlay was
+  // registered. Only the layout recompute remains here.
   window.addEventListener("resize", () => {
-    closeEditContextMenu();
-    closeLanguageMenu();
-    closeThemeMenu();
-    hideAppTooltip();
     updateMainLayoutMetrics();
   });
-  window.addEventListener("scroll", closeEditContextMenu, true);
-  window.addEventListener("resize", closeTreeContextMenu);
-  window.addEventListener(
-    "scroll",
-    () => {
-      closeTreeContextMenu();
-      closeLanguageMenu();
-      closeThemeMenu();
-      hideAppTooltip();
-    },
-    true,
-  );
 
-  document.addEventListener("mouseover", (event) => {
-    const target = /** @type {HTMLElement|null|undefined} */ (
-      /** @type {Element|null} */ (event.target)?.closest?.("[data-tooltip]")
-    );
-    if (!target) {
-      return;
-    }
-    showAppTooltip(target, event.clientX, event.clientY);
-  });
-
-  document.addEventListener("mousemove", (event) => {
-    if (!tooltipTarget) {
-      return;
-    }
-    positionAppTooltip(event.clientX, event.clientY);
-  });
-
-  document.addEventListener("mouseout", (event) => {
-    if (!tooltipTarget) {
-      return;
-    }
-    const related = /** @type {Node|null} */ (event.relatedTarget);
-    if (related && tooltipTarget.contains(related)) {
-      return;
-    }
-    const target = /** @type {Node|null} */ (event.target);
-    if (target && tooltipTarget.contains(target)) {
-      hideAppTooltip();
-    }
-  });
-
-  document.addEventListener("focusin", (event) => {
-    const target = /** @type {HTMLElement|null|undefined} */ (
-      /** @type {Element|null} */ (event.target)?.closest?.("[data-tooltip]")
-    );
-    if (!target) {
-      return;
-    }
-    const rect = target.getBoundingClientRect();
-    showAppTooltip(target, rect.left + rect.width / 2, rect.bottom);
-  });
-
-  document.addEventListener("focusout", (event) => {
-    const target = /** @type {Node|null} */ (event.target);
-    if (tooltipTarget && target && tooltipTarget.contains(target)) {
-      hideAppTooltip();
-    }
-  });
+  tooltipModule.bindEvents();
 
   topToast?.addEventListener("click", hideTopToast);
 
@@ -1440,30 +522,9 @@ function bindTreeActions() {
     }
   });
 
-  document.addEventListener("contextmenu", (event) => {
-    const target = /** @type {Element|null} */ (event.target);
-    if (isEditableTarget(target)) {
-      event.preventDefault();
-      openEditContextMenu(target, event.clientX, event.clientY);
-      return;
-    }
-    const isInsideTree = Boolean(
-      target &&
-        typeof target.closest === "function" &&
-        target.closest("#bookmark-list"),
-    );
-    if (!isInsideTree) {
-      event.preventDefault();
-    }
-  });
+  document.addEventListener("contextmenu", editMenuModule.handleContextMenu);
 
-  const preferred = window.YABMI18n.getLanguagePreference();
-  if (openLanguageMenuBtn) {
-    openLanguageMenuBtn.dataset.tooltip = t("languageCurrentTooltip", [
-      getLanguageOptionLabel(preferred),
-    ]);
-  }
-  updateThemeButtonTooltip();
+  appearanceMenuModule.refreshTriggerTooltips();
 }
 
 /**

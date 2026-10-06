@@ -403,9 +403,9 @@
             data-i18n-aria-label="editActionsAria"
             aria-label="Edit actions"
         ></div>
-        <!-- Language switcher dropdown; items injected by bookmarks.js -->
+        <!-- Language switcher dropdown; items injected by bookmark-appearance-menu.js -->
         <div id="language-menu" class="sort-menu hidden" role="menu" aria-label="Language"></div>
-        <!-- Theme switcher dropdown; items injected by bookmarks.js -->
+        <!-- Theme switcher dropdown; items injected by bookmark-appearance-menu.js -->
         <div
             id="theme-menu"
             class="sort-menu hidden"
@@ -414,7 +414,7 @@
             aria-label="Theme"
         ></div>
 
-        <!-- Global tooltip — repositioned near the hovered element by bookmarks.js -->
+        <!-- Global tooltip — repositioned near the hovered element by bookmark-tooltip.js -->
         <div id="app-tooltip" class="app-tooltip hidden" role="tooltip"></div>
 
         <!-- ════════════════════ BOTTOM STATUS BAR ════════════════════ -->
@@ -445,16 +445,23 @@
         <script src="../../lib/theme.js"></script>
         <script src="../../lib/sync-utils.js"></script>
         <script src="../../lib/webdav-config-session.js"></script>
+        <script src="../../lib/webdav-file-picker.js"></script>
         <!-- Feature modules (depend on the libs above) -->
         <script src="notifications.js"></script>
         <script src="custom-scrollbar.js"></script>
         <script src="favicon-cache.js"></script>
         <script src="modals.js"></script>
+        <script src="bookmark-overlay.js"></script>
+        <script src="bookmark-tooltip.js"></script>
+        <script src="bookmark-webdav-status.js"></script>
+        <script src="bookmark-edit-menu.js"></script>
+        <script src="bookmark-appearance-menu.js"></script>
         <script src="bookmark-tree-state.js"></script>
         <script src="bookmark-tree-dnd.js"></script>
         <script src="bookmark-tree-observers.js"></script>
         <script src="bookmark-tree-mutations.js"></script>
         <script src="bookmark-tree-menu.js"></script>
+        <script src="bookmark-tree-node-actions.js"></script>
         <script src="bookmark-tree-render.js"></script>
         <script src="bookmark-tree.js"></script>
         <!-- Orchestrator — initialises and wires all modules together -->

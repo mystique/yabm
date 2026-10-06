@@ -42,6 +42,7 @@
  * @property {(options?: { interactive?: boolean }) => Promise<void>} refreshWebdavStatusBar
  * @property {ModalsSyncService} sync
  * @property {(deps: import("../../lib/webdav-config-session.js").WebdavConfigSessionDeps) => import("../../lib/webdav-config-session.js").WebdavConfigSession} createConfigSession
+ * @property {(deps: import("../../lib/webdav-file-picker.js").WebdavFilePickerDeps) => import("../../lib/webdav-file-picker.js").WebdavFilePicker} createFilePicker
  */
 
 /**
@@ -96,6 +97,11 @@
     const configSession = deps.createConfigSession({
       sync,
       readForm: readConfigForm,
+    });
+    const configFilePicker = deps.createFilePicker({
+      container: requireElement("cfg-files"),
+      radioName: "cfg-file-select",
+      createNewFileLabel: () => t("createNewFile"),
     });
 
     /** CSS transition duration for modal open/close animations (ms). */
@@ -255,121 +261,6 @@
     }
 
     /**
-     * Formats a byte count as a human-readable size string (B / KB / MB / GB / TB).
-     * Returns `"-"` for invalid or negative values.
-     * @param {number|string} sizeValue
-     * @returns {string}
-     */
-    function formatFileSize(sizeValue) {
-      const bytes = Number.parseInt(String(sizeValue), 10);
-      if (!Number.isFinite(bytes) || bytes < 0) {
-        return "-";
-      }
-      if (bytes < 1024) {
-        return `${bytes} B`;
-      }
-      const units = ["KB", "MB", "GB", "TB"];
-      let value = bytes / 1024;
-      let unitIndex = 0;
-      while (value >= 1024 && unitIndex < units.length - 1) {
-        value /= 1024;
-        unitIndex += 1;
-      }
-      const text = value >= 100 ? value.toFixed(0) : value.toFixed(2);
-      return `${text.replace(/\.?0+$/, "")} ${units[unitIndex]}`;
-    }
-
-    /**
-     * Formats a last-modified value into separate date and time strings.
-     * Returns placeholder dashes when the value is missing or unparseable.
-     * @param {string|number|null} lastModifiedValue
-     * @returns {{ dateText: string, timeText: string }}
-     */
-    function formatLastModifiedParts(lastModifiedValue) {
-      const date = new Date(lastModifiedValue);
-      if (!lastModifiedValue || Number.isNaN(date.getTime())) {
-        return {
-          dateText: "---- -- --",
-          timeText: "--:--:--",
-        };
-      }
-      const pad = (n) => String(n).padStart(2, "0");
-      return {
-        dateText: `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`,
-        timeText: `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`,
-      };
-    }
-
-    /**
-     * Builds the inner HTML string for a file-list item's metadata section.
-     * @param {WebdavFileMetadata} file
-     * @returns {string}
-     */
-    function buildFileMetaHtml(file) {
-      const sizeText = formatFileSize(file?.size);
-      const { dateText, timeText } = formatLastModifiedParts(file?.lastModified);
-      return `<span class="file-size">${sizeText}</span><span class="file-datetime"><span>${dateText}</span><span>${timeText}</span></span>`;
-    }
-
-    /**
-     * Populates the config modal's file selection list with existing WebDAV files
-     * plus a "Create new file" option, using the session's initial selection.
-     * @param {WebdavFileMetadata[]} files
-     * @param {string} selectedFile - Session-selected radio value.
-     */
-    function renderConfigFileList(files, selectedFile) {
-      const container = requireElement("cfg-files");
-      container.innerHTML = "";
-
-      const createOption = document.createElement("div");
-      createOption.className = "file-item";
-      createOption.innerHTML = `<label><input type="radio" name="cfg-file-select" value="__new__"><span>${t("createNewFile")}</span></label>`;
-      container.appendChild(createOption);
-
-      for (const file of files) {
-        const item = document.createElement("div");
-        item.className = "file-item";
-
-        const label = document.createElement("label");
-        const radio = document.createElement("input");
-        radio.type = "radio";
-        radio.name = "cfg-file-select";
-        radio.value = file.name;
-
-        const name = document.createElement("span");
-        name.className = "file-name";
-        name.textContent = file.name;
-
-        label.append(radio, name);
-        item.appendChild(label);
-
-        const meta = document.createElement("span");
-        meta.className = "file-meta";
-        meta.innerHTML = buildFileMetaHtml(file);
-        item.appendChild(meta);
-
-        container.appendChild(item);
-      }
-
-      for (const radio of container.querySelectorAll('input[name="cfg-file-select"]')) {
-        if (radio instanceof HTMLInputElement) {
-          radio.checked = radio.value === selectedFile;
-        }
-      }
-    }
-
-    /**
-     * Returns the selected radio value; the session resolves new-file names.
-     * @returns {string}
-     */
-    function getSelectedConfigFile() {
-      const checked = document.querySelector(
-        'input[name="cfg-file-select"]:checked',
-      );
-      return checked instanceof HTMLInputElement ? checked.value : "";
-    }
-
-    /**
      * Resets the config test state and collapses the file selection section.
      * Must be called whenever the user changes credentials so stale test results
      * cannot be used to save a config to a different server.
@@ -429,7 +320,7 @@
         }
 
         requireElement("cfg-file-section").classList.add("is-open");
-        renderConfigFileList(result.files, result.selectedFile);
+        configFilePicker.render(result.files, result.selectedFile);
 
         if (!result.files.length) {
           setConfigStatus(t("connSuccessNoFiles"), "success");
@@ -454,7 +345,7 @@
      */
     async function saveConfigFromModal() {
       try {
-        const validationError = await configSession.save(getSelectedConfigFile());
+        const validationError = await configSession.save(configFilePicker.readSelection());
         if (validationError) {
           setConfigStatus(t(validationError), "error");
           return;
