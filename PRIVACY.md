@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Last updated: 2026-02-23
+Last updated: 2026-10-06
 
 ## Overview
 
@@ -14,15 +14,19 @@ The extension can process:
 - WebDAV configuration (directory URL, file name, username, password)
 - Local extension preferences (language and UI-related settings)
 - Local favicon cache data
+- The ID of the open bookmarks tab (session storage only; discarded when the browser session ends)
 
 ## Where Data Is Stored
 
 - `chrome.storage.local` is used for extension settings, WebDAV config, and local cache.
+- `chrome.storage.session` holds only the bookmarks-tab ID used to focus an existing tab; it is cleared when the browser session ends.
 - Bookmark data remains in Chrome bookmark storage unless you explicitly sync to your WebDAV server.
 
 ## Network Access
 
-The extension performs network requests only when required for WebDAV operations:
+The extension performs network requests in two categories.
+
+WebDAV operations, only when you configure and use them:
 
 - Test WebDAV connection
 - List files in WebDAV directory
@@ -31,6 +35,13 @@ The extension performs network requests only when required for WebDAV operations
 - Read remote bookmark file for status/count checks
 
 WebDAV requests are limited to HTTPS endpoints.
+
+Asset requests made by the extension pages themselves:
+
+- Google Fonts (`fonts.googleapis.com`, `fonts.gstatic.com`) for the UI typeface and icon font
+- jsDelivr (`cdn.jsdelivr.net`) for Twemoji SVG icons
+
+These asset requests carry no bookmark data, no WebDAV credentials, and no identifiers. They are ordinary asset fetches that reveal your IP address and the fact that you are using this extension. Pages fall back to text glyphs when the assets are blocked.
 
 ## Permissions
 

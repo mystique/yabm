@@ -24,6 +24,8 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 - Fonts (Space Grotesk, Material Symbols) load from Google Fonts and Twemoji icons load from jsDelivr instead of being bundled; the pages now need network access to render these assets
 - Extension pages now declare an explicit Content Security Policy limited to these font/icon hosts and HTTPS connections
 - Dropping an item onto a folder no longer auto-expands that folder
+- The WebDAV remote file picker is now one shared implementation used by both the options page and the bookmarks-page config modal, so the file list, size/date formatting, and the new-file option render identically in both
+- All popovers and menus (tree context menu, sort menu, rich-text edit menu, language menu, theme menu, tooltip) now come from one viewport-anchored overlay with a single 8px margin; the language and theme menus previously used 10px and could hang off the bottom edge of the window
 - Bookmarks page code is split into focused modules (tree state, rendering, menus, mutations, observers, drag-and-drop, modals, favicon cache, notifications, scrollbar)
 - Developer tooling: npm scripts for build (esbuild to `dist/`), lint (ESLint), and JSDoc typecheck (TypeScript `checkJs`) covering all extension JavaScript; the runtime still uses classic script tags
 - A missing required page element now shows an error message instead of silently leaving the page unresponsive
@@ -31,6 +33,8 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 ### Fixed
 
 - A completed WebDAV request from old credentials can no longer restore save eligibility after the form changes.
+- Traditional Chinese now shows the Hong Kong flag in the language picker
+- Bookmark rows in dark mode now use the card surface colour instead of a lighter shade that stood out from the panel
 - Bookmark refresh requests that arrive during another refresh are processed after the current pass.
 - Drag cancellation, target lookup failures, and failed moves now clear source styling, drop highlights, and drag previews.
 - Folders can no longer be dropped into their own descendants
@@ -40,6 +44,7 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 ### Removed
 
 - Bundled font files and local Twemoji SVGs (replaced by the CDN assets above)
+- Five hand-rolled overlay implementations (context menus, sort menu, language and theme menus, tooltip) replaced by a single overlay module
 
 ## [0.1.0] - 2026-02-23
 
