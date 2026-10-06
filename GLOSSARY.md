@@ -29,3 +29,13 @@ _Avoid_: connection, auth state, validation
 **WebDAV file picker**:
 The choice, made after a successful config test, between an existing remote file and a new one to create. The new file takes its name from the entered name and gains an `.html` extension.
 _Avoid_: file list, upload target, destination chooser
+
+**Bookmarks file**:
+The single document a sync action uploads or downloads, holding the entire bookmark set. It is what makes the set a unit: one document, all or nothing.
+_Avoid_: backup, export file, HTML file
+
+**Download and replace**:
+The sync action that makes a downloaded bookmarks file the browser's bookmark set. It is not a merge. The current set is snapshotted, the root folders are cleared, and the file's contents are rebuilt into them; if any step fails, the snapshot is restored. Every other sync action adds to or leaves the set alone, so this is the one action that can remove bookmarks.
+_Avoid_: download, import, restore, sync
+
+The distinction is not cosmetic. "Download" suggests retrieval, which is what an upload in reverse would be. Only this action destroys, and the destroy is recoverable but only because of the snapshot.
